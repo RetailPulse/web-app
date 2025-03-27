@@ -3,7 +3,7 @@ name: CI with Maven and npm
 on:
   push:
     branches: 
-      - "master"
+      - "main"
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:
