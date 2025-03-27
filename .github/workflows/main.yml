@@ -7,10 +7,35 @@ on:
     branches: 
       - "main"
   pull_request:
-    types: [opened, synchronize, reopened]
+    branches: 
+      - "main"
+    types: 
+      - opened
+      - synchronize
+      - reopened
+
 jobs:
-  sonarqube-scan:
-    # needs: [frontend-unit-tests] #, 
+  web-app-unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js for Angular 19
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }} 
+
+    - name: Install Dependencies for RP Web App
+      run: npm ci
+
+    - name: Test RP Web App
+      run: npm run test:ci
+
+    - name: Build RP Web App
+      run: npm run build:prod
+
+  web-app-sonarqube-scan:
     name: SonarQube Frontend Scan
     runs-on: ubuntu-latest
 
