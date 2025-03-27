@@ -1,0 +1,33 @@
+name: CI with Maven and npm
+
+on:
+  push:
+    branches: 
+      - "master"
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  sonarqube-scan:
+    # needs: [frontend-unit-tests] #, 
+    name: SonarQube Frontend Scan
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout the repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+    # Analyze Frontend (Angular Project)
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Install Dependencies for RP Web App
+      run: npm ci
+
+    - name: Analyze Frontend with SonarQube
+      uses: SonarSource/sonarqube-scan-action@v5
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
