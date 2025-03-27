@@ -1,0 +1,99 @@
+<div class="table-header-container">
+  <div class="table-header">Product Management</div>
+  <div class="search-bar-container">
+        <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <input pInputText type="text" placeholder="Search..." [(ngModel)]="searchTerm" (input)="filterProducts()" class="search-bar" />
+        </span>
+    <button pButton type="button" icon="pi pi-plus" class="create-button" (click)="createProduct()"></button>
+  </div>
+</div>
+
+<div class="table-responsive">
+  <p-table [value]="filteredProducts" [responsiveLayout]="'scroll'" class="table table-hover">
+    <ng-template pTemplate="header">
+      <tr>
+        <th *ngFor="let col of cols">{{ col.header }}</th>
+        <th>Actions</th>
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-product>
+      <tr>
+        <td *ngFor="let col of cols">
+          <ng-container [ngSwitch]="col.field">
+            <ng-container *ngSwitchCase="'is_active'">
+              <p-tag [value]="product[col.field] ? 'Active' : 'Inactive'"
+                     [severity]="product[col.field] ? 'success' : 'danger'">
+              </p-tag>
+            </ng-container>
+            <ng-container *ngSwitchCase="'rrp'">
+              {{ product[col.field] | currency:'SGD':'symbol' }}
+            </ng-container>
+            <ng-container *ngSwitchDefault>
+              {{ product[col.field] }}
+            </ng-container>
+          </ng-container>
+        </td>
+        <td>
+          <button pButton type="button" icon="pi pi-pencil" class="p-button-primary p-button-sm mr-2" (click)="editProduct(product)"></button>
+          <button pButton type="button" icon="pi pi-trash" class="p-button-danger p-button-sm mr-2" (click)="deleteProduct(product)"></button>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<p-dialog [(visible)]="displayModal" [modal]="true" [header]="modalMode === 'create' ? 'Create Product' : modalMode === 'update' ? 'Update Product' : 'Product'" [style]="{width: '70vw'}">
+  <div class="grid p-fluid">
+    <!-- Brand, Category, Subcategory Line -->
+    <div class="col-4 mb-3 mui-text-field">
+      <input pInputText id="brand" [(ngModel)]="newProduct.brand" placeholder=" " />
+      <label for="brand">Brand</label>
+    </div>
+    <div class="col-4 mb-3 mui-text-field">
+      <input pInputText id="category" [(ngModel)]="newProduct.category" placeholder=" " />
+      <label for="category">Category</label>
+    </div>
+    <div class="col-4 mb-3 mui-text-field">
+      <input pInputText id="subcategory" [(ngModel)]="newProduct.subcategory" placeholder=" " />
+      <label for="subcategory">Subcategory</label>
+    </div>
+
+    <!-- Description Textarea -->
+    <div class="col-12 mb-3 mui-text-field">
+      <textarea pTextarea id="description" [(ngModel)]="newProduct.description" rows="3" placeholder=" "></textarea>
+      <label for="description">Description</label>
+    </div>
+
+    <!-- RRP, UOM, Origin Line -->
+    <div class="col-4 mb-3 mui-text-field">
+      <input pInputText id="rrp" type="number" [(ngModel)]="newProduct.rrp" placeholder=" " />
+      <label for="rrp">RRP</label>
+    </div>
+    <div class="col-4 mb-3 mui-text-field">
+      <input pInputText id="uom" [(ngModel)]="newProduct.uom" placeholder=" " />
+      <label for="uom">UOM</label>
+    </div>
+    <div class="col-4 mb-3 mui-text-field">
+      <input pInputText id="origin" [(ngModel)]="newProduct.origin" placeholder=" " />
+      <label for="origin">Origin</label>
+    </div>
+
+    <!-- Barcode Line -->
+    <div class="col-4 mb-3 mui-text-field">
+      <input pInputText id="barcode" [(ngModel)]="newProduct.barcode" placeholder=" " />
+      <label for="barcode">Barcode</label>
+    </div>
+
+    <!-- Vendor Code and Active Status Line -->
+    <div class="col-4 mb-3 mui-text-field">
+      <input pInputText id="vendor_code" [(ngModel)]="newProduct.vendorCode" placeholder=" " />
+      <label for="vendor_code">Vendor Code</label>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <button pButton type="button" icon="pi pi-check" (click)="saveProduct()" class="p-button-success"></button>
+    <button pButton type="button" icon="pi pi-times" (click)="displayModal = false" class="p-button-secondary ml-2"></button>
+  </ng-template>
+</p-dialog>

@@ -1,0 +1,77 @@
+.table-header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.table-header {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--pastel-dark);
+}
+
+/* Center the profile container */
+.profile-container {
+  max-width: 600px; /* Adjust as needed */
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: left; /* Left-align text within the container */
+}
+
+/* Style the vertical table */
+.profile-table {
+  display: grid;
+  grid-template-columns: 1fr 2fr; /* Two columns: labels (1/3 width) and values (2/3 width) */
+  gap: 1rem;
+  border: 1px solid var(--pastel-border);
+  border-radius: var(--radius-medium);
+  padding: 1rem;
+  background-color: var(--pastel-light);
+}
+
+/* Style rows and labels */
+.profile-row {
+  display: contents; /* Ensure rows span the grid columns */
+}
+
+.profile-label {
+  font-weight: bold;
+  color: var(--pastel-dark);
+  padding: 0.5rem 0;
+}
+
+.profile-value {
+  padding: 0.5rem 0;
+  color: var(--pastel-dark);
+}
+
+.mui-text-field {
+  display: flex;
+  flex-direction: column; /* Stack the label and input vertically */
+  gap: 0.5rem; /* Add spacing between the label and the input */
+}
+
+/* Align the "Change Password" button to the right */
+.button-container {
+  text-align: right; /* Align button to the right */
+  margin-top: 2rem;
+}
+
+/* Customize the button style */
+.button-container button {
+  background-color: var(--pastel-blue); /* Pastel blue background */
+  color: var(--pastel-dark); /* Text color */  
+  border-radius: 8px; /* Slightly rounded corners */
+  padding: 0.75rem 1.5rem; /* Adjust padding for better sizing */
+  font-size: 1rem; /* Font size */
+  font-weight: bold; /* Bold text */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth hover effects */
+}
+
+/* Hover effect for the button */
+.button-container button:hover {
+  background-color: var(--pastel-blue-dark); /* Darker pastel blue on hover */
+  transform: scale(1.05); /* Slightly enlarge the button */
+}

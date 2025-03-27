@@ -1,0 +1,212 @@
+<div class="table-header-container">
+  <div class="table-header">Business Entity Management</div>
+  @if (!isLoading()) {
+    <div class="search-bar-container">
+      <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input pInputText type="text" 
+            class="search-bar" 
+            placeholder="Search by name..." 
+            (input)="filterBusinessEntity($event)" 
+          /> 
+      </span>
+      <button pButton type="button" icon="pi pi-plus" class="create-button" (click)="showNewBusinessEnityDialog()"></button>
+    </div>
+  }
+
+<!-- Loading Indicator -->
+@if (isLoading()) {
+  <div class="loading-indicator">
+    <p>Loading users...</p>
+  </div>
+}
+</div>
+  
+<!-- Error Message -->
+@if (error_msg()) {
+  <div class="error-message">
+    <p>{{ error_msg() }}</p>
+  </div>
+}
+
+<!-- Success Message -->
+@if (success_msg()) {
+  <div class="success-message">
+    <p>{{ success_msg() }}</p>
+  </div>
+}
+
+@if (!isLoading()) {
+  <!-- Confirmation Dialog -->
+  <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+  <div class="table-responsive">
+    <p-table [value]="filteredBusinessEntities()" stripedRows [responsiveLayout]="'scroll'" class="table table-hover"> 
+      <ng-template pTemplate="header">
+        <tr>
+          <th>ID</th>
+          <th>Name</th>
+          <th>Location</th>          
+          <th>Type</th>
+          <th>External</th>        
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-businessEntity>
+        <tr>
+          <td>{{ businessEntity.id }}</td>
+          <td>{{ businessEntity.name }}</td>
+          <td>{{ businessEntity.location }}</td>          
+          <td>{{ businessEntity.type }}</td>    
+          <td>{{ businessEntity.external }}</td>        
+          <td>
+            <div class="button-container">
+              <button pButton type="button" icon="pi pi-pencil" class="p-button-primary p-button-sm mr-2" (click)="showEditBusinessEntityForm(businessEntity)"></button>
+              <button pButton type="button" icon="pi pi-trash" class="p-button-danger p-button-sm mr-2" (click)="confirmDeleteBusinessEntity(businessEntity)"></button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+}
+
+<p-dialog id="newBusinessEntityDialog" [(visible)]="newDialog_visible" 
+  [modal]="true" 
+  [header]="'Register New Business Entity'"
+  [style]="{width: '70vw', height: '100vh'}">
+  @if (newDialog_error_msg()) {
+    <div class="error-message">
+      <p>{{ newDialog_error_msg() }}</p>
+    </div>
+  }
+  <form [formGroup]="newBusinessEntityForm" (ngSubmit)="confirmNewBusinessEntity()">    
+    <div class="grid p-fluid">
+      <div class="col-6 mb-3 mui-text-field">
+        <label for="txtName">Name</label>
+        <input pInputText id="txtName" 
+          formControlName="ctlName" 
+          placeholder=" " 
+        /> 
+        @if (isFieldInvalid(newBusinessEntityForm, 'ctlName')) {
+          <div class="label-error-message">
+            <p>Business Entity Name is required.</p>
+          </div>
+        }         
+      </div>
+      <div class="col-6 mb-3 mui-text-field">
+        <label for="txtLocation">Location</label>
+        <input pInputText id="txtLocation"  
+          formControlName="ctlLocation" 
+          placeholder=" " 
+        />  
+        @if (isFieldInvalid(newBusinessEntityForm, 'ctlLocation')) {
+          <div class="label-error-message">
+            <p>Location is required.</p>
+          </div>
+        }
+      </div>      
+      <div class="col-6 mb-3 mui-select-field">
+          <label for="selectEntityType">Entity Type</label>
+          <p-select
+            id="selectEntityType" 
+            [options]="entityTypes" 
+            formControlName="ctlType"
+            placeholder="Select Entity Type"
+            optionLabel="label"
+            optionValue="value">
+          </p-select>
+      </div>
+      <div class="col-6 mb-3 external-container">
+        <label for="divExternal" class="ml-2">External</label>
+        <div id="divExternal" class="radio-group-container">          
+          <div class="flex items-center">
+              <p-radiobutton value="true" inputId="radTrue" formControlName="ctlExternal"/>
+              <label for="radTrue" class="ml-2">True</label>
+          </div>
+          <div class="flex items-center">
+            <p-radiobutton value="false" inputId="radFalse" formControlName="ctlExternal"/>
+            <label for="radFalse" class="ml-2">False</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <ng-template pTemplate="footer">      
+    <button pButton type="button" label="Cancel" icon="pi pi-times" (click)="newDialog_visible.set(false)" class="p-button-secondary ml-2"></button>
+    <button pButton type="button" label="Save" icon="pi pi-check" (click)="confirmNewBusinessEntity()" class="p-button-success" [disabled]="newBusinessEntityForm.invalid"></button>
+  </ng-template>
+</p-dialog>
+
+
+<p-dialog id="editBusinessEntityDialog" [(visible)]="editDialog_visible" 
+  [modal]="true" 
+  [header]="'Edit Business Entity'"
+  [style]="{width: '70vw', height: '100vh'}">
+  @if (editDialog_error_msg()) {
+    <div class="error-message">
+      <p>{{ editDialog_error_msg() }}</p>
+    </div>
+  }
+  <form [formGroup]="editBusinessEntityForm" (ngSubmit)="confirmEditBusinessEntity()">    
+    <div class="grid p-fluid">
+      <div class="col-4 mb-3 mui-text-field">
+        <label for="txtId">ID</label>
+        <input pInputText id="txtId" 
+          formControlName="ctlId" 
+          placeholder= "" 
+        />          
+      </div>
+      <div class="col-4 mb-3 mui-text-field">
+        <label for="txtName">Name</label>
+        <input pInputText id="txtName"  
+          formControlName="ctlName" 
+          placeholder= "" 
+        />  
+        @if (isFieldInvalid(editBusinessEntityForm, 'ctlName')) {
+          <div class="label-error-message">
+            <p>Name is required.</p>
+          </div>
+        }
+      </div>
+      <div class="col-4 mb-3 mui-text-field">
+        <label for="txtLocation">Location</label>
+        <input pInputText id="txtLocation" 
+          formControlName="ctlLocation" 
+          placeholder=" "
+        />          
+        @if (isFieldInvalid(editBusinessEntityForm, 'ctlLocation')) {
+          <div class="label-error-message">
+            <p>Location is required.</p>
+          </div>
+        }
+      </div>
+      <div class="col-4 mb-3 mui-select-field">
+          <label for="selectEntityType">EntityType</label>
+          <p-select
+            id="selectEntityType" 
+            [options]="entityTypes" 
+            formControlName="ctlType"
+            placeholder="Select Entity Type"
+            optionLabel="label"
+            optionValue="value">
+          </p-select>
+      </div>
+      <div class="col-6 mb-3 external-container">
+        <label for="divExternal" class="ml-2">External</label>
+        <div id="divExternal" class="radio-group-container">          
+          <div class="flex items-center">
+              <p-radiobutton value="true" inputId="radTrue" formControlName="ctlExternal"/>
+              <label for="radTrue" class="ml-2">True</label>
+          </div>
+          <div class="flex items-center">
+            <p-radiobutton value="false" inputId="radFalse" formControlName="ctlExternal"/>
+            <label for="radFalse" class="ml-2">False</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <ng-template pTemplate="footer">      
+    <button pButton type="button" label="Cancel" icon="pi pi-times" (click)="editDialog_visible.set(false)" class="p-button-secondary ml-2"></button>
+    <button pButton type="button" label="Save" icon="pi pi-check" (click)="confirmEditBusinessEntity()" class="p-button-success" [disabled]="editBusinessEntityForm.invalid"></button>
+  </ng-template>
+</p-dialog>

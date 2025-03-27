@@ -1,0 +1,209 @@
+@import '@angular/material/prebuilt-themes/indigo-pink.css';
+@import "assets/theme.css";
+
+
+/* styles.css or styles.scss */
+/* Table Container */
+/* Apply background to the entire body and html */
+body {
+  /*padding-top: 2px;*/
+  background-image: var(--bs-backdrop-bg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  padding: var(--space-large);
+  padding-top: var(--space-top);
+  /*background-color: var(--pastel-light);*/
+  border-radius: var(--radius-medium);
+  min-height: 100vh;
+  overflow: auto;
+}
+.p-table-wrapper {
+  /*background-color: v/ar(--pastel-background);*/
+  border: 1px solid var(--pastel-border) !important ;
+  border-radius: var(--radius-medium) !important;
+  /*box-shadow: 0 2px 4px var(--pastel-shadow);*/
+}
+
+.p-datatable-thead > tr > th {
+  background-color: white!important;
+  color: var(--pastel-dark) !important;
+  font-weight: 600 !important;
+}
+
+.p-datatable-tbody > tr {
+  background-color: white!important;
+  color: var(--pastel-dark) !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.p-datatable-tbody > tr:hover > td {
+  background-color: var(--pastel-purple-background) !important;
+}
+
+
+/*.table.p-datatable-tbody > tr:hover > td {*/
+/*  background-color: var(--pastel-purple-background);*/
+/*}*/
+
+
+/* Dialog Container */
+.p-dialog {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 1050 !important;
+  border-radius: var(--radius-large) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+  background-color: #ffffff !important;
+  max-height: 90vh !important;
+}
+
+/* Dialog Header */
+.p-dialog .p-dialog-header {
+  background-color: var(--pastel-yellow-background) !important;
+  border-radius: var(--radius-large) var(--radius-large) 0 0 !important;
+  padding: 1rem !important;
+  border-bottom: 1px solid var(--pastel-border) !important;
+}
+
+.p-dialog .p-dialog-title {
+  color: var(--pastel-dark) !important;
+  font-weight: bold !important;
+  text-align: center !important;
+  width: 100% !important;
+}
+
+/* Dialog Content */
+.p-dialog .p-dialog-content {
+  background-color: var(--pastel-light) !important;
+  padding: 1.5rem !important;
+  color: var(--pastel-dark) !important;
+  overflow-y: auto !important;
+  max-height: calc(90vh - 10rem) !important; /* Adjust based on header and footer height */
+}
+
+/* Adjust the grid layout for proportional text fields */
+.p-dialog .grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.p-dialog .col-12,
+.p-dialog .col-6,
+.p-dialog .col-4 {
+  flex: 1;
+  min-width: 200px; /* Ensure a minimum width for smaller screens */
+}
+
+.p-dialog .col-12 {
+  flex-basis: 100%;
+}
+
+.p-dialog .col-6 {
+  flex-basis: 48%;
+}
+
+.p-dialog .col-4 {
+  flex-basis: 30%;
+}
+/* Form Controls */
+.p-dialog .form-label {
+  display: block !important;
+  margin-bottom: 0.5rem !important;
+  color: var(--pastel-dark) !important;
+  font-weight: 500 !important;
+}
+
+.p-dialog .p-inputtext,
+.p-dialog .p-inputtextarea {
+  width: 100% !important;
+  padding: 0.75rem !important;
+  border: 1px solid var(--pastel-border) !important;
+  border-radius: var(--radius-large) !important;
+  background-color: var(--pastel-light) !important;
+  color: var(--pastel-dark) !important;
+  transition: border-color 0.2s !important;
+}
+
+.p-dialog .p-inputtext:focus,
+.p-dialog .p-inputtextarea:focus {
+  border-color: var(--pastel-primary) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Dialog Footer */
+.p-dialog .p-dialog-footer {
+  background-color: var(--pastel-light) !important;
+  padding: 1rem !important;
+  border-top: 1px solid var(--pastel-border) !important;
+  border-radius: 0 0 var(--radius-large) var(--radius-large) !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 0.5rem !important;
+}
+
+/* Buttons */
+.p-dialog .p-button-success {
+  background-color: var(--pastel-success) !important;
+  color: var(--pastel-dark) !important;
+  border: none !important;
+  border-radius: var(--radius-large) !important;
+  padding: 0.5rem 1rem !important;
+  cursor: pointer !important;
+}
+
+.p-dialog .p-button-secondary {
+  background-color: var(--pastel-secondary) !important;
+  color: var(--pastel-dark) !important;
+  border: none !important;
+  border-radius: var(--radius-large) !important;
+  padding: 0.5rem 1rem !important;
+  cursor: pointer !important;
+}
+
+/* Input Switch */
+.p-dialog .p-inputswitch {
+  margin-top: 0.5rem !important;
+}
+
+/* Responsive Adjustments */
+@media screen and (max-width: 768px) {
+  .p-dialog {
+    width: 90vw !important;
+  }
+
+  .p-dialog .col-4 {
+    width: 100% !important;
+  }
+}
+.p-inputswitch {
+  width: 50px;
+  height: 25px;
+  background-color: var(--pastel-border);
+  border-radius: 25px;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.p-inputswitch .p-inputswitch-slider {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 21px;
+  height: 21px;
+  background-color: var(--pastel-light);
+  border-radius: 50%;
+  transition: left 0.3s;
+}
+
+.p-inputswitch.p-inputswitch-checked {
+  background-color: var(--pastel-primary);
+}
+
+.p-inputswitch.p-inputswitch-checked .p-inputswitch-slider {
+  left: 27px;
+}

@@ -1,0 +1,40 @@
+form {
+  padding: 1rem;
+  max-width: 40rem;
+  margin: 2rem auto;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #3a7bd5, #2b98f0);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.input-group {
+  display: flex;
+  justify-content: space-evenly;
+  gap: 1.5rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-family: "Roboto Condensed", sans-serif;
+  font-size: 0.5rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+button {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #76a6c0;
+  border-radius: 0.25rem;
+  background-color: #83c8e6;
+  color: #1a1f1d;
+  font-size: 1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #aaf1f6;
+}

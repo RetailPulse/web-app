@@ -1,0 +1,19 @@
+<form (ngSubmit)="onSubmit()">
+  <div class="input-group">
+    <p>
+      <p-floatlabel variant="on">
+        <p-datepicker [(ngModel)]="startDate" inputId="start-date" name="start-date" showIcon iconDisplay="input"/>
+        <label for="start-date">Start Date</label>
+      </p-floatlabel>
+    </p>
+    <p>
+      <p-floatlabel variant="on">
+        <p-datepicker [(ngModel)]="endDate" inputId="end-date" name="end-date" showIcon iconDisplay="input"/>
+        <label for="end-date">End Date</label>
+      </p-floatlabel>
+    </p>
+  </div>
+  <p>
+    <button>Generate</button>
+  </p>
+</form>

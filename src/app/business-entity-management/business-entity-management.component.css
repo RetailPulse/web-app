@@ -1,0 +1,228 @@
+.table-header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.table-header {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--pastel-dark);
+}
+
+.search-bar-container {
+  display: flex;
+  align-items: center;
+}
+
+.p-input-icon-left .pi {
+  margin-right: 0.5rem;
+}
+
+.search-bar {
+  padding: 0.5rem;
+  border: 1px solid var(--pastel-border);
+  border-radius: var(--radius-medium);
+  margin-right: 1rem;
+  background-color: var(--pastel-light);
+  color: var(--pastel-dark);
+}
+
+.create-button {
+  padding: 0.5rem 1rem;
+  background-color: var(--pastel-yellow-background);
+  color: var(--pastel-dark);
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+}
+
+.create-button:hover {
+  background-color: var(--pastel-success);
+}
+
+/* Style for the edit button */
+.edit-button {
+  border-color: var(--pastel-info) !important;
+  color: var(--pastel-dark) !important;
+  border-radius: var(--radius-small);
+  padding: var(--space-small);
+  margin-right: var(--space-small);
+}
+
+.edit-button:hover {
+  background-color: var(--pastel-primary) !important;
+}
+
+
+/* Style for the delete button */
+.delete-button {
+  border-color: var(--pastel-danger) !important;
+  color: var(--pastel-dark) !important;
+  border-radius: var(--radius-small);
+  padding: var(--space-small);
+}
+
+.delete-button:hover {
+  background-color: var(--pastel-danger) !important;
+}
+
+/* Container for buttons */
+.button-container {
+  display: flex;
+  gap: 8px; /* Adds space between the buttons */
+}
+
+/* Ensure buttons have the same width */
+.button-container button {
+  flex: 1; /* Makes buttons expand to fill available space */
+  min-width: 20px; /* Ensures a minimum width for consistency */
+  max-width: 50px; /* Ensures a maximum width for consistency */
+  text-align: center; /* Centers the text inside the button */ 
+}
+
+/* Custom styles for the p-dialog */
+.p-dialog .p-dialog-header {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.p-dialog .p-dialog-content {
+  font-size: 16px;
+}
+
+/* MUI-like text field styles */
+.mui-text-field {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.mui-text-field input,
+.mui-text-field textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--pastel-border);
+  border-radius: var(--radius-medium);
+  background-color: var(--pastel-light);
+  color: var(--pastel-dark);
+  transition: border-color 0.2s;
+}
+
+.mui-text-field input:focus,
+.mui-text-field textarea:focus {
+  border-color: var(--pastel-primary);
+  outline: none;
+}
+
+.mui-text-field label {
+  position: absolute;
+  top: -0.75rem;
+  left: 0.75rem;
+  background-color: var(--pastel-light);
+  padding: 0 0.25rem;
+  color: var(--pastel-dark);
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.mui-text-field input:focus + label,
+.mui-text-field textarea:focus + label {
+  color: var(--pastel-primary);
+}
+
+.mui-select-field {
+  display: flex;
+  flex-direction: column; /* Stack label and dropdown vertically */
+  gap: 8px; /* Add space between the label and the dropdown */
+}
+
+.mui-select-field label {
+  font-size: 14px; /* Adjust font size if needed */
+  margin-bottom: 4px; /* Add spacing below the label */
+}
+
+/* Custom styles for the p-inputSwitch */
+.p-inputswitch {
+  width: 50px;
+  height: 25px;
+  background-color: var(--pastel-border);
+  border-radius: 25px;
+  position: relative;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+/* Style for the external container */
+.external-container {
+  display: flex;
+  flex-direction: column; /* Arrange children vertically */
+  align-items: flex-start; /* Align items to the left */
+  gap: 8px; /* Add spacing between the label and the radio group */
+}
+
+/* Style for the label */
+.status-label {
+  font-weight: bold; /* Make the label bold */
+  margin-left: 2px; /* Optional: Add a small left margin */
+}
+
+/* Style for the radio button group container */
+.radio-group-container {
+  display: flex; /* Arrange children horizontally */
+  align-items: center; /* Align items vertically in the center */
+  gap: 16px; /* Add spacing between the radio buttons */
+  padding: 8px 16px; /* Add padding inside the container */
+  border: 1px solid var(--pastel-border); /* Add a border */
+  border-radius: 16px; /* Make the border rounded */
+  background-color: var(--pastel-light); /* Optional: Add a background color */
+}
+
+/* Ensure labels and radio buttons are aligned properly */
+.radio-group-container .flex.items-center {
+  display: flex;
+  align-items: center;
+}
+
+.radio-group-container:hover {
+  border-color: var(--pastel-primary); /* Change border color on hover */
+}
+
+p-radiobutton:focus {
+  outline: 2px solid var(--pastel-primary); /* Highlight focused radio button */
+}
+
+/* Highlight invalid fields */
+.error {
+  border: 2px solid red !important;
+}
+
+/* Optional: Add a red asterisk to labels for required fields */
+.required::after {
+  content: '*';
+  color: red;
+  margin-left: 5px;
+}
+
+/* Error message styling */
+.label-error-message {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+/* Error message styling */
+.error-message {
+  color: red;
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 5px;
+}
+
+/* Success message styling */
+.success-message {
+  color: rgb(22, 94, 0);
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 5px;
+}

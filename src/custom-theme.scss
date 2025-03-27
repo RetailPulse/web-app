@@ -1,0 +1,122 @@
+@use '@angular/material' as mat;
+
+// Define your custom color palettes
+$pastel-primary: (
+  50: #F0F5FD,
+  100: #D8E5F7,
+  200: #B3CEF0,
+  300: #8EB7E8,
+  400: #69A0E1,
+  500: #D8E5F7,  // This is your main primary color
+  600: #3571C2,
+  700: #285AAB,
+  800: #1B4394,
+  900: #0E2D7D,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: rgba(black, 0.87),
+    400: rgba(black, 0.87),
+    500: rgba(black, 0.87),
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+  )
+);
+
+$pastel-accent: (
+  50: #FFF0F0,
+  100: #FFDCDB,
+  200: #FFB3B1,
+  300: #FF8A87,
+  400: #FF615D,
+  500: #FFDCDB,  // This is your main accent color
+  600: #FF3B36,
+  700: #FF1209,
+  800: #DB0600,
+  900: #B20500,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: rgba(black, 0.87),
+    400: rgba(black, 0.87),
+    500: rgba(black, 0.87),
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+  )
+);
+
+$pastel-warn: (
+  50: #FFF5F5,
+  100: #FFCDD2,
+  200: #EF9A9A,
+  300: #E57373,
+  400: #EF5350,
+  500: #FFCDD2,  // This is your main warn color
+  600: #E53935,
+  700: #D32F2F,
+  800: #C62828,
+  900: #B71C1C,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: rgba(black, 0.87),
+    400: rgba(black, 0.87),
+    500: rgba(black, 0.87),
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+  )
+);
+
+// Create the palettes
+$primary-palette: mat.m2-define-palette($pastel-primary, 500);
+$accent-palette: mat.m2-define-palette($pastel-accent, 500);
+$warn-palette: mat.m2-define-palette($pastel-warn, 500);
+
+// Create the theme
+$custom-theme: mat.m2-define-light-theme((
+  color: (
+    primary: $primary-palette,
+    accent: $accent-palette,
+    warn: $warn-palette,
+  )
+));
+
+// Include the theme styles
+@include mat.all-component-themes($custom-theme);
+
+// You can still define CSS variables for use in other parts of your application
+:root {
+  --pastel-primary: #D8E5F7;
+  --pastel-secondary: #FFDCDB;
+  --pastel-success: #D8EEDF;
+  --pastel-info: #B2EBF2;
+  --pastel-warning: #FFE0B2;
+  --pastel-danger: #FFCDD2;
+  --pastel-light: #F5F5F5;
+  --pastel-dark: #616161;
+  --pastel-background: #d0dde1;
+  --pastel-border: #b0bec5;
+  --pastel-shadow: rgba(0, 0, 0, 0.1);
+  --pastel-muted-text: #90a4ae;
+  --pastel-purple-background: #F2D9EF;
+  --pastel-yellow-background: #FDF1C9;
+}
+
+body {
+  background-color: var(--pastel-background);
+  color: var(--pastel-dark);
+}
+
+// Example of styling a Material component using the theme's palette
+.mat-mdc-raised-button.mat-primary {
+  // The color will be automatically set by the theme
+}

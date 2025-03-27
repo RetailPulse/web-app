@@ -1,0 +1,11 @@
+/* admin-page.component.css */
+.admin-container {
+  display: flex;
+  height: 100vh;
+}
+
+.main-dashboard {
+  flex-grow: 1;
+  padding: 20px;
+  overflow-y: auto;
+}

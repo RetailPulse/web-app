@@ -1,0 +1,28 @@
+/* Layout Flexbox */
+.layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Content Styling */
+.main-content {
+  margin-top: 60px; /* Adjust the value as needed */
+}
+
+/* Sidebar Toggle */
+.sidebar-toggle-btn {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 1000;
+}
+
+/* Sidebar Styling */
+.sidebar-header {
+  padding: 1rem;
+  background-color: var(--pastel-primary);
+}
+
+.sidebar-body {
+  padding: 1rem;
+}

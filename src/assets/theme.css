@@ -1,0 +1,44 @@
+.form-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  margin-right: 1rem;
+  min-width: 100px; /* Adjust as needed */
+}
+
+.form-group .form-control {
+  flex: 1;
+}
+
+:root {
+  --pastel-primary: #D8E5F7; /* Pastel Blue */
+  --pastel-secondary: #FFDCDB; /* Pastel Pink */
+  --pastel-success: #D8EEDF; /* Pastel Green */
+  --pastel-info: #B2EBF2; /* Pastel Cyan */
+  --pastel-warning: #FFE0B2; /* Pastel Orange */
+  --pastel-danger: #FFCDD2; /* Pastel Red */
+  --pastel-light: #F5F5F5; /* Light Gray */
+  --pastel-dark: #616161; /* Dark Gray */
+  --pastel-background: #d0dde1; /* Pastel Light Blue (Background) */
+  --pastel-border: #b0bec5; /* Light Gray Border */
+  --pastel-shadow: rgba(0, 0, 0, 0.1); /* Shadow Color */
+  --pastel-muted-text: #90a4ae; /* Muted Text Color */
+  --pastel-purple-background: #F2D9EF; /* Pastel Purple */
+  --pastel-yellow-background: #FDF1C9; /* Pastel Yellow */
+
+  --space-small: 0.5rem;
+  --space-medium: 1rem;
+  --space-large: 2rem;
+  --space-top: 3rem;
+
+  --radius-small: 4px;
+  --radius-medium: 8px;
+  --radius-large: 12px;
+
+  --bs-backdrop-bg: url('background.jpg');
+}
+
+

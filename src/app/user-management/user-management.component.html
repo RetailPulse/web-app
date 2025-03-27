@@ -1,0 +1,215 @@
+<div class="table-header-container">
+  <div class="table-header">User Management</div>
+  @if (!isLoading()) {
+    <div class="search-bar-container">
+      <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input pInputText type="text" 
+            class="search-bar" 
+            placeholder="Search by name..." 
+            (input)="filterUsers($event)" 
+          />
+      </span>
+      <button pButton type="button" icon="pi pi-plus" class="create-button" (click)="showNewUserDialog()"></button>
+    </div>
+  }
+</div>
+
+<!-- Loading Indicator -->
+@if (isLoading()) {
+  <div class="loading-indicator">
+    <p>Loading users...</p>
+  </div>
+}
+
+<!-- Error Message -->
+@if (error_msg()) {
+  <div class="error-message">
+    <p>{{ error_msg() }}</p>
+  </div>
+}
+
+<!-- Success Message -->
+@if (success_msg()) {
+  <div class="success-message">
+    <p>{{ success_msg() }}</p>
+  </div>
+}
+
+@if (!isLoading()) {
+  <!-- Confirmation Dialog -->
+  <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+  <div class="table-responsive">
+    <p-table [value]="filteredUsers()" stripedRows [responsiveLayout]="'scroll'" class="table table-hover"> 
+      <ng-template pTemplate="header">
+        <tr>
+          <th>ID</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Name</th>
+          <th>Role</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-user>
+        <tr>
+          <td>{{ user.id }}</td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.name }}</td>
+          <td>{{ user.roles[0] }}</td>
+          <td>{{ user.enabled ? 'Enabled' : 'Disabled' }}</td>
+          <td>
+            <div class="button-container">
+              <!-- <button pButton type="button" icon="pi pi-sync" class="p-button-help p-button-sm mr-2" (click)="confirmResetPassword(user)"></button> -->
+              <button pButton type="button" icon="pi pi-trash" class="p-button-danger p-button-sm mr-2" (click)="confirmDeleteUser(user)"></button>
+              <button pButton type="button" icon="pi pi-pencil" class="p-button-primary p-button-sm mr-2" (click)="showEditUserForm(user)"></button>              
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+}
+
+<p-dialog id="newUserDialog" [(visible)]="newDialog_visible" 
+  [modal]="true" 
+  [header]="'Register New User'"
+  [style]="{width: '70vw', height: '100vh'}">
+  @if (newDialog_error_msg()) {
+    <div class="error-message">
+      <p>{{ newDialog_error_msg() }}</p>
+    </div>
+  }
+  <form [formGroup]="newUserForm" (ngSubmit)="confirmRegisterUser()">    
+    <div class="grid p-fluid">
+      <div class="col-4 mb-3 mui-text-field">
+        <label for="txtUsername">Username</label>
+        <input pInputText id="txtUsername" 
+          formControlName="ctlUsername" 
+          placeholder=" " 
+        /> 
+        @if (isFieldInvalid(newUserForm, 'ctlUsername')) {
+          <div class="label-error-message">
+            <p>Username is required.</p>
+          </div>
+        }         
+      </div>
+      <div class="col-4 mb-3 mui-text-field">
+        <label for="txtName">Full Name</label>
+        <input pInputText id="txtName"  
+          formControlName="ctlName" 
+          placeholder=" " 
+        />  
+        @if (isFieldInvalid(newUserForm, 'ctlName')) {
+          <div class="label-error-message">
+            <p>Full Name is required.</p>
+          </div>
+        }
+      </div>
+      <div class="col-4 mb-3 mui-text-field">
+        <label for="txtEmail">Email</label>
+        <input pInputText id="txtEmail" 
+          formControlName="ctlEmail" 
+          placeholder=" "
+        />          
+        @if (isFieldInvalid(newUserForm, 'ctlEmail')) {
+          <div class="label-error-message">
+            <p>Email is required in the correct format.</p>
+          </div>
+        }
+      </div>
+      <div class="col-4 mb-3 mui-select-field">
+          <label for="selectRole">Role</label>
+          <p-select
+            id="selectRole" 
+            [options]="userRoles" 
+            formControlName="ctlRole"
+            placeholder="Select Role"
+            optionLabel="label"
+            optionValue="value">
+          </p-select>
+      </div>
+    </div>
+  </form>
+  <ng-template pTemplate="footer">      
+    <button pButton type="button" label="Cancel" icon="pi pi-times" (click)="newDialog_visible.set(false)" class="p-button-secondary ml-2"></button>
+    <button pButton type="button" label="Save" icon="pi pi-check" (click)="confirmRegisterUser()" class="p-button-success" [disabled]="newUserForm.invalid"></button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog id="editUserDialog" [(visible)]="editDialog_visible" 
+  [modal]="true" 
+  [header]="'Edit User'"
+  [style]="{width: '70vw', height: '100vh'}">
+  @if (editDialog_error_msg()) {
+    <div class="error-message">
+      <p>{{ editDialog_error_msg() }}</p>
+    </div>
+  }
+  <form [formGroup]="editUserForm" (ngSubmit)="confirmEditUser()">    
+    <div class="grid p-fluid">
+      <div class="col-4 mb-3 mui-text-field">
+        <label for="txtUsername">Username</label>
+        <input pInputText id="txtUsername" 
+          formControlName="ctlUsername" 
+          placeholder= "" 
+        />          
+      </div>
+      <div class="col-4 mb-3 mui-text-field">
+        <label for="txtName">Full Name</label>
+        <input pInputText id="txtName"  
+          formControlName="ctlName" 
+          placeholder= "" 
+        />  
+        @if (isFieldInvalid(editUserForm, 'ctlName')) {
+          <div class="label-error-message">
+            <p>Full Name is required.</p>
+          </div>
+        }
+      </div>
+      <div class="col-4 mb-3 mui-text-field">
+        <label for="txtEmail">Email</label>
+        <input pInputText id="txtEmail" 
+          formControlName="ctlEmail" 
+          placeholder=" "
+        />          
+        @if (isFieldInvalid(editUserForm, 'ctlEmail')) {
+          <div class="label-error-message">
+            <p>Email is required in the correct format.</p>
+          </div>
+        }
+      </div>
+      <div class="col-4 mb-3 mui-select-field">
+          <label for="selectRole">Role</label>
+          <p-select
+            id="selectRole" 
+            [options]="userRoles" 
+            formControlName="ctlRole"
+            placeholder="Select Role"
+            optionLabel="label"
+            optionValue="value">
+          </p-select>
+      </div>
+      <div class="col-4 mb-3 status-container">
+        <label for="divStatus" class="ml-2">Status</label>
+        <div id="divStatus" class="radio-group-container">          
+          <div class="flex items-center">
+              <p-radiobutton value="true" inputId="radEnabled" formControlName="ctlStatus"/>
+              <label for="radEnabled" class="ml-2">Enabled</label>
+          </div>
+          <div class="flex items-center">
+            <p-radiobutton value="false" inputId="radDisabled" formControlName="ctlStatus"/>
+            <label for="radDisabled" class="ml-2">Disabled</label>
+          </div>
+        </div>
+      </div>        
+    </div>
+  </form>
+  <ng-template pTemplate="footer">      
+    <button pButton type="button" label="Cancel" icon="pi pi-times" (click)="editDialog_visible.set(false)" class="p-button-secondary ml-2"></button>
+    <button pButton type="button" label="Save" icon="pi pi-check" (click)="confirmEditUser()" class="p-button-success" [disabled]="editUserForm.invalid"></button>
+  </ng-template>
+</p-dialog>
+  

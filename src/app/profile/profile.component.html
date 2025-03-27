@@ -1,0 +1,100 @@
+<div class="table-header-container">
+  <div class="table-header">My Profile</div>
+  <!-- Loading Indicator -->
+  @if (isLoading()) {
+    <div class="loading-indicator">
+      <p>Loading My Profile Page...</p>
+    </div>
+  }
+</div>
+
+<!-- Error Message -->
+@if (error_msg()) {
+  <div class="error-message">
+    <p>{{ error_msg() }}</p>
+  </div>
+}
+
+<!-- Success Message -->
+@if (success_msg()) {
+  <div class="success-message">
+    <p>{{ success_msg() }}</p>
+  </div>
+}
+
+<!-- Profile Content -->
+@if (!isLoading() && myProfile()) {
+  <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+  <p-card header="Profile Details" subheader="View and manage your profile information" styleClass="profile-card">
+    <div class="profile-table">
+      <div class="profile-row">
+        <div class="profile-label">ID</div>
+        <div class="profile-value">{{ myProfile()?.id }}</div>
+      </div>
+      <div class="profile-row">
+        <div class="profile-label">Username</div>
+        <div class="profile-value">{{ myProfile()?.username }}</div>
+      </div>
+      <div class="profile-row">
+        <div class="profile-label">Full Name</div>
+        <div class="profile-value">{{ myProfile()?.name }}</div>
+      </div>
+      <div class="profile-row">
+        <div class="profile-label">Email</div>
+        <div class="profile-value">{{ myProfile()?.email }}</div>
+      </div>
+      <div class="profile-row">
+        <div class="profile-label">Role</div>
+        <div class="profile-value">{{ getFirstRole() }}</div>
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <div class="button-container">        
+        <button pButton 
+          type="button" 
+          label="Change Password" 
+          class="p-button-secondary" 
+          (click)="onChangePassword()">
+
+        </button>
+      </div>
+    </ng-template>
+  </p-card>
+}
+
+<p-dialog id="changePasswordDialog" [(visible)]="changePassword_visible" 
+  [modal]="true" 
+  [header]="'Change Password'"
+  [style]="{width: '70vw', height: '100vh'}">
+  <div  class="info-message">
+    <p>Password should be at least 8 characters with at least one numeric character</p>
+  </div>
+
+  @if (changePassword_error_msg()) {
+    <div class="error-message">
+      <p>{{ changePassword_error_msg() }}</p>
+    </div>
+  }
+  <form [formGroup]="changePasswordForm" (ngSubmit)="confirmChangePassword()">
+    <div class="grid p-fluid">
+      <div class="col-4 mb-3 mui-text-field">
+        <label for="txtOldPassword">Old Password</label>
+        <p-password pInputText id="txtOldPassword" 
+          formControlName="ctlOldPassword"
+          feedback="false"
+        /> 
+      </div>
+      <div class="col-4 mb-3 mui-text-field">
+        <label for="txtNewPassword">New Password</label>
+        <p-password pInputText id="txtNewPassword" 
+          formControlName="ctlNewPassword" 
+          [toggleMask]="true"
+        /> 
+      </div>     
+    </div>
+  </form>
+  <ng-template pTemplate="footer">      
+    <button pButton type="button" label="Cancel" icon="pi pi-times" (click)="changePassword_visible.set(false)" class="p-button-secondary ml-2"></button>
+    <button pButton type="button" label="Save" icon="pi pi-check" (click)="confirmChangePassword()" class="p-button-success" [disabled]="changePasswordForm.invalid"></button>
+  </ng-template>
+</p-dialog>
