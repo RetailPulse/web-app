@@ -1,4 +1,6 @@
-name: CI with Maven and npm
+name: RetailPulse Frontend Web App CI Pipeline
+env:
+  NODE_VERSION: '22'          # Centralized Node.js version. Use the latest LTS version compatible with Angular 19
 
 on:
   push:
