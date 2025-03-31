@@ -2,10 +2,13 @@ import { AfterViewInit, ViewChild, Component } from '@angular/core';
 
 import { ScannerQRCodeConfig, NgxScannerQrcodeService, ScannerQRCodeSelectedFiles, ScannerQRCodeResult, NgxScannerQrcodeComponent, ScannerQRCodeSymbolType } from 'ngx-scanner-qrcode';
 
+import { CommonModule } from '@angular/common';
+
 @Component({
   selector: 'app-barcodescanner',
   imports: [
     NgxScannerQrcodeComponent, 
+    CommonModule
   ],
   templateUrl: './barcodescanner.component.html',
   styleUrl: './barcodescanner.component.css'
@@ -52,13 +55,13 @@ export class BarcodescannerComponent implements AfterViewInit {
 
     ngAfterViewInit(): void {
       this.action.isReady.subscribe((res: any) => {
-        // this.handle(this.action, 'start');
+        this.handle(this.action, 'start');
       });
     }
-
     
     public onEvent(e: ScannerQRCodeResult[], action?: any): void {
       // e && action && action.pause();
+      console.log("Casper Here 3:", action);
       console.log(e);
     }
 
@@ -69,6 +72,8 @@ export class BarcodescannerComponent implements AfterViewInit {
         const device = devices.find(f => (/back|rear|environment/gi.test(f.label))); // Default Back Facing Camera
         action.playDevice(device ? device.deviceId : devices[0].deviceId);
       }
+      
+      console.log('Function:', fn);
 
       if (fn === 'start') {
         action[fn](playDeviceFacingBack).subscribe((r: any) => console.log(fn, r), alert);

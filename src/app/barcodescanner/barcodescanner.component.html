@@ -20,7 +20,13 @@
     </div>
   </div>
 
+  <!-- data  -->
+  <span>{{ action.data.value | json }}</span><!-- value -->
+  <span>{{ action.data | async | json }}</span><!-- async -->
+
   ngx-scanner-qrcode
   <ngx-scanner-qrcode #action="scanner" [config]="config" (event)="onEvent($event, action)"></ngx-scanner-qrcode>
   <br>
+
+
 </div>
