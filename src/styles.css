@@ -15,7 +15,7 @@ body {
   /*background-color: var(--pastel-light);*/
   border-radius: var(--radius-medium);
   min-height: 100vh;
-  overflow: auto;
+  overflow: hidden;
 }
 .p-table-wrapper {
   /*background-color: v/ar(--pastel-background);*/

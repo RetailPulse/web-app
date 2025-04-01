@@ -3,7 +3,7 @@
   flex-direction: column;
   height: calc(100vh - 64px);
   padding: 16px;
-  background-color: var(--pastel-background);
+  background-color: transparent;
 }
 
 .search-section {
@@ -21,6 +21,7 @@
   display: flex;
   gap: 16px;
   height: calc(100% - 80px);
+  overflow: auto;
 }
 
 .products-grid {

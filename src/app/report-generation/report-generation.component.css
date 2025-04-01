@@ -3,8 +3,8 @@ form {
   max-width: 40rem;
   margin: 2rem auto;
   border-radius: 4px;
-  background: linear-gradient(180deg, #3a7bd5, #2b98f0);
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+  /*background: linear-gradient(180deg, #3a7bd5, #2b98f0);*/
+  /*box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);*/
 }
 
 .input-group {

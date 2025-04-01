@@ -8,24 +8,8 @@ import {CommonModule, CurrencyPipe, DatePipe} from '@angular/common';
 import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
-
-interface Product {
-  sku: string;
-  description: string;
-  price: number;
-  barcode?: string;
-}
-
-interface CartItem {
-  product: Product;
-  quantity: number;
-}
-
-interface FrozenTransaction {
-  id: string;
-  items: CartItem[];
-  timestamp: Date;
-}
+import {MatTab} from "@angular/material/tabs";
+import {CartItem, ProductCatalog, Transaction} from './pos-system.model';
 
 @Component({
   selector: 'app-pos-system',
@@ -51,23 +35,27 @@ export class PosComponent implements OnInit {
   searchControl = new FormControl('');
   barcodeControl = new FormControl('');
 
-  products: Product[] = [
-    { sku: 'SKU001', description: 'Wireless Mouse', price: 25.99, barcode: '123456789012' },
-    { sku: 'SKU002', description: 'Mechanical Keyboard', price: 89.99, barcode: '234567890123' },
-    { sku: 'SKU003', description: '27" Monitor', price: 199.99, barcode: '345678901234' },
-    { sku: 'SKU004', description: 'USB-C Cable', price: 12.99, barcode: '456789012345' },
-    { sku: 'SKU005', description: 'Noise Cancelling Headphones', price: 149.99, barcode: '567890123456' },
-    { sku: 'SKU006', description: 'Laptop Stand', price: 34.99, barcode: '678901234567' },
-    { sku: 'SKU007', description: 'Bluetooth Speaker', price: 59.99, barcode: '789012345678' },
-    { sku: 'SKU008', description: 'External SSD 1TB', price: 129.99, barcode: '890123456789' },
+  products: ProductCatalog[] = [
+
+    // { sku: 'SKU001', description: 'Wireless Mouse', price: 25.99, barcode: '123456789012' },
+    // { sku: 'SKU002', description: 'Mechanical Keyboard', price: 89.99, barcode: '234567890123' },
+    // { sku: 'SKU003', description: '27" Monitor', price: 199.99, barcode: '345678901234' },
+    // { sku: 'SKU004', description: 'USB-C Cable', price: 12.99, barcode: '456789012345' },
+    // { sku: 'SKU005', description: 'Noise Cancelling Headphones', price: 149.99, barcode: '567890123456' },
+    // { sku: 'SKU006', description: 'Laptop Stand', price: 34.99, barcode: '678901234567' },
+    // { sku: 'SKU007', description: 'Bluetooth Speaker', price: 59.99, barcode: '789012345678' },
+    // { sku: 'SKU008', description: 'External SSD 1TB', price: 129.99, barcode: '890123456789' },
+    // { sku: 'SKU009', description: 'Wireless Charger', price: 19.99, barcode: '901234567890' },
+    // { sku: 'SKU010', description: 'Gaming Mouse', price: 49.99, barcode: '012345678901' },
+
   ];
 
   filteredProducts = [...this.products];
   cart: CartItem[] = [];
-  frozenTransactions: FrozenTransaction[] = [];
+  frozenTransactions: Transaction[] = [];
 
 
-  constructor(private snackBar: MatSnackBar) {}
+  constructor(private snackBar: MatSnackBar, private produc) {}
 
 
   // const fuse = new Fuse(this.inventoryTransactions, {
@@ -80,7 +68,7 @@ export class PosComponent implements OnInit {
   // this.inventoryTransactions = fuse.search(term).map((result) => result.item);
   ngOnInit(): void {
     // Initialize Fuse.js for fuzzy search with proper typing
-    const fuse = new Fuse<Product>(this.products, {
+    const fuse = new Fuse<ProductCatalog>(this.products, {
       keys: ['sku', 'description', 'barcode'],
       threshold: 0.3
     });
@@ -115,7 +103,7 @@ export class PosComponent implements OnInit {
     }
   }
 
-  addToCart(product: Product): void {
+  addToCart(product: ProductCatalog): void {
     const existingItem = this.cart.find(item => item.product.sku === product.sku);
 
     if (existingItem) {
@@ -156,7 +144,7 @@ export class PosComponent implements OnInit {
       return;
     }
 
-    const transaction: FrozenTransaction = {
+    const transaction: Transaction = {
       id: `TRX-${Date.now()}`,
       items: [...this.cart],
       timestamp: new Date()
@@ -167,7 +155,7 @@ export class PosComponent implements OnInit {
     this.snackBar.open('Transaction frozen', 'Close', { duration: 2000 });
   }
 
-  unfreezeTransaction(transaction: FrozenTransaction): void {
+  unfreezeTransaction(transaction: Transaction): void {
     this.cart = [...transaction.items];
     this.frozenTransactions = this.frozenTransactions.filter(t => t.id !== transaction.id);
     this.snackBar.open('Transaction unfrozen', 'Close', { duration: 2000 });
