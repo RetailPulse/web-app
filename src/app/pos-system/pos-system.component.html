@@ -21,7 +21,7 @@
         <div class="product-info">
           <div class="product-sku">{{ product.sku }}</div>
           <div class="product-description">{{ product.description }}</div>
-          <div class="product-price">{{ product.price | currency }}</div>
+          <div class="product-price">{{ product.rrp | currency }}</div>
         </div>
         <button mat-raised-button color="primary" (click)="addToCart(product)">
           <mat-icon>add</mat-icon> Add
@@ -41,7 +41,7 @@
           <div class="item-info">
             <div class="item-sku">{{ item.product.sku }}</div>
             <div class="item-description">{{ item.product.description }}</div>
-            <div class="item-price">{{ item.product.price | currency }} × {{ item.quantity }}</div>
+            <div class="item-price">{{ item.product.rrp | currency }} × {{ item.quantity }}</div>
           </div>
           <div class="item-actions">
             <button mat-icon-button (click)="updateQuantity(item, -1)">

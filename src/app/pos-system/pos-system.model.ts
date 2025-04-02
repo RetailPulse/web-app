@@ -1,3 +1,5 @@
+import {Product} from '../product-management/product.model';
+
 export interface ProductCatalog {
   sku: string;
   description: string;
@@ -6,7 +8,7 @@ export interface ProductCatalog {
 }
 
 export interface CartItem {
-  product: ProductCatalog;
+  product: Product;
   quantity: number;
 }
 

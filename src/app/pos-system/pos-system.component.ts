@@ -10,6 +10,8 @@ import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
 import {MatTab} from "@angular/material/tabs";
 import {CartItem, ProductCatalog, Transaction} from './pos-system.model';
+import {ProductService} from '../product-management/product.service';
+import {Product} from '../product-management/product.model';
 
 @Component({
   selector: 'app-pos-system',
@@ -34,8 +36,7 @@ import {CartItem, ProductCatalog, Transaction} from './pos-system.model';
 export class PosComponent implements OnInit {
   searchControl = new FormControl('');
   barcodeControl = new FormControl('');
-
-  products: ProductCatalog[] = [
+  products: Product[] = [];
 
     // { sku: 'SKU001', description: 'Wireless Mouse', price: 25.99, barcode: '123456789012' },
     // { sku: 'SKU002', description: 'Mechanical Keyboard', price: 89.99, barcode: '234567890123' },
@@ -48,14 +49,14 @@ export class PosComponent implements OnInit {
     // { sku: 'SKU009', description: 'Wireless Charger', price: 19.99, barcode: '901234567890' },
     // { sku: 'SKU010', description: 'Gaming Mouse', price: 49.99, barcode: '012345678901' },
 
-  ];
+  // ];
 
-  filteredProducts = [...this.products];
+  filteredProducts: Product[] = [];
   cart: CartItem[] = [];
   frozenTransactions: Transaction[] = [];
 
 
-  constructor(private snackBar: MatSnackBar, private produc) {}
+  constructor(private snackBar: MatSnackBar, private productService: ProductService) {}
 
 
   // const fuse = new Fuse(this.inventoryTransactions, {
@@ -67,8 +68,9 @@ export class PosComponent implements OnInit {
   //
   // this.inventoryTransactions = fuse.search(term).map((result) => result.item);
   ngOnInit(): void {
+    this.loadProducts();
     // Initialize Fuse.js for fuzzy search with proper typing
-    const fuse = new Fuse<ProductCatalog>(this.products, {
+    const fuse = new Fuse<Product>(this.products, {
       keys: ['sku', 'description', 'barcode'],
       threshold: 0.3
     });
@@ -93,6 +95,12 @@ export class PosComponent implements OnInit {
       }
     });
   }
+  loadProducts(): void {
+    this.productService.getProducts().subscribe(products => {
+      this.products = products.filter(p => p.active);
+      this.filteredProducts = [...this.products];
+    });
+  }
 
   addProductByBarcode(barcode: string): void {
     const product = this.products.find(p => p.barcode === barcode);
@@ -103,7 +111,7 @@ export class PosComponent implements OnInit {
     }
   }
 
-  addToCart(product: ProductCatalog): void {
+  addToCart(product: Product): void {
     const existingItem = this.cart.find(item => item.product.sku === product.sku);
 
     if (existingItem) {
@@ -129,7 +137,8 @@ export class PosComponent implements OnInit {
   }
 
   getTotal(): number {
-    return this.cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+    //suppose to call from the backend
+    return this.cart.reduce((sum, item) => sum + (item.product.rrp * item.quantity), 0);
   }
 
   checkout(): void {
