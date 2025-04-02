@@ -73,7 +73,6 @@
   display: flex;
   flex-direction: column;
 }
-
 .shopping-cart .cart-header {
   display: flex;
   justify-content: space-between;
@@ -81,6 +80,7 @@
   margin-bottom: 16px;
   padding-bottom: 8px;
   border-bottom: 1px solid var(--pastel-border);
+  position: relative; /* Enables positioning of child elements */
 }
 
 .shopping-cart .cart-header h2 {
@@ -94,6 +94,20 @@
   border-radius: 12px;
   font-size: 12px;
   font-weight: 500;
+  margin-left: 8px; /* Adds spacing between title and count */
+}
+
+.shopping-cart .cart-header .action-button {
+  position: absolute; /* Positions the button relative to the cart-header */
+  right: 2em;
+  background-color: transparent; /* Removes background color */
+  box-shadow: none; /* Removes shadow */
+}
+.shopping-cart .cart-header .action-button :hover{
+  color: var(--pastel-warning);
+}
+.shopping-cart .cart-header .action-button mat-icon {
+  color: var(--pastel-dark); /* Ensures icon is visible */
 }
 
 .shopping-cart .cart-items {
@@ -160,15 +174,26 @@
 
 .shopping-cart .cart-footer .total {
   display: flex;
-  justify-content: space-between;
-  margin-bottom: 16px;
+  flex-direction: column; /* Stack rows vertically */
+  gap: 8px; /* Add spacing between rows */
+}
+
+.shopping-cart .cart-footer .total-row {
+  display: flex; /* Align title and amount in a row */
+  justify-content: space-between; /* Place title on the left and amount on the right */
+}
+
+.shopping-cart .cart-footer .total-row span {
   font-size: 18px;
   font-weight: 500;
 }
 
-.shopping-cart .cart-footer .total .total-amount {
+.shopping-cart .cart-footer .total-row .total-amount {
   color: #3f51b5;
 }
+
+
+
 
 .shopping-cart .cart-footer .cart-actions {
   display: flex;
