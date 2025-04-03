@@ -3,7 +3,6 @@ import { NgxScannerqrcodeAdapterComponent } from '../ngx-scannerqrcode-adapter/n
 
 @Component({
   selector: 'app-barcodescanner',
-  standalone: true,
   imports: [NgxScannerqrcodeAdapterComponent],
   templateUrl: './barcodescanner.component.html',
   styleUrls: ['./barcodescanner.component.css']
@@ -21,6 +20,15 @@ export class BarcodescannerComponent implements AfterViewInit {
 
     // Start the scanner
     this.scanner.StartScanner();
+  }
+
+  ngOnDestroy(): void {
+    console.log('Casper: Destroy Scanner');
+
+    if (this.scanner) {
+      // Stop the scanner
+      this.scanner.StopScanner();
+    }
   }
 
   onCodeResult(resultString: string): void {
