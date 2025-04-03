@@ -12,6 +12,8 @@ import {providePrimeNG} from 'primeng/config';
 import {ConfirmationService} from 'primeng/api';
 import {RetailPulsePreset} from './app.preset';
 
+import { LOAD_WASM } from 'ngx-scanner-qrcode';
+
 export const appConfig: ApplicationConfig = {
   providers: [
     ConfirmationService,
@@ -28,6 +30,7 @@ export const appConfig: ApplicationConfig = {
       }
     }),
     provideHttpClient(withInterceptors([authInterceptor]), withFetch()),
-    importProvidersFrom(OAuthModule.forRoot())
+    importProvidersFrom(OAuthModule.forRoot()),
+    { provide: LOAD_WASM, useValue: '/wasm/ngx-scanner-qrcode.wasm' },
   ]
 };

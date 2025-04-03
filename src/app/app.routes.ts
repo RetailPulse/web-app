@@ -3,6 +3,8 @@ import { authGuard } from './guards/auth.guard';
 import { LoginPageComponent } from './login-page/login-page.component';
 import {ReportGenerationComponent} from './report-generation/report-generation.component';
 
+import { BarcodescannerComponent } from './barcodescanner/barcodescanner.component';
+
 // Lazy-loaded components
 const lazyAdminPage = () => import('./admin-page/admin-page.component').then(mod => mod.AdminPageComponent);
 const lazyOperatorPage = () => import('./operator-page/operator-page.component').then(mod => mod.OperatorPageComponent);
@@ -12,6 +14,9 @@ const lazyBusinessEntityManagement = () => import('./business-entity-management/
 const lazyProfile = () => import('./profile/profile.component').then(mod => mod.ProfileComponent);
 const lazyReportGeneration = () => import('./report-generation/report-generation.component').then(mod => mod.ReportGenerationComponent);
 const lazyInvenotryManagement=()=> import ('./inventory-management/inventory-management.component').then(mod=>mod.InventoryManagementComponent);
+
+//Casper working
+const lazyBarcodeScanner=()=> import ('./barcodescanner/barcodescanner.component').then(mod=>mod.BarcodescannerComponent);
 
 export const routes: Routes = [
   // Login route
@@ -31,7 +36,9 @@ export const routes: Routes = [
       { path: 'business-entity-management', loadComponent: lazyBusinessEntityManagement},
       { path: 'report-generation', loadComponent: lazyReportGeneration},
       { path: 'profile', loadComponent: lazyProfile },
-      { path: '', redirectTo: 'user-management', pathMatch: 'full' }, // Default childroute
+      { path: 'barcodescanner', loadComponent: lazyBarcodeScanner },
+      { path: '', redirectTo: 'barcodescanner', pathMatch: 'full' }, // Default childroute
+      // { path: '', redirectTo: 'user-management', pathMatch: 'full' }, // Default childroute
     ],
   },
 
