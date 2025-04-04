@@ -1,11 +1,5 @@
 import {Product} from '../product-management/product.model';
 
-export interface ProductCatalog {
-  sku: string;
-  description: string;
-  price: number;
-  barcode: string;
-}
 
 export interface CartItem {
   product: Product;
@@ -13,8 +7,14 @@ export interface CartItem {
 }
 
 export interface Transaction { // shopping cart c
-  id: string;
+  id: number;
   items: CartItem[];
   timestamp: Date;
 }
 
+export interface SalesDetails {
+  saleId: number;
+  productId: number;
+  quantity: number;
+  salesPricePerUnit: number;
+}

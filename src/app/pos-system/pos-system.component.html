@@ -24,7 +24,8 @@
           <div class="product-price">{{ product.rrp | currency }}</div>
         </div>
         <button mat-raised-button color="primary" (click)="addToCart(product)">
-          <mat-icon>add</mat-icon> Add
+          <mat-icon>add</mat-icon>
+          Add
         </button>
       </div>
     </div>
@@ -39,7 +40,8 @@
         </button>
         <mat-menu #freezeMenu="matMenu">
           <button mat-menu-item (click)="freezeTransaction()">
-            <mat-icon>pause_circle</mat-icon> Freeze Transaction
+            <mat-icon>pause_circle</mat-icon>
+            Freeze Transaction
           </button>
           <mat-menu #frozenMenu="matMenu">
             <button mat-menu-item *ngFor="let trx of frozenTransactions" (click)="unfreezeTransaction(trx)">
@@ -47,7 +49,8 @@
             </button>
           </mat-menu>
           <button mat-menu-item [matMenuTriggerFor]="frozenMenu" [disabled]="frozenTransactions.length === 0">
-            <mat-icon>play_circle</mat-icon> Unfreeze Transaction
+            <mat-icon>play_circle</mat-icon>
+            Unfreeze Transaction
           </button>
         </mat-menu>
       </div>
@@ -86,7 +89,10 @@
         <div class="total">
           <div class="total-row">
             <span>Tax:</span>
-            <span class="total-amount">{{ getTotal() * 0.09 | currency }}</span>
+            <span class="total-amount">
+              {{ salesTax | currency }}
+              <mat-icon *ngIf="taxLoading" class="spinner">autorenew</mat-icon>
+            </span>
           </div>
           <div class="total-row">
             <span>Gross Total:</span>
@@ -94,14 +100,15 @@
           </div>
           <div class="total-row">
             <span>Total:</span>
-            <span class="total-amount">{{ getTotal() + getTotal() * 0.09 | currency }}</span>
+            <span class="total-amount">{{ getTotalWithTax() | currency }}</span>
           </div>
         </div>
 
 
         <div class="cart-actions">
           <button mat-raised-button color="primary" (click)="checkout()">
-            <mat-icon>check_circle</mat-icon> Checkout
+            <mat-icon>check_circle</mat-icon>
+            Checkout
           </button>
         </div>
       </div>

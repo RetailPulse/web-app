@@ -9,9 +9,11 @@ import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
 import {MatTab} from "@angular/material/tabs";
-import {CartItem, ProductCatalog, Transaction} from './pos-system.model';
+import {CartItem, Transaction} from './pos-system.model';
 import {ProductService} from '../product-management/product.service';
 import {Product} from '../product-management/product.model';
+import {PosSystemService} from './pos-system.service';
+import {catchError, of} from 'rxjs';
 
 @Component({
   selector: 'app-pos-system',
@@ -33,11 +35,13 @@ import {Product} from '../product-management/product.model';
   ],
   styleUrls: ['./pos-system.component.css']
 })
+
 export class PosComponent implements OnInit {
   searchControl = new FormControl('');
   barcodeControl = new FormControl('');
   products: Product[] = [];
-
+  taxLoading: boolean = false;
+  salesTax: number = 0;
     // { sku: 'SKU001', description: 'Wireless Mouse', price: 25.99, barcode: '123456789012' },
     // { sku: 'SKU002', description: 'Mechanical Keyboard', price: 89.99, barcode: '234567890123' },
     // { sku: 'SKU003', description: '27" Monitor', price: 199.99, barcode: '345678901234' },
@@ -56,7 +60,8 @@ export class PosComponent implements OnInit {
   frozenTransactions: Transaction[] = [];
 
 
-  constructor(private snackBar: MatSnackBar, private productService: ProductService) {}
+  constructor(private snackBar: MatSnackBar, private productService: ProductService,
+              private posService: PosSystemService) {}
 
 
   // const fuse = new Fuse(this.inventoryTransactions, {
@@ -95,6 +100,17 @@ export class PosComponent implements OnInit {
       }
     });
   }
+
+
+  private generateRandomLong():number {
+    // Generate a random number between 1,000,000,000 and 9,999,999,999
+    const min = 1000000000;
+    const max = 9999999999;
+    const randomNum = Math.floor(Math.random() * (max - min + 1)) + min;
+    return randomNum;
+  }
+
+
   loadProducts(): void {
     this.productService.getProducts().subscribe(products => {
       this.products = products.filter(p => p.active);
@@ -120,11 +136,13 @@ export class PosComponent implements OnInit {
       this.cart.push({ product, quantity: 1 });
     }
 
+    this.calculateSalesTax();
     this.snackBar.open(`${product.description} added to cart`, 'Close', { duration: 1000 });
   }
 
   removeFromCart(index: number): void {
     this.cart.splice(index, 1);
+    this.calculateSalesTax();
   }
 
   updateQuantity(item: CartItem, change: number): void {
@@ -134,6 +152,7 @@ export class PosComponent implements OnInit {
     } else {
       this.cart = this.cart.filter(cartItem => cartItem !== item);
     }
+    this.calculateSalesTax();
   }
 
   getTotal(): number {
@@ -141,11 +160,50 @@ export class PosComponent implements OnInit {
     return this.cart.reduce((sum, item) => sum + (item.product.rrp * item.quantity), 0);
   }
 
-  checkout(): void {
-    console.log('Checkout completed:', this.cart);
-    this.snackBar.open('Checkout completed successfully', 'Close', { duration: 2000 });
-    this.cart = [];
+  calculateSalesTax(): void {
+    if (this.cart.length === 0) {
+      this.salesTax = 0;
+      return;
+    }
+
+    this.taxLoading = true;
+    const transaction: Transaction = {
+      id: this.generateRandomLong(),
+      items: [...this.cart],
+      timestamp: new Date()
+    };
+
+    this.posService.calculateSalesTax(transaction).pipe(
+      catchError(error => {
+        console.error('Error calculating sales tax:', error);
+        this.snackBar.open('Failed to calculate sales tax', 'Close', { duration: 2000 });
+        this.taxLoading = false;
+        return of(0); // Return 0 as fallback
+      })
+    ).subscribe(tax => {
+      this.salesTax = tax;
+      this.taxLoading = false;
+    });
   }
+  getTotalWithTax(): number {
+    return this.getTotal() + this.salesTax;
+  }
+
+  // Update your checkout method to include tax
+  checkout(): void {
+    const totalWithTax = this.getTotalWithTax();
+    console.log('Checkout completed:', {
+      items: this.cart,
+      subtotal: this.getTotal(),
+      tax: this.salesTax,
+      total: totalWithTax
+    });
+
+    this.snackBar.open(`Checkout completed. Total: $${totalWithTax.toFixed(2)}`, 'Close', { duration: 2000 });
+    this.cart = [];
+    this.salesTax = 0;
+  }
+
 
   freezeTransaction(): void {
     if (this.cart.length === 0) {
@@ -154,10 +212,10 @@ export class PosComponent implements OnInit {
     }
 
     const transaction: Transaction = {
-      id: `TRX-${Date.now()}`,
+      id: this.generateRandomLong(),
       items: [...this.cart],
       timestamp: new Date()
-    };
+    }
 
     this.frozenTransactions.push(transaction);
     this.cart = [];
