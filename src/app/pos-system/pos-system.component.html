@@ -44,11 +44,11 @@
             Freeze Transaction
           </button>
           <mat-menu #frozenMenu="matMenu">
-            <button mat-menu-item *ngFor="let trx of frozenTransactions" (click)="unfreezeTransaction(trx)">
-              {{ trx.id }} ({{ trx.timestamp | date:'shortTime' }})
+            <button mat-menu-item *ngFor="let trx of suspendedTransaction" (click)="unfreezeTransaction(trx)">
+              {{ trx.transactionId }} ({{ trx.transactionDateTime }})
             </button>
           </mat-menu>
-          <button mat-menu-item [matMenuTriggerFor]="frozenMenu" [disabled]="frozenTransactions.length === 0">
+          <button mat-menu-item [matMenuTriggerFor]="frozenMenu" [disabled]="suspendedTransaction?.length === 0">
             <mat-icon>play_circle</mat-icon>
             Unfreeze Transaction
           </button>
