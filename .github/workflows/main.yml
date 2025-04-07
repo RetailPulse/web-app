@@ -37,8 +37,8 @@ jobs:
 
   web-app-sonarqube-scan:
     name: SonarQube Frontend Scan
+    needs: web-app-unit-tests
     runs-on: ubuntu-latest
-
     steps:
     - name: Checkout the repository
       uses: actions/checkout@v4
