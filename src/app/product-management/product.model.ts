@@ -1,5 +1,5 @@
 export class Product {
-  id!: string;            // Unique identifier for the product
+  id!: number;            // Unique identifier for the product
   sku!: string;           // SKU (Stock Keeping Unit)
   brand!: string;         // Product brand
   category!: string;      // Product category

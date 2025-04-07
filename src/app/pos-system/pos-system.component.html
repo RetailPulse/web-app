@@ -1,0 +1,117 @@
+<div class="pos-container">
+  <!-- Search and Barcode Section -->
+  <div class="search-section">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search Products</mat-label>
+      <input matInput [formControl]="searchControl" placeholder="SKU, Description or Barcode">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="barcode-field">
+      <mat-label>Barcode Scanner</mat-label>
+      <input matInput [formControl]="barcodeControl" placeholder="Scan barcode">
+      <mat-icon matSuffix>barcode_reader</mat-icon>
+    </mat-form-field>
+  </div>
+
+  <div class="main-content">
+    <!-- Products Grid (60%) -->
+    <div class="products-grid">
+      <div class="product-card" *ngFor="let product of filteredProducts">
+        <div class="product-info">
+          <div class="product-sku">{{ product.sku }}</div>
+          <div class="product-description">{{ product.description }}</div>
+          <div class="product-price">{{ product.rrp | currency }}</div>
+        </div>
+        <button mat-raised-button color="primary" (click)="addToCart(product)">
+          <mat-icon>add</mat-icon>
+          Add
+        </button>
+      </div>
+    </div>
+
+    <!-- Shopping Cart (40%) -->
+    <div class="shopping-cart">
+      <div class="cart-header">
+        <h2>Shopping Cart</h2>
+        <span class="items-count">{{ cart.length }} items</span>
+        <button mat-raised-button class="action-button" [matMenuTriggerFor]="freezeMenu">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #freezeMenu="matMenu">
+          <button mat-menu-item (click)="freezeTransaction()">
+            <mat-icon>pause_circle</mat-icon>
+            Freeze Transaction
+          </button>
+          <mat-menu #frozenMenu="matMenu">
+            <button mat-menu-item *ngFor="let trx of frozenTransactions" (click)="unfreezeTransaction(trx)">
+              {{ trx.id }} ({{ trx.timestamp | date:'shortTime' }})
+            </button>
+          </mat-menu>
+          <button mat-menu-item [matMenuTriggerFor]="frozenMenu" [disabled]="frozenTransactions.length === 0">
+            <mat-icon>play_circle</mat-icon>
+            Unfreeze Transaction
+          </button>
+        </mat-menu>
+      </div>
+
+
+      <div class="cart-items" *ngIf="cart.length > 0; else emptyCart">
+        <div class="cart-item" *ngFor="let item of cart; let i = index">
+          <div class="item-info">
+            <div class="item-sku">{{ item.product.sku }}</div>
+            <div class="item-description">{{ item.product.description }}</div>
+            <div class="item-price">{{ item.product.rrp | currency }} × {{ item.quantity }}</div>
+          </div>
+          <div class="item-actions">
+            <button mat-icon-button (click)="updateQuantity(item, -1)">
+              <mat-icon>remove</mat-icon>
+            </button>
+            <span class="quantity">{{ item.quantity }}</span>
+            <button mat-icon-button (click)="updateQuantity(item, 1)">
+              <mat-icon>add</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="removeFromCart(i)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <ng-template #emptyCart>
+        <div class="empty-cart">
+          <mat-icon>shopping_cart</mat-icon>
+          <p>Your cart is empty</p>
+        </div>
+      </ng-template>
+
+      <div class="cart-footer" *ngIf="cart.length > 0">
+        <div class="total">
+          <div class="total-row">
+            <span>Tax:</span>
+            <span class="total-amount">
+              {{ salesTax | currency }}
+              <mat-icon *ngIf="taxLoading" class="spinner">autorenew</mat-icon>
+            </span>
+          </div>
+          <div class="total-row">
+            <span>Gross Total:</span>
+            <span class="total-amount">{{ getTotal() | currency }}</span>
+          </div>
+          <div class="total-row">
+            <span>Total:</span>
+            <span class="total-amount">{{ getTotalWithTax() | currency }}</span>
+          </div>
+        </div>
+
+
+        <div class="cart-actions">
+          <button mat-raised-button color="primary" (click)="checkout()">
+            <mat-icon>check_circle</mat-icon>
+            Checkout
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
