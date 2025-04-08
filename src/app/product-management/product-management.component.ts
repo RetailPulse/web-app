@@ -122,7 +122,7 @@ export class ProductManagementComponent implements OnInit {
 
 
   deleteProduct(product: Product): void {
-    this.productService.deleteProduct(product.id).subscribe(() => {
+    this.productService.deleteProduct(product.id.toString()).subscribe(() => {
       this.products = this.products.filter(p => p.id !== product.id);
       this.filteredProducts = this.filteredProducts.filter(p => p.id !== product.id);
     }, (error) => {
