@@ -17,14 +17,6 @@ export interface SalesDetails {
   salesPricePerUnit: string;
 }
 
-export interface TaxResult {
-  subTotalAmount: string;
-  taxType: string;
-  taxRate: string;
-  taxAmount: string;
-  totalAmount: string;
-  salesDetails: SalesDetails[];
-}
 
 export interface TransientTransaction {
   transactionId: string;

@@ -8,13 +8,13 @@ p {
 div {
   text-align: center;
   background: #fdfdfd;
-  
+
   button {
     border-radius: 50%;
     height: 60px;
     width: 60px;
     margin: 4px;
-    &disabled {
+    disabled {
       cursor: no-drop;
     }
   }
