@@ -1,5 +1,56 @@
 <div class="pos-container">
-  <!-- Search and Barcode Section -->
+  <div *ngIf="showBusinessSelection" class="business-selection-panel">
+    <mat-card class="selection-card">
+      <mat-card-header>
+        <mat-card-title>Select Business Location</mat-card-title>
+        <mat-card-subtitle>Choose where to record this transaction</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Business Location</mat-label>
+          <mat-select [(value)]="selectedBusinessEntity" panelClass = "pastel-dropdown-panel">
+            <mat-option *ngFor="let entity of businessEntities" [value]="entity">
+              {{ entity.name }} ({{ entity.location }})
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <div *ngIf="isLoadingBusinessEntities" class="loading-spinner">
+          <mat-spinner diameter="40"></mat-spinner>
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button mat-button (click)="cancelSelection()">Cancel</button>
+        <button mat-raised-button
+                color="primary"
+                (click)="confirmBusinessSelection()"
+                [disabled]="!selectedBusinessEntity || isLoadingBusinessEntities">
+          Confirm
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
+
+  <!-- POS Interface (shown after confirmation) -->
+  <div *ngIf="!showBusinessSelection" class="pos-interface">
+    <div class="business-header-container">
+      <div class="business-header">
+        <div class="business-info">
+          <div class="business-name">{{ selectedBusinessEntity?.name }}</div>
+          <div class="business-location">{{ selectedBusinessEntity?.location }}</div>
+        </div>
+        <div class="header-actions">
+          <button mat-stroked-button (click)="changeBusinessLocation()" class="change-location-btn">
+            <mat-icon>store</mat-icon>
+            Change Location
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+    <!-- Search and Barcode Section -->
   <div class="search-section">
     <mat-form-field appearance="outline" class="search-field">
       <mat-label>Search Products</mat-label>

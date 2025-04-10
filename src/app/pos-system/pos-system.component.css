@@ -192,9 +192,6 @@
   color: #3f51b5;
 }
 
-
-
-
 .shopping-cart .cart-footer .cart-actions {
   display: flex;
   gap: 8px;
@@ -202,4 +199,224 @@
 
 .shopping-cart .cart-footer .cart-actions button {
   flex: 1;
+}
+
+
+.business-info p {
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Business Selection Panel - Pastel Theme */
+.business-selection-panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.1); /* Lighter overlay */
+  z-index: 1000;
+  backdrop-filter: blur(3px); /* Adds frosted glass effect */
+}
+
+.selection-card {
+  width: 90%;
+  max-width: 500px;
+  border: 1px solid var(--pastel-border);
+  border-radius: var(--radius-large);
+  box-shadow: 0 4px 20px var(--pastel-shadow);
+  overflow: hidden;
+}
+
+.selection-card mat-card-header {
+  background-color: var(--pastel-purple-background);
+  padding: var(--space-medium);
+  border-bottom: 1px solid var(--pastel-border);
+}
+
+.selection-card mat-card-title {
+  color: black;
+  font-weight: 500;
+  margin-bottom: var(--space-small);
+}
+
+.selection-card mat-card-subtitle {
+  color: var(--pastel-muted-text);
+  font-size: 0.9rem;
+}
+
+.selection-card mat-card-content {
+  padding: var(--space-medium);
+  background-color: var(--pastel-light);
+}
+
+/* Full Width Dropdown Styles */
+.dropdown-container {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.full-width .mat-form-field-wrapper {
+  padding-bottom: 0;
+}
+
+.full-width .mat-form-field-outline {
+  background-color: var(--pastel-light);
+  border-radius: var(--radius-medium);
+}
+
+.full-width .mat-form-field-flex {
+  align-items: center;
+}
+
+/* Dropdown panel styling */
+.pastel-dropdown-panel {
+  min-width: 100% !important;
+  max-width: 100% !important;
+  width: 100% !important;
+  margin-top: 8px;
+  background-color: var(--pastel-light);
+  border: 1px solid var(--pastel-border);
+  box-shadow: 0 4px 12px var(--pastel-shadow);
+}
+
+.pastel-dropdown-panel .mat-option {
+  padding: 12px 16px;
+  color: var(--pastel-dark);
+}
+
+.pastel-dropdown-panel .mat-option:hover {
+  background-color: var(--pastel-secondary);
+}
+
+.pastel-dropdown-panel .mat-option.mat-active {
+  background-color: var(--pastel-info);
+  color: white;
+}
+
+/* Remove the extra spacing from mat-form-field */
+.mat-form-field-appearance-outline .mat-form-field-infix {
+  padding: 0.5em 0;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-medium);
+}
+
+.loading-spinner mat-spinner {
+  color: var(--pastel-dark);
+}
+
+.selection-card mat-card-actions {
+  padding: var(--space-medium);
+  background-color: var(--pastel-light);
+  border-top: 1px solid var(--pastel-border);
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-small);
+}
+
+.selection-card mat-card-actions button {
+  min-width: 100px;
+}
+
+.selection-card mat-card-actions button[mat-button] {
+  color: var(--pastel-dark);
+  background-color: var(--pastel-light);
+  border: 1px solid var(--pastel-border);
+}
+
+.selection-card mat-card-actions button[mat-raised-button] {
+  background-color: lightpink;
+  color: var(--pastel-dark);
+}
+
+.selection-card mat-card-actions button[mat-raised-button]:hover {
+  background-color: var(--pastel-success);
+}
+
+.selection-card mat-card-actions button[disabled] {
+  background-color: var(--pastel-light);
+  color: var(--pastel-muted-text);
+  opacity: 0.7;
+}
+
+/* Animation for smoother appearance */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.selection-card {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Business Header with Side Button */
+.business-header-container {
+  background-color: var(--pastel-primary);
+  padding: var(--space-medium);
+  border-radius: var(--radius-medium);
+  margin-bottom: var(--space-medium);
+  box-shadow: 0 2px 8px var(--pastel-shadow);
+}
+
+.business-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.business-info {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.business-name {
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--pastel-dark);
+  margin-bottom: var(--space-small);
+}
+
+.business-location {
+  font-size: 1rem;
+  color: var(--pastel-muted-text);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  margin-left: var(--space-medium);
+}
+
+.change-location-btn {
+  border-color: var(--pastel-border);
+  color: var(--pastel-dark);
+  background-color: var(--pastel-light);
+  padding: 8px 16px;
+  border-radius: var(--radius-medium);
+  transition: all 0.2s ease;
+}
+
+.change-location-btn:hover {
+  background-color: var(--pastel-secondary);
+  color: var(--pastel-dark);
+}
+
+.change-location-btn mat-icon {
+  margin-right: var(--space-small);
+  color: var(--pastel-dark);
 }

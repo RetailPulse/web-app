@@ -19,6 +19,20 @@ import {
 import {ProductService} from '../product-management/product.service';
 import {Product} from '../product-management/product.model';
 import {PosSystemService} from './pos-system.service';
+import {BusinessEntityService} from "../business-entity-management/business-entity.service";
+import {BusinessEntity} from "../business-entity-management/business-entity.model";
+import {Observable} from "rxjs";
+import {MatOption, MatSelect} from '@angular/material/select';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {MatProgressSpinner} from '@angular/material/progress-spinner';
+import {
+  MatCard,
+  MatCardActions,
+  MatCardContent,
+  MatCardHeader,
+  MatCardSubtitle,
+  MatCardTitle
+} from '@angular/material/card';
 
 @Component({
   selector: 'app-pos-system',
@@ -29,7 +43,6 @@ import {PosSystemService} from './pos-system.service';
     ReactiveFormsModule,
     CurrencyPipe,
     MatMenu,
-    // DatePipe,
     MatMenuTrigger,
     CommonModule,
     MatLabel,
@@ -37,6 +50,16 @@ import {PosSystemService} from './pos-system.service';
     MatButton,
     MatMenuItem,
     MatInput,
+    MatSelect,
+    MatOption,
+    MatProgressSpinner,
+    MatCardActions,
+    MatCard,
+    MatCardHeader,
+    MatCardContent,
+    MatCardSubtitle,
+    MatCardTitle,
+    MatOption,
   ],
   styleUrls: ['./pos-system.component.css']
 })
@@ -47,49 +70,77 @@ export class PosComponent implements OnInit {
   products: Product[] = [];
   taxLoading: boolean = false;
   salesTax: number = 0;
-  // { sku: 'SKU001', description: 'Wireless Mouse', price: 25.99, barcode: '123456789012' },
-  // { sku: 'SKU002', description: 'Mechanical Keyboard', price: 89.99, barcode: '234567890123' },
-  // { sku: 'SKU003', description: '27" Monitor', price: 199.99, barcode: '345678901234' },
-  // { sku: 'SKU004', description: 'USB-C Cable', price: 12.99, barcode: '456789012345' },
-  // { sku: 'SKU005', description: 'Noise Cancelling Headphones', price: 149.99, barcode: '567890123456' },
-  // { sku: 'SKU006', description: 'Laptop Stand', price: 34.99, barcode: '678901234567' },
-  // { sku: 'SKU007', description: 'Bluetooth Speaker', price: 59.99, barcode: '789012345678' },
-  // { sku: 'SKU008', description: 'External SSD 1TB', price: 129.99, barcode: '890123456789' },
-  // { sku: 'SKU009', description: 'Wireless Charger', price: 19.99, barcode: '901234567890' },
-  // { sku: 'SKU010', description: 'Gaming Mouse', price: 49.99, barcode: '012345678901' },
-
-  // ];
-
   filteredProducts: Product[] = [];
   cart: CartItem[] = [];
   frozenTransactions: Transaction[] = [];
   suspendedTransaction: TransientTransaction[] | null = null;
+  businessEntities: BusinessEntity[] = [];
+  selectedBusinessEntity: BusinessEntity | null = null;
+  isLoadingBusinessEntities: boolean = true;
+  businessConfirmed = false;
+  showBusinessSelection = true;
 
   private destroyRef = inject(DestroyRef);
 
   constructor(private snackBar: MatSnackBar, private productService: ProductService,
-              private posService: PosSystemService) {
+              private posService: PosSystemService, private businessEntityService: BusinessEntityService) {
   }
 
 
-  // const fuse = new Fuse(this.inventoryTransactions, {
-  //   keys: ['sku', 'shop', 'category'],
-  //   includeScore: true,
-  //   threshold: 0.3,
-  //   ignoreLocation: true,
-  // });
-  //
-  // this.inventoryTransactions = fuse.search(term).map((result) => result.item);
   ngOnInit(): void {
+    this.loadBusinessEntities();
+  }
+
+
+  // Update your existing methods
+  confirmBusinessSelection(): void {
+    if (!this.selectedBusinessEntity) return;
+
+    this.businessConfirmed = true;
+    this.showBusinessSelection = false;
+    this.initializePOS();
+  }
+
+  initializePOS(): void {
     this.loadProducts();
-    // Initialize Fuse.js for fuzzy search with proper typing
+    this.setupSearch();
+    this.setupBarcodeScanner();
+  }
+
+  changeBusinessLocation(): void {
+    this.businessConfirmed = false;
+    this.showBusinessSelection = true;
+    this.selectedBusinessEntity = null;
+    this.resetPOS();
+  }
+
+  resetPOS(): void {
+    this.cart = [];
+    this.salesTax = 0;
+    this.searchControl.reset();
+    this.barcodeControl.reset();
+  }
+  cancelSelection(): void {
+    // You might want to navigate away or handle differently
+    this.selectedBusinessEntity = null;
+  }
+
+  changeBusiness(): void {
+    this.businessConfirmed = false;
+    this.selectedBusinessEntity = null;
+    this.cart = [];
+    this.salesTax = 0;
+  }
+
+  setupSearch(): void {
     const fuse = new Fuse<Product>(this.products, {
       keys: ['sku', 'description', 'barcode'],
       threshold: 0.3
     });
 
-    // Search when input changes
-    this.searchControl.valueChanges.subscribe(value => {
+    this.searchControl.valueChanges.pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(value => {
       if (!value) {
         this.filteredProducts = [...this.products];
         return;
@@ -97,23 +148,63 @@ export class PosComponent implements OnInit {
       const results = fuse.search(value);
       this.filteredProducts = results.map(result => result.item);
     });
+  }
 
-
-    // Barcode scanner simulation
-    this.barcodeControl.valueChanges.subscribe(value => {
-      if (value && value.length >= 12) { // Assuming barcode is 12 digits
+  setupBarcodeScanner(): void {
+    this.barcodeControl.valueChanges.pipe(
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(value => {
+      if (value && value.length >= 12) {
         this.addProductByBarcode(value);
         this.barcodeControl.reset();
       }
     });
   }
 
+  loadBusinessEntities(): void {
+    this.businessEntityService.getBusinessEntities().subscribe(entities => {
+      this.businessEntities = entities.filter(entity => entity.active && !entity.external);
+      this.isLoadingBusinessEntities = false;
+    }, error => {
+      console.error('Error loading business entities:', error);
+      this.snackBar.open('Failed to load business entities', 'Close', {duration: 2000});
+      this.isLoadingBusinessEntities = false;
+    });
+  }
   loadProducts(): void {
     this.productService.getProducts().subscribe(products => {
       this.products = products.filter(p => p.active);
       this.filteredProducts = [...this.products];
     });
   }
+
+  // onBusinessSelect():void {
+  //   this.loadProducts();
+  //   const fuse = new Fuse<Product>(this.products, {
+  //     keys: ['sku', 'description', 'barcode'],
+  //     threshold: 0.3
+  //   });
+  //
+  //   // Search when input changes
+  //   this.searchControl.valueChanges.subscribe(value => {
+  //     if (!value) {
+  //       this.filteredProducts = [...this.products];
+  //       return;
+  //     }
+  //     const results = fuse.search(value);
+  //     this.filteredProducts = results.map(result => result.item);
+  //   });
+  //
+  //
+  //   // Barcode scanner simulation
+  //   this.barcodeControl.valueChanges.subscribe(value => {
+  //     if (value && value.length >= 12) { // Assuming barcode is 12 digits
+  //       this.addProductByBarcode(value);
+  //       this.barcodeControl.reset();
+  //     }
+  //   });
+  // }
+
 
   addProductByBarcode(barcode: string): void {
     const product = this.products.find(p => p.barcode === barcode);
@@ -196,6 +287,8 @@ export class PosComponent implements OnInit {
 
   // Update your checkout method to include tax
   checkout(): void {
+    if(!this.selectedBusinessEntity) return;
+
     const totalWithTax = this.getTotalWithTax();
 
     const salesDetails = this.cart.map(item => ({
@@ -205,7 +298,7 @@ export class PosComponent implements OnInit {
     } as SalesDetails));
 
     const salesTransactionRequest: SalesTransactionRequest = {
-      businessEntityId: 1,
+      businessEntityId: this.selectedBusinessEntity.id,
       taxAmount: this.salesTax.toString(),
       totalAmount: totalWithTax.toString(),
       salesDetails
@@ -237,6 +330,7 @@ export class PosComponent implements OnInit {
 
 
   freezeTransaction(): void {
+    if(!this.selectedBusinessEntity) return;
     if (this.cart.length === 0) {
       this.snackBar.open('Cart is empty', 'Close', {duration: 2000});
       return;
@@ -249,7 +343,7 @@ export class PosComponent implements OnInit {
     } as SalesDetails));
 
     const suspendedTransactionRequest: SuspendedTransactionRequest = {
-      businessEntityId: 1,
+      businessEntityId: this.selectedBusinessEntity.id,
       salesDetails
     };
 
