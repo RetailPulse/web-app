@@ -22,7 +22,6 @@
       </mat-card-content>
 
       <mat-card-actions align="end">
-        <button mat-button (click)="cancelSelection()">Cancel</button>
         <button mat-raised-button
                 color="primary"
                 (click)="confirmBusinessSelection()"
@@ -58,16 +57,20 @@
       <mat-icon matSuffix>search</mat-icon>
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="barcode-field">
-      <mat-label>Barcode Scanner</mat-label>
-      <input matInput [formControl]="barcodeControl" placeholder="Scan barcode">
-      <mat-icon matSuffix>barcode_reader</mat-icon>
-    </mat-form-field>
+    <button mat-stroked-button (click)="toggleScannerView()" class="scanner-toggle-btn">
+      <mat-icon>{{showScannerView ? 'list' : 'barcode_reader'}}</mat-icon>
+      {{showScannerView ? 'Show Product List' : 'Show Scanner'}}
+    </button>
+<!--    <mat-form-field appearance="outline" class="barcode-field">-->
+<!--      <mat-label>Barcode Scanner</mat-label>-->
+<!--      <input matInput [formControl]="barcodeControl" placeholder="Scan barcode">-->
+<!--      <mat-icon matSuffix>barcode_reader</mat-icon>-->
+<!--    </mat-form-field>-->
   </div>
 
   <div class="main-content">
     <!-- Products Grid (60%) -->
-    <div class="products-grid">
+    <div class="products-grid" *ngIf="!showScannerView">
       <div class="product-card" *ngFor="let product of filteredProducts">
         <div class="product-info">
           <div class="product-sku">{{ product.sku }}</div>
@@ -80,8 +83,20 @@
         </button>
       </div>
     </div>
+    <div class="scanner-view" *ngIf="showScannerView">
+      <ngx-scannerqrcode-adapter #scanner (scannedEvent)="onCodeResult($event)"></ngx-scannerqrcode-adapter>
+      <div class="scanner-fallback">
+        <p>Or enter barcode manually:</p>
+        <mat-form-field appearance="outline">
+          <input matInput
+                 [(ngModel)]="manualBarcode"
+                 placeholder="Enter barcode"
+                 (keyup.enter)="processBarcode(manualBarcode)">
+        </mat-form-field>
+      </div>
+    </div>
 
-    <!-- Shopping Cart (40%) -->
+    <!-- Shopping Cart (40%)  which is always visible-->
     <div class="shopping-cart">
       <div class="cart-header">
         <h2>Shopping Cart</h2>
