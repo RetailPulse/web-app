@@ -1,99 +1,139 @@
 <div class="table-header-container">
-  <div class="table-header">Product Management</div>
-  <div class="search-bar-container">
-        <span class="p-input-icon-left">
-            <i class="pi pi-search"></i>
-            <input pInputText type="text" placeholder="Search..." [(ngModel)]="searchTerm" (input)="filterProducts()" class="search-bar" />
-        </span>
-    <button pButton type="button" icon="pi pi-plus" class="create-button" (click)="createProduct()"></button>
+  <h1 class="table-header">Product Management</h1>
+  <div class="search-container">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search</mat-label>
+      <input matInput type="text" [(ngModel)]="searchTerm" (input)="filterProducts()">
+      <mat-icon matPrefix>search</mat-icon>
+    </mat-form-field>
+    <button mat-fab class="create-button"  (click)="createProduct()">
+      <mat-icon>add</mat-icon>
+    </button>
   </div>
 </div>
 
-<div class="table-responsive">
-  <p-table [value]="filteredProducts" [responsiveLayout]="'scroll'" class="table table-hover">
-    <ng-template pTemplate="header">
-      <tr>
-        <th *ngFor="let col of cols">{{ col.header }}</th>
-        <th>Actions</th>
-      </tr>
-    </ng-template>
-    <ng-template pTemplate="body" let-product>
-      <tr>
-        <td *ngFor="let col of cols">
-          <ng-container [ngSwitch]="col.field">
-            <ng-container *ngSwitchCase="'is_active'">
-              <p-tag [value]="product[col.field] ? 'Active' : 'Inactive'"
-                     [severity]="product[col.field] ? 'success' : 'danger'">
-              </p-tag>
-            </ng-container>
-            <ng-container *ngSwitchCase="'rrp'">
-              {{ product[col.field] | currency:'SGD':'symbol' }}
-            </ng-container>
-            <ng-container *ngSwitchDefault>
-              {{ product[col.field] }}
-            </ng-container>
+<div class="table-container">
+  <table mat-table [dataSource]="filteredProducts" class="mat-elevation-z8">
+    <ng-container *ngFor="let col of cols" [matColumnDef]="col.field">
+      <th mat-header-cell *matHeaderCellDef>{{ col.header }}</th>
+      <td mat-cell *matCellDef="let product">
+        <ng-container [ngSwitch]="col.field">
+          <ng-container *ngSwitchCase="'is_active'">
+            <mat-chip-listbox>
+              <mat-chip [color]="product[col.field] ? 'primary' : 'warn'">
+                {{ product[col.field] ? 'Active' : 'Inactive' }}
+              </mat-chip>
+            </mat-chip-listbox>
           </ng-container>
-        </td>
-        <td>
-          <button pButton type="button" icon="pi pi-pencil" class="p-button-primary p-button-sm mr-2" (click)="editProduct(product)"></button>
-          <button pButton type="button" icon="pi pi-trash" class="p-button-danger p-button-sm mr-2" (click)="deleteProduct(product)"></button>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
+          <ng-container *ngSwitchCase="'rrp'">
+            {{ product[col.field] | currency:'SGD':'symbol' }}
+          </ng-container>
+          <ng-container *ngSwitchDefault>
+            {{ product[col.field] }}
+          </ng-container>
+        </ng-container>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef>Actions</th>
+      <td mat-cell *matCellDef="let product">
+        <button mat-icon-button color="primary" (click)="editProduct(product)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" (click)="deleteProduct(product)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
 </div>
 
-<p-dialog [(visible)]="displayModal" [modal]="true" [header]="modalMode === 'create' ? 'Create Product' : modalMode === 'update' ? 'Update Product' : 'Product'" [style]="{width: '70vw'}">
-  <div class="grid p-fluid">
-    <!-- Brand, Category, Subcategory Line -->
-    <div class="col-4 mb-3 mui-text-field">
-      <input pInputText id="brand" [(ngModel)]="newProduct.brand" placeholder=" " />
-      <label for="brand">Brand</label>
-    </div>
-    <div class="col-4 mb-3 mui-text-field">
-      <input pInputText id="category" [(ngModel)]="newProduct.category" placeholder=" " />
-      <label for="category">Category</label>
-    </div>
-    <div class="col-4 mb-3 mui-text-field">
-      <input pInputText id="subcategory" [(ngModel)]="newProduct.subcategory" placeholder=" " />
-      <label for="subcategory">Subcategory</label>
+<mat-dialog-content *ngIf="displayModal">
+  <form [formGroup]="productForm" class="product-form">
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Brand</mat-label>
+        <input matInput formControlName="brand" required>
+        <mat-error *ngIf="productForm.get('brand')?.hasError('required')">
+          Brand is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Category</mat-label>
+        <input matInput formControlName="category" required>
+        <mat-error *ngIf="productForm.get('category')?.hasError('required')">
+          Category is required
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Subcategory</mat-label>
+        <input matInput formControlName="subcategory">
+      </mat-form-field>
     </div>
 
-    <!-- Description Textarea -->
-    <div class="col-12 mb-3 mui-text-field">
-      <textarea pTextarea id="description" [(ngModel)]="newProduct.description" rows="3" placeholder=" "></textarea>
-      <label for="description">Description</label>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description" rows="3"></textarea>
+    </mat-form-field>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>RRP</mat-label>
+        <input matInput type="number" formControlName="rrp" required min="0">
+        <mat-error *ngIf="productForm.get('rrp')?.hasError('required')">
+          RRP is required
+        </mat-error>
+        <mat-error *ngIf="productForm.get('rrp')?.hasError('min')">
+          RRP must be positive
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>UOM</mat-label>
+        <input matInput formControlName="uom">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Origin</mat-label>
+        <input matInput formControlName="origin">
+      </mat-form-field>
     </div>
 
-    <!-- RRP, UOM, Origin Line -->
-    <div class="col-4 mb-3 mui-text-field">
-      <input pInputText id="rrp" type="number" [(ngModel)]="newProduct.rrp" placeholder=" " />
-      <label for="rrp">RRP</label>
-    </div>
-    <div class="col-4 mb-3 mui-text-field">
-      <input pInputText id="uom" [(ngModel)]="newProduct.uom" placeholder=" " />
-      <label for="uom">UOM</label>
-    </div>
-    <div class="col-4 mb-3 mui-text-field">
-      <input pInputText id="origin" [(ngModel)]="newProduct.origin" placeholder=" " />
-      <label for="origin">Origin</label>
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Barcode</mat-label>
+        <input matInput formControlName="barcode">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>Vendor Code</mat-label>
+        <input matInput formControlName="vendorCode">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field">
+        <mat-label>SKU</mat-label>
+        <input matInput formControlName="sku" required>
+        <mat-error *ngIf="productForm.get('sku')?.hasError('required')">
+          SKU is required
+        </mat-error>
+      </mat-form-field>
     </div>
 
-    <!-- Barcode Line -->
-    <div class="col-4 mb-3 mui-text-field">
-      <input pInputText id="barcode" [(ngModel)]="newProduct.barcode" placeholder=" " />
-      <label for="barcode">Barcode</label>
-    </div>
+    <mat-slide-toggle formControlName="is_active" color="primary">
+      Active Status
+    </mat-slide-toggle>
+  </form>
+</mat-dialog-content>
 
-    <!-- Vendor Code and Active Status Line -->
-    <div class="col-4 mb-3 mui-text-field">
-      <input pInputText id="vendor_code" [(ngModel)]="newProduct.vendorCode" placeholder=" " />
-      <label for="vendor_code">Vendor Code</label>
-    </div>
-  </div>
-
-  <ng-template pTemplate="footer">
-    <button pButton type="button" icon="pi pi-check" (click)="saveProduct()" class="p-button-success"></button>
-    <button pButton type="button" icon="pi pi-times" (click)="displayModal = false" class="p-button-secondary ml-2"></button>
-  </ng-template>
-</p-dialog>
+<mat-dialog-actions align="end" *ngIf="displayModal">
+  <button mat-button (click)="displayModal = false">Cancel</button>
+  <button mat-raised-button color="primary" (click)="saveProduct()" [disabled]="productForm.invalid">
+    Save
+  </button>
+</mat-dialog-actions>

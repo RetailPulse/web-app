@@ -1,70 +1,113 @@
 import { Component, OnInit } from '@angular/core';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { CurrencyPipe, CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
+import {MatDialog, MatDialogActions, MatDialogContent} from '@angular/material/dialog';
+import {
+  MatCell, MatCellDef,
+  MatColumnDef,
+  MatHeaderCell, MatHeaderCellDef,
+  MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef,
+  MatTable,
+  MatTableDataSource
+} from '@angular/material/table';
 import Fuse from 'fuse.js';
-import {Column, Product} from './product.model';
-import {InputText} from "primeng/inputtext";
-import {ProductService} from "./product.service";
-import {Textarea} from 'primeng/textarea';
-
+import { Product } from './product.model';
+import { ProductService } from './product.service';
+import {MatError, MatFormField, MatLabel} from '@angular/material/form-field';
+import {MatIcon} from '@angular/material/icon';
+import {CurrencyPipe, NgForOf, NgIf, NgSwitch, NgSwitchCase, NgSwitchDefault} from '@angular/common';
+import {MatChip, MatChipListbox} from '@angular/material/chips';
+import {MatSlideToggle} from '@angular/material/slide-toggle';
+import {MatButton, MatFabButton, MatIconButton} from '@angular/material/button';
+import {MatInput} from '@angular/material/input';
 
 @Component({
   selector: 'app-product-management',
-  standalone: true,
-  imports: [
-    TableModule,
-    TagModule,
-    FormsModule,
-    CurrencyPipe,
-    ButtonModule,
-    DialogModule,
-    InputText,
-    CommonModule,
-    Textarea,
-  ],
   templateUrl: './product-management.component.html',
+  imports: [
+    MatFormField,
+    MatIcon,
+    FormsModule,
+    MatTable,
+    NgSwitch,
+    MatColumnDef,
+    MatChip,
+    CurrencyPipe,
+    MatDialogContent,
+    ReactiveFormsModule,
+    MatDialogActions,
+    MatSlideToggle,
+    MatButton,
+    MatInput,
+    MatFabButton,
+    MatHeaderCell,
+    MatCell,
+    MatChipListbox,
+    MatIconButton,
+    MatHeaderRow,
+    MatRow,
+    MatHeaderCellDef,
+    NgForOf,
+    MatCellDef,
+    NgSwitchCase,
+    NgSwitchDefault,
+    MatHeaderRowDef,
+    MatRowDef,
+    NgIf,
+    MatLabel,
+    MatError,
+  ],
   styleUrls: ['./product-management.component.css']
 })
 export class ProductManagementComponent implements OnInit {
-  products!: Product[];
-  filteredProducts!: Product[];
+  products: Product[] = [];
+  filteredProducts: Product[] = [];
   searchTerm: string = '';
   displayModal: boolean = false;
-  newProduct: Product = new Product();
   modalMode: 'create' | 'update' = 'create';
+  productForm: FormGroup;
 
-  cols!: Column[];
-  checked: boolean = true;
+  cols = [
+    {field: 'sku', header: 'SKU'},
+    {field: 'brand', header: 'Brand'},
+    {field: 'category', header: 'Category'},
+    {field: 'subcategory', header: 'Subcategory'},
+    {field: 'description', header: 'Description'},
+    {field: 'rrp', header: 'RRP'},
+    {field: 'barcode', header: 'Barcode'},
+    {field: 'origin', header: 'Origin'},
+    {field: 'uom', header: 'UOM'},
+    {field: 'vendorCode', header: 'Vendor Code'},
+    {field: 'is_active', header: 'Status'}
+  ];
 
-  constructor(private productService: ProductService) {
+  displayedColumns: string[] = [...this.cols.map(col => col.field), 'actions'];
+
+  constructor(
+    private productService: ProductService,
+    private fb: FormBuilder,
+    private dialog: MatDialog
+  ) {
+    this.productForm = this.fb.group({
+      id: [''],
+      sku: ['', Validators.required],
+      brand: ['', Validators.required],
+      category: ['', Validators.required],
+      subcategory: [''],
+      description: [''],
+      rrp: [0, [Validators.required, Validators.min(0)]],
+      barcode: [''],
+      origin: [''],
+      uom: [''],
+      vendorCode: [''],
+      is_active: [true]
+    });
   }
 
   ngOnInit(): void {
-    // Use the ProductService to fetch the products from the backend
     this.productService.getProducts().subscribe((data: Product[]) => {
-      console.log('Fetched Products:', data);
-      // Filter the products to only include those that are active
       this.products = data.filter(product => product.active);
-      console.log('Active Products:', this.products);
       this.filteredProducts = this.products;
     });
-
-    this.cols = [
-      {field: 'sku', header: 'SKU'},
-      {field: 'brand', header: 'Brand'},
-      {field: 'category', header: 'Category'},
-      {field: 'subcategory', header: 'Subcategory'},
-      {field: 'description', header: 'Description'},
-      {field: 'rrp', header: 'RRP'},
-      {field: 'barcode', header: 'Barcode'},
-      {field: 'origin', header: 'Origin'},
-      {field: 'uom', header: 'UOM'},
-      {field: 'vendorCode', header: 'Vendor Code'}
-    ];
   }
 
   filterProducts(): void {
@@ -75,7 +118,7 @@ export class ProductManagementComponent implements OnInit {
     }
 
     const fuse = new Fuse(this.products, {
-      keys: ['brand', 'sku', 'category', 'subcategory', 'description', 'barcode', 'origin', 'uom', 'vendor_code'],
+      keys: ['brand', 'sku', 'category', 'subcategory', 'description', 'barcode', 'origin', 'uom', 'vendorCode'],
       includeScore: true,
       threshold: 0.3,
       ignoreLocation: true,
@@ -86,49 +129,58 @@ export class ProductManagementComponent implements OnInit {
   }
 
   createProduct(): void {
-    this.newProduct = new Product();
+    this.productForm.reset({ is_active: true });
     this.modalMode = 'create';
     this.displayModal = true;
-
   }
 
- editProduct(product: Product): void {
-   this.newProduct = { ...product };
-   this.modalMode = 'update';
-   this.displayModal = true;
- }
+  editProduct(product: Product): void {
+    this.productForm.patchValue({
+      ...product,
+      is_active: product.active || false
+    });
+    this.modalMode = 'update';
+    this.displayModal = true;
+  }
 
- saveProduct(): void {
-   if (this.modalMode === 'create') {
-     this.productService.createProduct(this.newProduct).subscribe((createdProduct: Product) => {
-       console.log(createdProduct);
-       this.products.push(createdProduct);
-       this.filteredProducts = [...this.products];
-       this.newProduct = new Product();
-       this.displayModal = false;
-     }, (error) => {
-       console.error('Error creating product:', error);
-     });
-   } else if (this.modalMode === 'update') {
-     this.productService.updateProduct(this.newProduct).subscribe((updatedProduct: Product) => {
-       const index = this.products.findIndex(p => p.id === updatedProduct.id);
-       this.products[index] = updatedProduct;
-       this.filteredProducts = [...this.products];
-       this.displayModal = false;
-     }, (error) => {
-       console.error('Error updating product:', error);
-     });
-   }
- }
+  saveProduct(): void {
+    if (this.productForm.invalid) {
+      return;
+    }
 
+    const productData = this.productForm.value;
+
+    if (this.modalMode === 'create') {
+      this.productService.createProduct(productData).subscribe({
+        next: (createdProduct) => {
+          this.products.push(createdProduct);
+          this.filteredProducts = [...this.products];
+          this.displayModal = false;
+        },
+        error: (error) => console.error('Error creating product:', error)
+      });
+    } else {
+      this.productService.updateProduct(productData).subscribe({
+        next: (updatedProduct) => {
+          const index = this.products.findIndex(p => p.id === updatedProduct.id);
+          this.products[index] = updatedProduct;
+          this.filteredProducts = [...this.products];
+          this.displayModal = false;
+        },
+        error: (error) => console.error('Error updating product:', error)
+      });
+    }
+  }
 
   deleteProduct(product: Product): void {
-    this.productService.deleteProduct(product.id.toString()).subscribe(() => {
-      this.products = this.products.filter(p => p.id !== product.id);
-      this.filteredProducts = this.filteredProducts.filter(p => p.id !== product.id);
-    }, (error) => {
-      console.error('Error deleting product:', error);
-    });
+    if (confirm('Are you sure you want to delete this product?')) {
+      this.productService.deleteProduct(product.id.toString()).subscribe({
+        next: () => {
+          this.products = this.products.filter(p => p.id !== product.id);
+          this.filteredProducts = this.filteredProducts.filter(p => p.id !== product.id);
+        },
+        error: (error) => console.error('Error deleting product:', error)
+      });
+    }
   }
 }
-
