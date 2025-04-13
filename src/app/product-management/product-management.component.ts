@@ -101,6 +101,7 @@ export class ProductManagementComponent implements OnInit {
  saveProduct(): void {
    if (this.modalMode === 'create') {
      this.productService.createProduct(this.newProduct).subscribe((createdProduct: Product) => {
+       console.log(createdProduct);
        this.products.push(createdProduct);
        this.filteredProducts = [...this.products];
        this.newProduct = new Product();

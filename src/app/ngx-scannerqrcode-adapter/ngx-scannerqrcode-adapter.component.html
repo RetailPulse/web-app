@@ -1,6 +1,4 @@
 <div class="container">
-  <h1> ngx-scanner-qrcode </h1>
-
   <!-- devices -->
   <div class="row">
     <div class="col-xs-12 col-md-6 col-lg-4 col-xl-3 my-1">
@@ -21,11 +19,11 @@
   </div>
 
   <!-- data  -->
-  <span>{{ action.data.value | json }}</span><!-- value -->
-  <span>{{ action.data | async | json }}</span><!-- async -->
+<!--  <span>{{ action.data.value | json }}</span>&lt;!&ndash; value &ndash;&gt;-->
+<!--  <span>{{ action.data | async | json }}</span>&lt;!&ndash; async &ndash;&gt;-->
 
-  ngx-scanner-qrcode
-  <ngx-scanner-qrcode #action="scanner" [config]="config" (event)="onEvent($event, action)"></ngx-scanner-qrcode>
+<!--  ngx-scanner-qrcode-->
+  <ngx-scanner-qrcode #action="scanner" [config]="config" (event)="onEvent($event, action)"> </ngx-scanner-qrcode>
   <br>
 
 
