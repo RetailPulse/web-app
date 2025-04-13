@@ -13,8 +13,10 @@ RUN npm ci --quiet
 # Copy the rest of the application source code
 COPY . .
 
+ARG BUILD_CONFIG=production
+
 # Build the Angular application for production
-RUN npm run build -- --configuration production --output-path dist
+RUN npm run build -- --configuration $BUILD_CONFIG --output-path dist
 
 # Stage 2: Serve the application using NGINX
 FROM nginx:alpine
