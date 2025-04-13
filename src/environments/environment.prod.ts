@@ -1,10 +1,25 @@
 import { AuthConfig } from 'angular-oauth2-oidc';
 
 export const authConfig: AuthConfig = {
-  issuer: 'http://localhost:8080', // Update with your authorization server URL
+  issuer: 'http://retailpulse.me:8081', // Update with your authorization server URL
   redirectUri: window.location.origin,
   clientId: 'client',
   responseType: 'code',
-  scope: 'openid', // Update based on your requirements
+  scope: 'openid',
+  useSilentRefresh: true,
+  useHttpBasicAuth: false,
+  disablePKCE: false,
   showDebugInformation: true
+};
+
+export const apiConfig = {
+  backend_api_url: 'http://retailpulse.me:8085/',
+  user_api_url: 'http://retailpulse.me:8083/'
+};
+
+export const environment = {
+  production: true,
+  authEnabled: true,
+  devModeUser: 'superadmin',
+  devModeRole: 'ADMIN' //'OPERATOR' //
 };
