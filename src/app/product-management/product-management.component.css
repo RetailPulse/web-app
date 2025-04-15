@@ -78,7 +78,7 @@
 }
 
 .modal-content {
-  background-color: white;
+  background-color: var(--pastel-light);
   border-radius: 8px;
   max-width: 160vh;
   max-height: 80vh;

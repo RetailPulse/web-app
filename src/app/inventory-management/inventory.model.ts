@@ -1,7 +1,7 @@
 import {BusinessEntity} from '../business-entity-management/business-entity.model';
 
 export class InventoryTransaction {
-  productSku!: string;
+  productId!: number;
   quantity!: number;
   costPerUnit!: number;
   source!:  string;

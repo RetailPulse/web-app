@@ -1,51 +1,112 @@
 import { Component, OnInit } from '@angular/core';
-import { TableModule } from 'primeng/table';
-import { TagModule } from 'primeng/tag';
-import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
-import { MatTab, MatTabGroup } from '@angular/material/tabs';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
+import {
+  MatCell, MatCellDef,
+  MatColumnDef,
+  MatHeaderCell, MatHeaderCellDef,
+  MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef,
+  MatTable,
+  MatTableDataSource
+} from '@angular/material/table';
 import Fuse from 'fuse.js';
-import {Column, Inventory, InventoryTransaction} from './inventory.model';
-import { InventoryService } from './inventory.service';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectChange, MatSelectModule } from '@angular/material/select';
-import { InventoryModalComponent } from '../inventory-modal/inventory-modal.component';
 import { forkJoin, map, switchMap } from 'rxjs';
+import { InventoryService } from './inventory.service';
 import { BusinessEntityService } from '../business-entity-management/business-entity.service';
+import { ProductService } from '../product-management/product.service';
+import { InventoryModalComponent } from '../inventory-modal/inventory-modal.component';
 import { BusinessEntity } from '../business-entity-management/business-entity.model';
-import {ProductService} from '../product-management/product.service';
+import {MatFormField, MatLabel} from '@angular/material/form-field';
+import {MatIcon} from '@angular/material/icon';
+import {MatInput} from '@angular/material/input';
+import {MatButton} from '@angular/material/button';
+import {FormsModule} from '@angular/forms';
+import {MatTab, MatTabGroup} from '@angular/material/tabs';
+import {MatCard, MatCardContent} from '@angular/material/card';
+import {MatOption, MatSelect} from '@angular/material/select';
+import {NgForOf, NgIf} from '@angular/common';
+
+interface Column {
+  field: string;
+  header: string;
+}
+
+interface InventoryTransaction {
+  productSku: string;
+  quantity: number;
+  costPerUnit: number;
+  source: string;
+  destination: string;
+}
+
+interface SummaryData {
+  productSKU: string;
+  businessEntityName: string;
+  quantity: number;
+  totalCostPrice: number;
+}
 
 @Component({
   selector: 'app-inventory-management',
-  standalone: true,
-  imports: [
-    TableModule,
-    TagModule,
-    CommonModule,
-    MatTab,
-    MatTabGroup,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatSelectModule,
-    FormsModule,
-  ],
   templateUrl: './inventory-management.component.html',
-  styleUrls: ['./inventory-management.component.css'],
+  imports: [
+    MatFormField,
+    MatIcon,
+    MatInput,
+    MatButton,
+    FormsModule,
+    MatTabGroup,
+    MatTab,
+    MatCard,
+    MatCardContent,
+    MatTable,
+    MatColumnDef,
+    MatHeaderCell,
+    MatCell,
+    MatHeaderRow,
+    MatRow,
+    MatSelect,
+    MatOption,
+    MatHeaderRowDef,
+    MatRowDef,
+    NgForOf,
+    MatCellDef,
+    MatHeaderCellDef,
+    NgIf,
+    MatLabel
+  ],
+  styleUrls: ['./inventory-management.component.css']
 })
 export class InventoryManagementComponent implements OnInit {
   searchTerm: string = '';
-  isMenuOpen: boolean = false;
   isModalOpen: boolean = false;
-  inventoryTransactionCols: Column[] = [];
-  summaryCols: Column[] = [];
-  businessOptions: BusinessEntity[] = []; // Holds the list of business entities for the dropdown
-  selectedFilter: number | null = null; // Holds the selected business entity ID
-  inventoryTransactions: InventoryTransaction[] = [];
-  inventories:Inventory[]=[];
-  errorMessage: string = ''; // Holds the error message to be displayed in the table
+
+  // Table configurations
+  inventoryTransactionCols: Column[] = [
+    { field: 'productSku', header: 'Product SKU' },
+    { field: 'quantity', header: 'Quantity' },
+    { field: 'costPerUnit', header: 'Cost Per Unit' },
+    { field: 'source', header: 'Source' },
+    { field: 'destination', header: 'Destination' }
+  ];
+
+  summaryCols: Column[] = [
+    { field: 'productSKU', header: 'SKU' },
+    { field: 'quantity', header: 'Quantity' },
+    { field: 'businessEntityName', header: 'Business Entity' },
+    { field: 'totalCostPrice', header: 'Total Cost Price' }
+  ];
+
+  displayedTransactionColumns: string[] = this.inventoryTransactionCols.map(col => col.field);
+  displayedSummaryColumns: string[] = this.summaryCols.map(col => col.field);
+
+  // Data sources
+  inventoryTransactions = new MatTableDataSource<InventoryTransaction>([]);
+  tableData = new MatTableDataSource<SummaryData>([]);
+
+  businessOptions: BusinessEntity[] = [];
+  selectedFilter: number | null = null;
+  errorMessage: string = '';
   shopMap: { [id: number]: string } = {};
-  tableData: { productSKU: string; businessEntityName: string; quantity: number; totalCostPrice: number }[]=[];
 
   constructor(
     private businessEntityService: BusinessEntityService,
@@ -56,17 +117,15 @@ export class InventoryManagementComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadInventoryTransaction();
-    this.initializeColumns();
     this.fetchBusinessEntities();
   }
 
-  // Fetch business entities for the dropdown
   fetchBusinessEntities(): void {
     this.businessEntityService.getBusinessEntities().subscribe({
       next: (businessEntities) => {
-        this.businessOptions = businessEntities; // Populate the dropdown options
+        this.businessOptions = businessEntities;
         businessEntities.forEach((entity) => {
-          this.shopMap[entity.id] = entity.name; // Populate the shop map
+          this.shopMap[entity.id] = entity.name;
         });
       },
       error: (error) => {
@@ -75,52 +134,30 @@ export class InventoryManagementComponent implements OnInit {
     });
   }
 
- onFilterChange(filterValue: number): void {
+  onFilterChange(filterValue: number): void {
     this.inventoryService.getInventoryByBusinessEntity(filterValue).subscribe({
       next: (inventoryData) => {
         if (!inventoryData || inventoryData.length === 0) {
-          this.tableData = [];
+          this.tableData.data = [];
           return;
         }
 
-        // Array to store the combined data
-        const tableData: {
-            productSKU: string; // Assuming the product object has a `name` field
-            businessEntityName: string; // Assuming the business entity object has a `name` field
-            quantity: number; totalCostPrice: number;
-        }[] = [];
+        const requests = inventoryData.map(item =>
+          forkJoin([
+            this.productService.getProductById(item.productId),
+            this.businessEntityService.getBusinessEntityById(item.businessEntityId)
+          ]).pipe(
+            map(([product, businessEntity]) => ({
+              productSKU: product.sku,
+              businessEntityName: businessEntity.name,
+              quantity: item.quantity,
+              totalCostPrice: item.totalCostPrice
+            }))
+          )
+        );
 
-        // Loop through each inventory item
-        inventoryData.forEach((item) => {
-          // Fetch product details to get the product name
-          this.productService.getProductById(item.productId).subscribe({
-            next: (product) => {
-              // Fetch business entity details to get the business entity name
-              this.businessEntityService.getBusinessEntityById(item.businessEntityId).subscribe({
-                next: (businessEntity) => {
-                  // Combine the data
-                  tableData.push({
-                    productSKU: product.sku, // Assuming the product object has a `name` field
-                    businessEntityName: businessEntity.name, // Assuming the business entity object has a `name` field
-                    quantity: item.quantity,
-                    totalCostPrice: item.totalCostPrice,
-                  });
-
-                  // If all items are processed, assign the combined data to `this.tableData`
-                  if (tableData.length === inventoryData.length) {
-                    this.tableData = tableData;
-                    console.log(this.tableData); // Log the combined data
-                  }
-                },
-                error: (error) => {
-                  console.error('Error fetching business entity details:', error);
-                }
-              });
-            },
-            error: (error) => {
-              console.error('Error fetching product details:', error);
-            }
-          });
+        forkJoin(requests).subscribe(results => {
+          this.tableData.data = results;
         });
       },
       error: (error) => {
@@ -130,7 +167,6 @@ export class InventoryManagementComponent implements OnInit {
     });
   }
 
-  // Load inventory transactions
   private loadInventoryTransaction(): void {
     this.inventoryService.getInventoryTransaction().pipe(
       switchMap((data: any[]) => {
@@ -139,81 +175,53 @@ export class InventoryManagementComponent implements OnInit {
           return [];
         }
 
-        // Collect all entity ID requests
         const entityRequests = data.flatMap((item) => [
           this.businessEntityService.getBusinessEntityById(item.inventoryTransaction.source),
           this.businessEntityService.getBusinessEntityById(item.inventoryTransaction.destination),
         ]);
 
-        // Perform all requests concurrently
         return forkJoin(entityRequests).pipe(
           map((entities) => {
             return data.map((item, index) => ({
               productSku: item.product.sku,
               quantity: item.inventoryTransaction.quantity,
               costPerUnit: item.inventoryTransaction.costPricePerUnit,
-              source: entities[index].name, // Source entity
-              destination: entities[index + 1].name, // Destination entity
+              source: entities[index * 2].name,
+              destination: entities[index * 2 + 1].name,
             }));
           })
         );
       })
     ).subscribe({
       next: (result) => {
-        this.inventoryTransactions = result;
-        this.errorMessage = ''; // Clear error message on success
+        this.inventoryTransactions.data = result;
+        this.errorMessage = '';
       },
       error: (error) => {
         console.error('Error fetching inventory transactions:', error);
-        this.inventoryTransactions = [];
+        this.inventoryTransactions.data = [];
         this.errorMessage = 'An error occurred while fetching inventory transactions.';
       },
     });
   }
 
-  // Initialize table columns
-  private initializeColumns(): void {
-    this.inventoryTransactionCols = [
-      { field: 'productSku', header: 'Product SKU' },
-      { field: 'quantity', header: 'Quantity' },
-      { field: 'costPerUnit', header: 'Cost Per Unit' },
-      { field: 'source', header: 'Source' },
-      { field: 'destination', header: 'Destination' },
-    ];
-
-    this.summaryCols = [
-      { field: 'productSKU', header: 'SKU' },
-      { field: 'quantity', header: 'Quantity' },
-      { field: 'businessEntityName', header: 'Business Entity' },
-      { field : 'totalCostPrice', header: 'Total Cost Price'}
-    ];
-  }
-
-  // Filter products based on search term
   filterProducts(): void {
     const term = this.searchTerm.trim().toLowerCase();
     if (!term) {
-      this.inventoryTransactions = [...this.inventoryTransactions];
+      this.inventoryTransactions.filter = '';
       return;
     }
 
-    const fuse = new Fuse(this.inventoryTransactions, {
-      keys: ['sku', 'shop', 'category'],
+    const fuse = new Fuse(this.inventoryTransactions.data, {
+      keys: ['productSku', 'source', 'destination'],
       includeScore: true,
       threshold: 0.3,
       ignoreLocation: true,
     });
 
-    this.inventoryTransactions = fuse.search(term).map((result) => result.item);
+    this.inventoryTransactions.filter = term;
   }
 
-  // Toggle menu
-  toggleMenu(event: MouseEvent): void {
-    this.isMenuOpen = !this.isMenuOpen;
-    event.stopPropagation();
-  }
-
-  // Open modal
   openModal(): void {
     const dialogRef = this.dialog.open(InventoryModalComponent, {
       width: '60%',
@@ -225,7 +233,6 @@ export class InventoryManagementComponent implements OnInit {
         console.log('Selected Options:', result.selectedOption1, result.selectedOption2);
       }
       this.isModalOpen = false;
-      this.isMenuOpen = false;
     });
   }
 }

@@ -1,43 +1,62 @@
-<mat-dialog-content>
-  <h2>Allocate Inventory</h2>
+<mat-dialog-content class="dialog-content">
+  <div class = "modal-content">
+  <div class="modal-header">
+    <h2 class="dialog-title">Allocate Inventory</h2>
+    <button mat-icon-button class="close-button" mat-dialog-close>
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
 
-  <!-- Import Products Layout -->
-  <ng-container>
-    <div class="modal-content">
-      <div class="import-controls">
-        <mat-form-field appearance="outline" class="search-bar">
-          <input
-            matInput
-            placeholder="Search products"
-            [(ngModel)]="searchTerm"
-            (input)="filterProducts()"
-            [ngModelOptions]="{ standalone: true }"
-          />
-        </mat-form-field>
-      </div>
-        <form [formGroup]="importForm">
-            <mat-form-field appearance="outline" >
-                <mat-label>Source</mat-label>
-                <mat-select formControlName="sourceBusinessEntity" (selectionChange)="onBusinessEntitySelected($event.value)">
-                    <mat-option *ngFor="let entity of stores" [value]="entity.id">{{ entity.name }}</mat-option>
-                </mat-select>
-                    Business Entity is required
-                <mat-error *ngIf="importForm.get('sourceBusinessEntity')?.hasError('required')">
+  <div class="search-container">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-icon matPrefix>search</mat-icon>
+      <input
+        matInput
+        placeholder="Search products"
+        [(ngModel)]="searchTerm"
+        (input)="filterProducts()"
+        [ngModelOptions]="{ standalone: true }"
+      />
+    </mat-form-field>
+  </div>
 
-            </mat-error>
-            </mat-form-field>
+  <form [formGroup]="importForm" class="import-form">
+    <div class="business-entity-fields">
+      <mat-form-field appearance="outline">
+        <mat-label>Source</mat-label>
+        <mat-select
+          formControlName="sourceBusinessEntity"
+          (selectionChange)="onBusinessEntitySelected($event.value)"
+          required>
+          <mat-option *ngFor="let entity of stores" [value]="entity.id">
+            {{ entity.name }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="importForm.get('sourceBusinessEntity')?.hasError('required') && importForm.get('sourceBusinessEntity')?.touched">
+          Business Entity is required
+        </mat-error>
+      </mat-form-field>
 
-            <mat-form-field appearance="outline">
-                <mat-label>Destination</mat-label>
-                <mat-select formControlName="destinationBusinessEntity" (selectionChange)="onBusinessEntitySelected($event.value)">
-                    <mat-option *ngFor="let entity of stores" [value]="entity.id">{{entity.name}}</mat-option>
-                </mat-select>
-                    Business Entity is required
-                <mat-error *ngIf="importForm.get('destinationBusinessEntity')?.hasError('required')">
-                </mat-error>
-            </mat-form-field>
-        </form>
+      <mat-form-field appearance="outline">
+        <mat-label>Destination</mat-label>
+        <mat-select
+          formControlName="destinationBusinessEntity"
+          (selectionChange)="onBusinessEntitySelected($event.value)"
+          required>
+          <mat-option *ngFor="let entity of stores" [value]="entity.id">
+            {{ entity.name }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="importForm.get('destinationBusinessEntity')?.hasError('required') && importForm.get('destinationBusinessEntity')?.touched">
+          Business Entity is required
+        </mat-error>
+        <mat-error *ngIf="importForm.hasError('duplicateEntities')">
+          Source and Destination cannot be the same
+        </mat-error>
+      </mat-form-field>
+    </div>
 
+    <div class="table-container" *ngIf="filteredProducts.length > 0">
       <table mat-table [dataSource]="filteredProducts" class="product-table">
         <!-- Checkbox Column -->
         <ng-container matColumnDef="select">
@@ -63,66 +82,68 @@
           <th mat-header-cell *matHeaderCellDef>SKU</th>
           <td mat-cell *matCellDef="let product">{{ product.sku }}</td>
         </ng-container>
-
         <!-- Quantity Column -->
         <ng-container matColumnDef="quantity">
           <th mat-header-cell *matHeaderCellDef>Quantity</th>
-          <td mat-cell *matCellDef="let product; let i = index" >
-            <mat-form-field appearance="outline" >
+          <td mat-cell *matCellDef="let product; let i = index">
+            <mat-form-field appearance="outline" *ngIf="selection.isSelected(product)">
               <input
                 matInput
                 type="number"
-                pattern="^[1-9]\d*$"
                 [formControl]="getProductQuantityControl(i)"
                 placeholder="Enter quantity"
-                (blur)="productQuantities.controls[i].markAsTouched()"
+                (blur)="markQuantityAsTouched(i)"
               />
-              <mat-error
-                *ngIf="productQuantities.controls[i]?.hasError('required')"
-              >
-                Required
-              </mat-error>
-              <mat-error
-                *ngIf="productQuantities.controls[i]?.hasError('min')"
-              >
-                Must be positive!
+              <mat-error *ngIf="shouldShowQuantityError(i)">
+                {{ getQuantityErrorMessage(i) }}
               </mat-error>
             </mat-form-field>
+            <span *ngIf="!selection.isSelected(product)">-</span>
           </td>
         </ng-container>
 
-          <!-- Cost Per Unit Column -->
-          <ng-container matColumnDef="costPerUnit">
-              <th mat-header-cell *matHeaderCellDef>Cost Per Unit</th>
-              <td mat-cell *matCellDef="let product; let i = index">
-                  <mat-form-field appearance="outline">
-                      <input matInput
-                             [formControl]="getCostPerUnitControl(i)"
-                             currencyMask
-                             [options]="{ prefix: '$ ', thousands: ',', decimal: '.', precision: 2 }"
-                             placeholder="0.00"
-                             required>
-                      <mat-error *ngIf="costPerUnits.hasError('required')">
-                          Cost per unit is required
-                      </mat-error>
-                      <mat-error *ngIf="costPerUnits.hasError('min')">
-                          Cost must be at least $0.01
-                      </mat-error>
-                  </mat-form-field>
-              </td>
-          </ng-container>
+        <!-- Cost Per Unit Column -->
+        <ng-container matColumnDef="costPerUnit">
+          <th mat-header-cell *matHeaderCellDef>Cost Per Unit</th>
+          <td mat-cell *matCellDef="let product; let i = index">
+            <mat-form-field appearance="outline" *ngIf="selection.isSelected(product)">
+              <input
+                matInput
+                [formControl]="getCostPerUnitControl(i)"
+                currencyMask
+                [options]="{ prefix: '$ ', thousands: ',', decimal: '.', precision: 2 }"
+                placeholder="0.00"
+                (blur)="markCostAsTouched(i)"
+              >
+              <mat-error *ngIf="shouldShowCostError(i)">
+                {{ getCostErrorMessage(i) }}
+              </mat-error>
+            </mat-form-field>
+            <span *ngIf="!selection.isSelected(product)">-</span>
+          </td>
+        </ng-container>
 
 
 
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
       </table>
     </div>
-  </ng-container>
 
-  <div class="modal-actions">
+    <div class="no-products" *ngIf="filteredProducts.length === 0">
+      No products found matching your search criteria.
+    </div>
+  </form>
+
+  <div class="dialog-actions">
     <button mat-button (click)="close()">Cancel</button>
-    <button mat-button color="primary" (click)="submit()">Submit</button>
+    <button
+      mat-raised-button
+      color="primary"
+      (click)="submit()"
+      [disabled]="importForm.invalid || selection.selected.length === 0">
+      Submit
+    </button>
+  </div>
   </div>
 </mat-dialog-content>
