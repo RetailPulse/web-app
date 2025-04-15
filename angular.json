@@ -33,7 +33,7 @@
               }
             ],
             "styles": [
-              "src/custom-theme.scss",
+              "src/custom-theme.css",
               "src/styles.css",
               "src/assets/theme.css",
               "node_modules/primeicons/primeicons.css",
