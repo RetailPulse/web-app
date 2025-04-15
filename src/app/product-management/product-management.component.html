@@ -51,89 +51,107 @@
     <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
   </table>
 </div>
+<ng-template #productDialog>
+  <div class="modal-overlay">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>{{ modalMode === 'create' ? 'Create Product' : 'Edit Product' }}</h2>
+        <button mat-icon-button class="close-button" mat-dialog-close>
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
 
-<mat-dialog-content *ngIf="displayModal">
-  <form [formGroup]="productForm" class="product-form">
-    <div class="form-row">
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Brand</mat-label>
-        <input matInput formControlName="brand" required>
-        <mat-error *ngIf="productForm.get('brand')?.hasError('required')">
-          Brand is required
-        </mat-error>
-      </mat-form-field>
+      <div class="modal-body">
+        <form [formGroup]="productForm" class="product-form">
+          <!-- Basic Information Section -->
+          <div class="form-section">
+            <div class="section-title">Basic Information</div>
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Brand</mat-label>
+                <input matInput formControlName="brand" required>
+              </mat-form-field>
 
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Category</mat-label>
-        <input matInput formControlName="category" required>
-        <mat-error *ngIf="productForm.get('category')?.hasError('required')">
-          Category is required
-        </mat-error>
-      </mat-form-field>
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Category</mat-label>
+                <input matInput formControlName="category" required>
+              </mat-form-field>
+            </div>
 
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Subcategory</mat-label>
-        <input matInput formControlName="subcategory">
-      </mat-form-field>
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Subcategory</mat-label>
+                <input matInput formControlName="subcategory">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>SKU</mat-label>
+                <input matInput formControlName="sku" required>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="form-section">
+            <div class="section-title">Description</div>
+            <mat-form-field appearance="outline" class="full-width">
+              <textarea matInput formControlName="description" rows="2"></textarea>
+            </mat-form-field>
+          </div>
+
+          <!-- Pricing Section -->
+          <div class="form-section">
+            <div class="section-title">Pricing</div>
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>RRP</mat-label>
+                <input matInput type="number" formControlName="rrp" required min="0">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>UOM</mat-label>
+                <input matInput formControlName="uom">
+              </mat-form-field>
+            </div>
+          </div>
+
+          <!-- Additional Information -->
+          <div class="form-section">
+            <div class="section-title">Additional Information</div>
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Origin</mat-label>
+                <input matInput formControlName="origin">
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Barcode</mat-label>
+                <input matInput formControlName="barcode">
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Vendor Code</mat-label>
+                <input matInput formControlName="vendorCode">
+              </mat-form-field>
+
+              <div class="toggle-container">
+                <mat-slide-toggle formControlName="is_active" color="primary">
+                  Active Status
+                </mat-slide-toggle>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-actions frozen">
+        <button mat-stroked-button mat-dialog-close>Cancel</button>
+        <button mat-raised-button color="primary" (click)="saveProduct()" [disabled]="productForm.invalid">
+          {{ modalMode === 'create' ? 'Create' : 'Update' }}
+        </button>
+      </div>
     </div>
-
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Description</mat-label>
-      <textarea matInput formControlName="description" rows="3"></textarea>
-    </mat-form-field>
-
-    <div class="form-row">
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>RRP</mat-label>
-        <input matInput type="number" formControlName="rrp" required min="0">
-        <mat-error *ngIf="productForm.get('rrp')?.hasError('required')">
-          RRP is required
-        </mat-error>
-        <mat-error *ngIf="productForm.get('rrp')?.hasError('min')">
-          RRP must be positive
-        </mat-error>
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>UOM</mat-label>
-        <input matInput formControlName="uom">
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Origin</mat-label>
-        <input matInput formControlName="origin">
-      </mat-form-field>
-    </div>
-
-    <div class="form-row">
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Barcode</mat-label>
-        <input matInput formControlName="barcode">
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>Vendor Code</mat-label>
-        <input matInput formControlName="vendorCode">
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="form-field">
-        <mat-label>SKU</mat-label>
-        <input matInput formControlName="sku" required>
-        <mat-error *ngIf="productForm.get('sku')?.hasError('required')">
-          SKU is required
-        </mat-error>
-      </mat-form-field>
-    </div>
-
-    <mat-slide-toggle formControlName="is_active" color="primary">
-      Active Status
-    </mat-slide-toggle>
-  </form>
-</mat-dialog-content>
-
-<mat-dialog-actions align="end" *ngIf="displayModal">
-  <button mat-button (click)="displayModal = false">Cancel</button>
-  <button mat-raised-button color="primary" (click)="saveProduct()" [disabled]="productForm.invalid">
-    Save
-  </button>
-</mat-dialog-actions>
+  </div>
+</ng-template>

@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators} from '@angular/forms';
-import {MatDialog, MatDialogActions, MatDialogContent} from '@angular/material/dialog';
+import {MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle} from '@angular/material/dialog';
 import {
   MatCell, MatCellDef,
   MatColumnDef,
@@ -32,9 +32,7 @@ import {MatInput} from '@angular/material/input';
     MatColumnDef,
     MatChip,
     CurrencyPipe,
-    MatDialogContent,
     ReactiveFormsModule,
-    MatDialogActions,
     MatSlideToggle,
     MatButton,
     MatInput,
@@ -52,9 +50,8 @@ import {MatInput} from '@angular/material/input';
     NgSwitchDefault,
     MatHeaderRowDef,
     MatRowDef,
-    NgIf,
     MatLabel,
-    MatError,
+    MatDialogClose,
   ],
   styleUrls: ['./product-management.component.css']
 })
@@ -81,7 +78,7 @@ export class ProductManagementComponent implements OnInit {
   ];
 
   displayedColumns: string[] = [...this.cols.map(col => col.field), 'actions'];
-
+  @ViewChild('productDialog') productDialogTemplate!: TemplateRef<any>;
   constructor(
     private productService: ProductService,
     private fb: FormBuilder,
@@ -128,10 +125,18 @@ export class ProductManagementComponent implements OnInit {
     this.filteredProducts = results.map(result => result.item);
   }
 
+  openDialog() {
+    this.dialog.open(this.productDialogTemplate, {
+      width: '800px',
+      disableClose: true // Optional: prevents closing by clicking outside
+    });
+  }
+
+
   createProduct(): void {
     this.productForm.reset({ is_active: true });
     this.modalMode = 'create';
-    this.displayModal = true;
+    this.openDialog();
   }
 
   editProduct(product: Product): void {
@@ -140,7 +145,7 @@ export class ProductManagementComponent implements OnInit {
       is_active: product.active || false
     });
     this.modalMode = 'update';
-    this.displayModal = true;
+    this.openDialog();
   }
 
   saveProduct(): void {
@@ -155,7 +160,7 @@ export class ProductManagementComponent implements OnInit {
         next: (createdProduct) => {
           this.products.push(createdProduct);
           this.filteredProducts = [...this.products];
-          this.displayModal = false;
+          this.dialog.closeAll();
         },
         error: (error) => console.error('Error creating product:', error)
       });
@@ -165,7 +170,7 @@ export class ProductManagementComponent implements OnInit {
           const index = this.products.findIndex(p => p.id === updatedProduct.id);
           this.products[index] = updatedProduct;
           this.filteredProducts = [...this.products];
-          this.displayModal = false;
+          this.dialog.closeAll();
         },
         error: (error) => console.error('Error updating product:', error)
       });
