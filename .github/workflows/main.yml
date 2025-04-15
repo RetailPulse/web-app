@@ -3,16 +3,17 @@ env:
   NODE_VERSION: '22'          # Centralized Node.js version. Use the latest LTS version compatible with Angular 19
 
 on:
-  push:
-    branches: 
-      - "main"
-  pull_request:
-    branches: 
-      - "main"
-    types: 
-      - opened
-      - synchronize
-      - reopened
+  workflow_dispatch:
+  # push:
+  #   branches: 
+  #     - "main"
+  # pull_request:
+  #   branches: 
+  #     - "main"
+  #   types: 
+  #     - opened
+  #     - synchronize
+  #     - reopened
 
 jobs:
   web-app-unit-tests:

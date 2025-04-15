@@ -78,7 +78,7 @@ export class BusinessEntityManagementComponent {
       ctlName: ['', Validators.required],
       ctlLocation: ['', [Validators.required]],      
       ctlType: ['', Validators.required],
-      ctlExternal: ['', Validators.required],
+      ctlExternal: ['false', Validators.required],
     });
 
     // Initialize the Edit User Form
@@ -87,7 +87,7 @@ export class BusinessEntityManagementComponent {
       ctlName: ['', Validators.required],
       ctlLocation: ['', [Validators.required]],      
       ctlType: ['', Validators.required],
-      ctlExternal: ['', Validators.required],
+      ctlExternal: ['false', Validators.required],
     });
 
     this.editBusinessEntityForm.get('ctlId')?.disable();
@@ -140,6 +140,7 @@ export class BusinessEntityManagementComponent {
     this.resetMessages();
     console.log('Form State:', this.newBusinessEntityForm);
     this.newBusinessEntityForm.reset();
+    this.newBusinessEntityForm.get('ctlExternal')?.setValue('false');
     this.newDialog_visible.set(true);
   }
  
@@ -176,7 +177,7 @@ export class BusinessEntityManagementComponent {
       id: -1,
       name: this.newBusinessEntityForm.value.ctlName,
       location: this.newBusinessEntityForm.value.ctlLocation,
-      external: this.newBusinessEntityForm.value.ctlExternal=== 'true', 
+      external: this.newBusinessEntityForm.value.ctlExternal === 'true', 
       type: this.newBusinessEntityForm.value.ctlType,
       active: true,
     };
@@ -245,7 +246,7 @@ export class BusinessEntityManagementComponent {
       ctlName: businessEntity.name,
       ctlLocation: businessEntity.location,
       ctlType: businessEntity.type,
-      ctlExternal: businessEntity.external,
+      ctlExternal: businessEntity.external === true ? 'true' : 'false',
     });
   }
 
@@ -276,7 +277,7 @@ export class BusinessEntityManagementComponent {
       name: this.editBusinessEntityForm.value.ctlName,
       location: this.editBusinessEntityForm.value.ctlLocation,      
       type: this.editBusinessEntityForm.value.ctlType,
-      external: this.newBusinessEntityForm.value.ctlExternal=== 'true', 
+      external: this.editBusinessEntityForm.value.ctlExternal=== 'true', 
       active: true
     };
 
