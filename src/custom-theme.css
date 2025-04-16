@@ -129,13 +129,16 @@
   /* Snackbar Styles */
 
   .mat-mdc-snack-bar-container.success-snackbar {
-    --mdc-snackbar-container-color: var(--pastel-success);
-    --mat-mdc-snack-bar-button-color: var(--pastel-dark);
+    --mdc-snackbar-container-color: #e0f2f1;
+    --mdc-snackbar-supporting-text-color: #00897b;
+    --mat-mdc-snack-bar-button-color: #26a69a;
   }
 
+  /* Error */
   .mat-mdc-snack-bar-container.error-snackbar {
-    --mdc-snackbar-container-color: var(--pastel-danger);
-    --mat-mdc-snack-bar-button-color: var(--pastel-dark);
+    --mdc-snackbar-container-color: #f3e5f5;
+    --mdc-snackbar-supporting-text-color: #8e24aa;
+    --mat-mdc-snack-bar-button-color: #9c27b0;
   }
 
   /* Material Theme Overrides */

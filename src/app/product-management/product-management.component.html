@@ -135,7 +135,11 @@
                 <mat-label>Vendor Code</mat-label>
                 <input matInput formControlName="vendorCode">
               </mat-form-field>
-
+            </div>
+            <div class="toggle-container">
+              <mat-slide-toggle formControlName="active" color="primary">
+                {{ productForm.get('active')?.value ? 'Active' : 'Inactive' }}
+              </mat-slide-toggle>
             </div>
           </div>
         </form>
