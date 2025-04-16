@@ -33,7 +33,6 @@ import {MatInput} from '@angular/material/input';
     MatChip,
     CurrencyPipe,
     ReactiveFormsModule,
-    MatSlideToggle,
     MatButton,
     MatInput,
     MatFabButton,
@@ -74,7 +73,7 @@ export class ProductManagementComponent implements OnInit {
     {field: 'origin', header: 'Origin'},
     {field: 'uom', header: 'UOM'},
     {field: 'vendorCode', header: 'Vendor Code'},
-    {field: 'is_active', header: 'Status'}
+    {field: 'active', header: 'Status'}
   ];
 
   displayedColumns: string[] = [...this.cols.map(col => col.field), 'actions'];
@@ -96,13 +95,13 @@ export class ProductManagementComponent implements OnInit {
       origin: [''],
       uom: [''],
       vendorCode: [''],
-      is_active: [true]
+      active: ['']
     });
   }
 
   ngOnInit(): void {
     this.productService.getProducts().subscribe((data: Product[]) => {
-      this.products = data.filter(product => product.active);
+      this.products = data;
       this.filteredProducts = this.products;
     });
   }
@@ -134,7 +133,7 @@ export class ProductManagementComponent implements OnInit {
 
 
   createProduct(): void {
-    this.productForm.reset({ is_active: true });
+    this.productForm.reset({ active: true });
     this.modalMode = 'create';
     this.openDialog();
   }
@@ -142,7 +141,7 @@ export class ProductManagementComponent implements OnInit {
   editProduct(product: Product): void {
     this.productForm.patchValue({
       ...product,
-      is_active: product.active || false
+      active: product.active || false
     });
     this.modalMode = 'update';
     this.openDialog();
@@ -152,8 +151,11 @@ export class ProductManagementComponent implements OnInit {
     if (this.productForm.invalid) {
       return;
     }
-
-    const productData = this.productForm.value;
+    const formData = this.productForm.value;
+    const productData = {
+      ...formData,
+      active: formData.active
+    };
 
     if (this.modalMode === 'create') {
       this.productService.createProduct(productData).subscribe({

@@ -35,14 +35,16 @@ export class PosSystemService {
       );
   }
 
-  createTransaction(salesTransaction: SalesTransactionRequest) {
-    return this.http.post<SalesTransactionResponse>(`${this.apiUrl}/createTransaction`, salesTransaction)
-      .pipe(
-        catchError(error => {
-          console.error('Error creating transaction:', error);
-          return throwError(() => new Error('Failed to create transaction.'));
-        })
-      );
+  createTransaction( salesTransaction: SalesTransactionRequest,businessEntityId: number) {
+    return this.http.post<SalesTransactionResponse>(
+      `${this.apiUrl}/createTransaction/${businessEntityId}`,  // Add path variable
+      salesTransaction
+    ).pipe(
+      catchError(error => {
+        console.error('Error creating transaction:', error);
+        return throwError(() => new Error('Failed to create transaction.'));
+      })
+    );
   }
 
   suspendTransaction(suspendedTransaction: SuspendedTransactionRequest) {
