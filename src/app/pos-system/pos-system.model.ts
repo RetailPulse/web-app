@@ -53,3 +53,12 @@ export interface SalesTransactionResponse {
   salesDetails: SalesDetails[];
   transactionDateTime: string;
 }
+
+export interface TaxResult {
+  subTotalAmount: string;
+  taxType: string;
+  taxRate: string;
+  taxAmount: string;
+  totalAmount: string;
+  salesDetails: SalesDetails[];
+}

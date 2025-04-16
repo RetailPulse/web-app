@@ -12,7 +12,7 @@ import {
   CartItem,
   SalesDetails,
   SalesTransactionRequest,
-  SalesTransactionResponse, SuspendedTransactionRequest,
+  SalesTransactionResponse, SuspendedTransactionRequest, TaxResult,
   Transaction,
   TransientTransaction
 } from './pos-system.model';
@@ -318,8 +318,8 @@ export class PosComponent implements OnInit, AfterViewInit {
 
     const subscription = this.posService.calculateSalesTax(transaction)
       .subscribe({
-        next: (taxResult: number) => {
-          this.salesTax = taxResult;
+        next: (taxResult: TaxResult) => {
+          this.salesTax = parseFloat(taxResult.taxAmount);
         },
         error: (error: Error) => {
           console.error('Error calculating sales tax:', error);
