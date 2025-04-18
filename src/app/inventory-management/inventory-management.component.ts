@@ -33,7 +33,7 @@ interface Column {
 interface InventoryTransaction {
   productSku: string;
   quantity: number;
-  costPerUnit: number;
+  rrp: number;
   source: string;
   destination: string;
 }
@@ -42,7 +42,6 @@ interface SummaryData {
   productSKU: string;
   businessEntityName: string;
   quantity: number;
-  totalCostPrice: number;
 }
 
 @Component({
@@ -84,7 +83,7 @@ export class InventoryManagementComponent implements OnInit {
   inventoryTransactionCols: Column[] = [
     { field: 'productSku', header: 'Product SKU' },
     { field: 'quantity', header: 'Quantity' },
-    { field: 'costPerUnit', header: 'Cost Per Unit' },
+    { field: 'rrp', header: 'Retail Price' },
     { field: 'source', header: 'Source' },
     { field: 'destination', header: 'Destination' }
   ];
@@ -92,8 +91,8 @@ export class InventoryManagementComponent implements OnInit {
   summaryCols: Column[] = [
     { field: 'productSKU', header: 'SKU' },
     { field: 'quantity', header: 'Quantity' },
+    { field: 'rrp', header: 'Retail Price' },
     { field: 'businessEntityName', header: 'Business Entity' },
-    { field: 'totalCostPrice', header: 'Total Cost Price' }
   ];
 
   displayedTransactionColumns: string[] = this.inventoryTransactionCols.map(col => col.field);
@@ -149,6 +148,7 @@ export class InventoryManagementComponent implements OnInit {
           ]).pipe(
             map(([product, businessEntity]) => ({
               productSKU: product.sku,
+              rrp: product.rrp,
               businessEntityName: businessEntity.name,
               quantity: item.quantity,
               totalCostPrice: item.totalCostPrice
@@ -185,7 +185,7 @@ export class InventoryManagementComponent implements OnInit {
             return data.map((item, index) => ({
               productSku: item.product.sku,
               quantity: item.inventoryTransaction.quantity,
-              costPerUnit: item.inventoryTransaction.costPricePerUnit,
+              rrp: item.product.rrp,
               source: entities[index * 2].name,
               destination: entities[index * 2 + 1].name,
             }));
