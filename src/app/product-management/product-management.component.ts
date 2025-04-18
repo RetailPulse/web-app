@@ -65,6 +65,7 @@ export class ProductManagementComponent implements OnInit {
   productForm: FormGroup;
 
   cols = [
+    {field: 'sku', header: 'SKU'},
     {field: 'brand', header: 'Brand'},
     {field: 'category', header: 'Category'},
     {field: 'subcategory', header: 'Subcategory'},
