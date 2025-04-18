@@ -230,8 +230,7 @@ export class PosComponent implements OnInit, AfterViewInit {
     if (!barcode) return;
 
     const product = this.products.find(p =>
-      p.barcode === barcode ||
-      p.sku === barcode
+      p.barcode === barcode
     );
 
     if (product) {
@@ -358,7 +357,7 @@ export class PosComponent implements OnInit, AfterViewInit {
     };
 
     this.posService
-      .createTransaction(salesTransactionRequest,this.selectedBusinessEntity.id)
+      .createTransaction(salesTransactionRequest)
       .subscribe({
         next: (response) => {
           this.snackBar.open(`Checkout completed. Total: $${response.totalAmount}`, 'Close', { duration: 2000 });

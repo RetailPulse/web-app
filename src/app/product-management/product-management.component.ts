@@ -19,8 +19,6 @@ import {MatChip, MatChipListbox} from '@angular/material/chips';
 import {MatSlideToggle} from '@angular/material/slide-toggle';
 import {MatButton, MatFabButton, MatIconButton} from '@angular/material/button';
 import {MatInput} from '@angular/material/input';
-import {MatTooltip} from '@angular/material/tooltip';
-import {ConfirmationDialogComponent, ErrorDialogComponent} from './confirmation-dialog.component';
 import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
@@ -67,7 +65,6 @@ export class ProductManagementComponent implements OnInit {
   productForm: FormGroup;
 
   cols = [
-    {field: 'sku', header: 'SKU'},
     {field: 'brand', header: 'Brand'},
     {field: 'category', header: 'Category'},
     {field: 'subcategory', header: 'Subcategory'},
@@ -90,7 +87,6 @@ export class ProductManagementComponent implements OnInit {
   ) {
     this.productForm = this.fb.group({
       id: [''],
-      sku: ['', Validators.required],
       brand: ['', Validators.required],
       category: ['', Validators.required],
       subcategory: [''],
