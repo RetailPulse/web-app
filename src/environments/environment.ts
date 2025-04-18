@@ -19,7 +19,7 @@ export const apiConfig = {
 
 export const environment = {
   production: false,
-  authEnabled: false,
+  authEnabled: true,
   devModeUser: 'superadmin',
   devModeRole: 'ADMIN' //'OPERATOR' //
 };
