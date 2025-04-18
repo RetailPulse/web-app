@@ -2,6 +2,7 @@ import { AuthConfig } from 'angular-oauth2-oidc';
 
 export const authConfig: AuthConfig = {
   issuer: 'http://retailpulse.me:8081', // Update with your authorization server URL
+  requireHttps: false,
   redirectUri: window.location.origin,
   clientId: 'client',
   responseType: 'code',
