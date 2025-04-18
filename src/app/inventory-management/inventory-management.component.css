@@ -1,134 +1,116 @@
-.header-container {
+/* Add to your component's CSS file */
+.loading-spinner {
+  margin: 40px auto;
+  display: block;
+}
+
+/* Pastel Theme Styles */
+.empty-state.pastel-theme {
   display: flex;
   flex-direction: column;
-  background-color: transparent;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: var(--pastel-dark); /* Soft pastel shadow */
+  text-align: center;
+  max-width: 400px;
+  margin: 20px auto;
 }
 
-.header-container .header-content {
+.pastel-icon-container {
+  width: 80px;
+  height: 80px;
   display: flex;
-  flex-direction: column;
-  gap: 16px;
+  align-items: center;
+  justify-content: center;
 }
 
-@media (min-width: 768px) {
-  .header-container .header-content {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
+.pastel-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  color: var(--pastel-dark);
 }
 
-.header-container .header-title {
-  margin: 0;
-  font-size: 24px;
+.pastel-message {
+  color: var(--pastel-dark);
+  font-size: 16px;
+  margin-bottom: 20px;
   font-weight: 500;
 }
 
-.header-container .search-container {
-  display: flex;
-  gap: 16px;
-  align-items: center;
+.pastel-button {
+  background-color: var(--pastel-yellow-background) !important;
+  color: var(--pastel-dark) !important;
+  padding: 8px 24px !important;
+  transition: all 0.3s ease !important;
 }
 
-.header-container .search-container .search-field {
-  width: 300px !important;
+.pastel-button:hover {
+  background-color: #b3e5fc !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(2, 136, 209, 0.1);
 }
 
-.allocate-button{
-  margin-bottom: 16px;
+.pastel-button mat-icon {
+  color: var(--pastel-dark);
+  margin-right: 8px;
 }
 
-
-.header-container .search-container .allocate-button {
-  white-space: nowrap;
-}
-
-.table-container,
-.summary-container {
-  padding: 16px;
-  overflow-x: auto;
-}
-
-.table-container table,
-.summary-container table {
-  width: 100%;
+.numeric-cell {
+  text-align: right;
+  padding-right: 24px;
 }
 
 .error-card {
-  margin: 16px;
-  background-color: #fff8f8;
-  color: #d32f2f;
+  margin-bottom: 20px;
+  background-color: #ca6c8e; /* Light red background */
 }
 
-.filter-field {
+.error-card mat-icon {
+  color: var(--pastel-danger); /* Red error color */
+  vertical-align: middle;
+  margin-right: 8px;
+}
+
+.table-container, .summary-container {
+  padding: 16px;
+}
+
+/* Add to your component's CSS */
+.search-field {
   width: 300px;
-  margin: 16px;
+  margin-right: 16px;
 }
 
-.mat-elevation-z8 {
-  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
-  0 8px 10px 1px rgba(0, 0, 0, 0.14),
-  0 3px 14px 2px rgba(0, 0, 0, 0.12);
+.mat-table {
+  width: 100%;
 }
 
-/* Additional styles for Material table */
-table.mat-table {
-  border-spacing: 0;
+.mat-column-productSku,
+.mat-column-productSKU {
+  width: 20%;
 }
 
-th.mat-header-cell {
-  text-align: left;
-  font-weight: 500;
-  color: rgba(0, 0, 0, 0.87);
+.mat-column-quantity {
+  width: 15%;
+  text-align: right;
+  padding-right: 24px;
 }
 
-td.mat-cell, th.mat-header-cell {
-  padding: 0 16px;
-  border-bottom-width: 1px;
-  border-bottom-style: solid;
+.mat-column-rrp {
+  width: 20%;
+  text-align: right;
+  padding-right: 24px;
 }
 
-tr.mat-row, tr.mat-header-row {
-  height: 48px;
+.mat-column-source,
+.mat-column-destination,
+.mat-column-businessEntityName {
+  width: 22.5%;
 }
 
-/* Form field styles */
-.mat-form-field {
-  display: inline-block;
-  position: relative;
-  text-align: left;
+.mat-column-date {
+  width: 20%;
 }
-
-.mat-form-field-appearance-outline .mat-form-field-outline {
-  color: rgba(0, 0, 0, 0.12);
-}
-
-.mat-form-field-appearance-outline .mat-form-field-wrapper {
-  margin: 0.25em 0;
-}
-
-/* Button styles */
-.mat-raised-button {
-  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2),
-  0 2px 2px 0 rgba(0, 0, 0, 0.14),
-  0 1px 5px 0 rgba(0, 0, 0, 0.12);
-  position: relative;
-}
-
-.mat-raised-button.mat-primary {
-  background-color: #3f51b5;
-  color: white;
-}
-
-/* Tab group styles */
-.mat-tab-group {
-  font-family: Roboto, "Helvetica Neue", sans-serif;
-}
-
-.mat-tab-label {
-  min-width: 160px;
-  padding: 0 24px;
-}
-
-
-
