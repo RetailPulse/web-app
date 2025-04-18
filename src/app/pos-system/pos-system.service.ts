@@ -5,7 +5,7 @@ import {apiConfig} from '../../environments/environment';
 import {
   SalesDetails,
   SalesTransactionRequest,
-  SalesTransactionResponse, SuspendedTransactionRequest,
+  SalesTransactionResponse, SuspendedTransactionRequest, TaxResult,
   Transaction,
   TransientTransaction
 } from './pos-system.model';
@@ -25,7 +25,7 @@ export class PosSystemService {
     const salesDetails: SalesDetails[] = TransactionAdapter.mapTransactionToSalesDetails(transaction);
     console.log(salesDetails);
 
-    return this.http.post<number>(
+    return this.http.post<TaxResult>(
       `${this.apiUrl}/calculateSalesTax`, salesDetails)
       .pipe(
         catchError(error => {
