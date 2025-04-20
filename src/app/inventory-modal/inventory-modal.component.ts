@@ -35,6 +35,7 @@ import {CurrencyMaskModule} from 'ng2-currency-mask';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatCheckbox} from '@angular/material/checkbox';
 import {CurrencyPipe, NgForOf, NgIf} from '@angular/common';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-inventory-modal',
@@ -89,6 +90,7 @@ export class InventoryModalComponent implements OnInit {
     private businessEntityService: BusinessEntityService,
     private fb: FormBuilder,
     private inventoryModalService: InventoryModalService,
+    private snackBar: MatSnackBar
   ) {
     this.importForm = this.fb.group({
       productQuantities: this.fb.array([]),
@@ -237,14 +239,35 @@ export class InventoryModalComponent implements OnInit {
       destination: this.importForm.value.destinationBusinessEntity,
     }));
 
-    this.inventoryModalService.createInventoryTransaction(transactions).subscribe(
-      response => {
+    this.inventoryModalService.createInventoryTransaction(transactions).subscribe({
+      next: (response) => {
+        this.showSuccessNotification('Inventory allocated successfully!');
         this.dialogRef.close(response);
       },
-      error => {
+      error: (error) => {
         console.error('Error creating inventory transaction:', error);
+        console.log(error);
+        this.showErrorNotification('Failed to allocate inventory. Please try again.');
       }
-    );
+    });
+  }
+
+  private showSuccessNotification(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 5000,
+      panelClass: ['success-snackbar'],
+      horizontalPosition: 'right',
+      verticalPosition: 'top'
+    });
+  }
+
+  private showErrorNotification(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 5000,
+      panelClass: ['error-snackbar'],
+      horizontalPosition: 'right',
+      verticalPosition: 'top'
+    });
   }
 
   onBusinessEntitySelected(value: number): void {

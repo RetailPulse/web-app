@@ -1,15 +1,17 @@
 <div class="header-container" [attr.inert]="isModalOpen ? true : null">
   <div class="header-content">
-    <h1 class="header-title">Inventory Management</h1>
-    <div class="search-container">
-      <mat-form-field appearance="outline" class="search-field">
-        <mat-icon matPrefix>search</mat-icon>
-        <input matInput type="text" placeholder="Search products..."
-               [(ngModel)]="searchTerm" (input)="applyFilter()">
-      </mat-form-field>
-      <button mat-raised-button color="primary" (click)="openModal()" class="allocate-button">
-        <mat-icon>add</mat-icon> Allocate inventory
-      </button>
+    <div class="header-title-row">
+      <h1 class="header-title">Inventory Management</h1>
+      <div class="search-container">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput type="text" placeholder="Search products..."
+                 [(ngModel)]="searchTerm" (input)="applyFilter()">
+        </mat-form-field>
+        <button mat-raised-button color="primary" (click)="openModal()" class="allocate-button">
+          <mat-icon>add</mat-icon> Allocate inventory
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -23,7 +25,7 @@
       <mat-spinner *ngIf="isLoading" diameter="50" class="loading-spinner"></mat-spinner>
 
       <!-- Error Message -->
-      <mat-card *ngIf="errorMessage && !isLoading" class="error-card">
+      <mat-card *ngIf="isLoading" class="error-card">
         <mat-card-content>
           <mat-icon>error_outline</mat-icon>
           {{ errorMessage }}
