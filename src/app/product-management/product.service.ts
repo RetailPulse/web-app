@@ -23,6 +23,10 @@ export class ProductService {
     return this.http.delete<void>(`${this.apiUrl}/${productId}`);
   }
 
+  reverseProduct(productId: number): Observable<Product> {
+   return this.http.put<Product>(`${this.apiUrl}/reverseSoftDelete/${productId}`, null);
+ }
+
   updateProduct(updatedProduct: Product): Observable<Product> {
     return this.http.put<Product>(`${this.apiUrl}/${updatedProduct.id}`, updatedProduct);
   }

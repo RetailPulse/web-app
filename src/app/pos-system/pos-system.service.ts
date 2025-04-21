@@ -45,6 +45,7 @@ export class PosSystemService {
       );
   }
 
+
   suspendTransaction(suspendedTransaction: SuspendedTransactionRequest) {
     return this.http.post<TransientTransaction[]>(`${this.apiUrl}/suspend`, suspendedTransaction)
       .pipe(
