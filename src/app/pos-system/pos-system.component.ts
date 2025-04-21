@@ -111,7 +111,7 @@ export class PosComponent implements OnInit, AfterViewInit {
   }
   ngAfterViewInit(): void {
     if (!this.scanner) {
-      console.error('Casper: Scanner not found!');
+      console.error('Scanner not found!');
       return;
     }
 

@@ -32,12 +32,8 @@
   overflow-y: auto;
   padding-right: 8px;
 }
-.scanner-container{
-  height: 5px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
+
+
 .products-grid .product-card {
   background-color: white;
   border-radius: 8px;
@@ -59,6 +55,7 @@
   margin: 4px 0;
   color: var(--pastel-dark);
 }
+
 .scanner-container {
   display: flex;
   flex-direction: column;

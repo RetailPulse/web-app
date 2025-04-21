@@ -71,5 +71,4 @@ export class NgxScannerqrcodeAdapterComponent extends InputScanner implements Af
       action[fn]().subscribe((r: any) => console.log(fn, r), alert);
     }
   }
-
 }
