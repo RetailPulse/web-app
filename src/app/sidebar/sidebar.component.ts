@@ -1,17 +1,18 @@
-import { Component, HostListener } from '@angular/core';
+// sidebar.component.ts
+import { Component, HostListener, OnInit } from '@angular/core';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { RouterModule } from '@angular/router';
 import { LogoutButtonComponent } from '../logout-button/logout-button.component';
+import { CommonModule } from '@angular/common';
+import {SidebarItem} from './sidebar.interface';
+import {SidebarFactory} from './factoryMethod/sidebar.factory';
 
 @Component({
   selector: 'app-sidebar',
+  standalone: true,
+  imports: [RouterModule, LogoutButtonComponent, CommonModule],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css'],
-  standalone: true,
-  imports: [
-    RouterModule,
-    LogoutButtonComponent
-  ],
   animations: [
     trigger('sidebarState', [
       state('closed', style({
@@ -28,8 +29,15 @@ import { LogoutButtonComponent } from '../logout-button/logout-button.component'
     ])
   ]
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit {
   sidebarVisible = false;
+  sidebarItems: SidebarItem[] = [];
+
+  constructor(private sidebarFactory: SidebarFactory) {}
+
+  ngOnInit() {
+    this.sidebarItems = this.sidebarFactory.createStrategy().getMenuItems();
+  }
 
   toggleSidebar() {
     this.sidebarVisible = !this.sidebarVisible;

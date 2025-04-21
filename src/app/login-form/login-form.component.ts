@@ -24,11 +24,14 @@ export class LoginFormComponent implements OnInit {
         if (userRoles.includes("ADMIN") || userRoles.includes("SUPER")) {
           console.log("Going to admin page");
           this.router.navigate(['/admin']);
-        } else if (userRoles.includes("OPERATOR")) {
-          this.router.navigate(['/operator']);
+        } else if (userRoles.includes("MANAGER")) {
+          this.router.navigate(['/manager']);
+        }
+        else if (userRoles.includes("CASHIER")) {
+          this.router.navigate(['/cashier']);
         }
       }
-    });    
+    });
   }
 
   // Method to handle login action
