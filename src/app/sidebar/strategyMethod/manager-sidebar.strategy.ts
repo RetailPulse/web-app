@@ -31,18 +31,6 @@ export class ManagerSidebarStrategy implements ISidebarStrategy {
         visible: true
       },
       {
-        icon: 'pi-chart-line',
-        text: 'Reports',
-        route: './report-generation',
-        visible: true
-      },
-      {
-        icon: 'pi-user',
-        text: 'Profile',
-        route: './profile',
-        visible: true
-      },
-      {
         icon: 'pi-chart-bar',
         text: 'Report Generation',
         route: './report-generation',
