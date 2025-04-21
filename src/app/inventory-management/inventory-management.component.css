@@ -1,134 +1,159 @@
-.header-container {
+.header-title-row {
   display: flex;
-  flex-direction: column;
-  background-color: transparent;
-}
-
-.header-container .header-content {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-@media (min-width: 768px) {
-  .header-container .header-content {
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-}
-
-.header-container .header-title {
-  margin: 0;
-  font-size: 24px;
-  font-weight: 500;
-}
-
-.header-container .search-container {
-  display: flex;
-  gap: 16px;
   align-items: center;
-}
-
-.header-container .search-container .search-field {
-  width: 300px !important;
-}
-
-.allocate-button{
-  margin-bottom: 16px;
-}
-
-
-.header-container .search-container .allocate-button {
-  white-space: nowrap;
-}
-
-.table-container,
-.summary-container {
-  padding: 16px;
-  overflow-x: auto;
-}
-
-.table-container table,
-.summary-container table {
+  justify-content: space-between;
   width: 100%;
 }
 
-.error-card {
-  margin: 16px;
-  background-color: #fff8f8;
-  color: #d32f2f;
+.header-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--pastel-dark);
 }
 
-.filter-field {
-  width: 300px;
-  margin: 16px;
+.search-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-grow: 1;
+  max-width: 600px; /* Adjust as needed */
 }
 
-.mat-elevation-z8 {
-  box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
-  0 8px 10px 1px rgba(0, 0, 0, 0.14),
-  0 3px 14px 2px rgba(0, 0, 0, 0.12);
+.search-field {
+  flex-grow: 1;
 }
 
-/* Additional styles for Material table */
-table.mat-table {
-  border-spacing: 0;
+.header-content {
+  padding: 16px;
 }
 
-th.mat-header-cell {
-  text-align: left;
+.loading-spinner {
+  margin: 40px auto;
+  display: block;
+}
+
+.empty-state.pastel-theme {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: var(--pastel-dark);
+  text-align: center;
+  max-width: 400px;
+  margin: 20px auto;
+}
+
+.pastel-icon-container {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pastel-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  color: var(--pastel-dark);
+}
+
+.pastel-message {
+  color: var(--pastel-dark);
+  font-size: 16px;
+  margin-bottom: 20px;
   font-weight: 500;
-  color: rgba(0, 0, 0, 0.87);
 }
 
-td.mat-cell, th.mat-header-cell {
-  padding: 0 16px;
-  border-bottom-width: 1px;
-  border-bottom-style: solid;
+.pastel-button {
+  background-color: var(--pastel-yellow-background) !important;
+  color: var(--pastel-dark) !important;
+  padding: 8px 24px !important;
+  transition: all 0.3s ease !important;
 }
 
-tr.mat-row, tr.mat-header-row {
-  height: 48px;
+.pastel-button:hover {
+  background-color: #b3e5fc !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(2, 136, 209, 0.1);
 }
 
-/* Form field styles */
-.mat-form-field {
-  display: inline-block;
-  position: relative;
-  text-align: left;
+.pastel-button mat-icon {
+  color: var(--pastel-dark);
+  margin-right: 8px;
 }
 
-.mat-form-field-appearance-outline .mat-form-field-outline {
-  color: rgba(0, 0, 0, 0.12);
+.numeric-cell {
+  text-align: right;
+  padding-right: 24px;
 }
 
-.mat-form-field-appearance-outline .mat-form-field-wrapper {
-  margin: 0.25em 0;
+.error-card {
+  margin-bottom: 20px;
+  background-color: var(--pastel-secondary); /* Light red background */
 }
 
-/* Button styles */
-.mat-raised-button {
-  box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.2),
-  0 2px 2px 0 rgba(0, 0, 0, 0.14),
-  0 1px 5px 0 rgba(0, 0, 0, 0.12);
-  position: relative;
+.error-card mat-icon {
+  color: var(--pastel-danger); /* Red error color */
+  vertical-align: middle;
+  margin-right: 8px;
 }
 
-.mat-raised-button.mat-primary {
-  background-color: #3f51b5;
-  color: white;
+.table-container, .summary-container {
+  padding: 16px;
 }
 
-/* Tab group styles */
-.mat-tab-group {
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+/* Add to your component's CSS */
+.search-field {
+  width: 300px;
+  margin-right: 16px;
 }
 
-.mat-tab-label {
-  min-width: 160px;
-  padding: 0 24px;
+.mat-table {
+  width: 100%;
 }
 
+.mat-column-productSku,
+.mat-column-productSKU {
+  width: 20%;
+}
 
+.mat-column-quantity {
+  width: 15%;
+  text-align: right;
+  padding-right: 24px;
+}
 
+.mat-column-rrp {
+  width: 20%;
+  text-align: right;
+  padding-right: 24px;
+}
+
+.mat-column-source,
+.mat-column-destination,
+.mat-column-businessEntityName {
+  width: 22.5%;
+}
+
+.mat-column-date {
+  width: 20%;
+}
+
+@media (max-width: 600px) {
+  .form-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /*.modal-content {*/
+  /*  width: 800px;*/
+  /*  max-height: 95vh;*/
+  /*}*/
+
+  .modal-body {
+    padding: 12px 16px;
+  }
+}

@@ -1,17 +1,17 @@
 import { Component, HostListener } from '@angular/core';
 import { trigger, state, style, transition, animate } from '@angular/animations';
 import { RouterModule } from '@angular/router';
-
 import { LogoutButtonComponent } from '../logout-button/logout-button.component';
 
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.css'],
+  standalone: true,
   imports: [
     RouterModule,
     LogoutButtonComponent
-    ],
+  ],
   animations: [
     trigger('sidebarState', [
       state('closed', style({
@@ -38,7 +38,7 @@ export class SidebarComponent {
   @HostListener('document:click', ['$event'])
   onClick(event: MouseEvent) {
     const target = event.target as HTMLElement;
-    if (!target.closest('.sidebar') && !target.closest('.sidebar-toggle-btn')) {
+    if (!target.closest('.sidebar') && !target.closest('.sidebar-toggle')) {
       this.sidebarVisible = false;
     }
   }
