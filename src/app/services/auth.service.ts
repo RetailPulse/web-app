@@ -19,13 +19,13 @@ export class AuthService {
   public initializeAuth() {
 
     if (!environment.authEnabled) {
-      console.log("Authentication is disabled. Using dummy token.");      
+      console.log("Authentication is disabled. Using dummy token.");
       return Promise.resolve();
     }
 
     return this.oauthService.loadDiscoveryDocumentAndTryLogin().then(() => {
       if (this.oauthService.hasValidAccessToken()) {
-        console.log("Token: \r\n" + this.accessToken);        
+        console.log("Token: \r\n" + this.accessToken);
       } else {
         console.log('User is not logged in');
         this.router.navigate(['/login']);
@@ -54,27 +54,36 @@ export class AuthService {
 
   get isAuthenticated(): boolean {
     if (!environment.authEnabled) {
+      console.log('Authentication is disabled');
       return true;
     }
     return this.oauthService.hasValidAccessToken();
   }
 
+  // auth.service.ts
   public getUserRole(): string[] {
     if (!environment.authEnabled) {
-      return [environment.devModeRole];
+      return [environment.devModeRole.toUpperCase()]; // Ensure consistent case
     }
+
     if (!this.accessToken) {
       return ['UNAUTHORIZED'];
     }
 
-    let decodedToken = jwtDecode<DecodedToken>(this.accessToken);
+    try {
+      const decodedToken = jwtDecode<DecodedToken>(this.accessToken);
 
-    return decodedToken.roles;
+      // Ensure roles are uppercase for consistency
+      return decodedToken.roles?.map(role => role.toUpperCase()) || ['UNAUTHORIZED'];
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return ['UNAUTHORIZED'];
+    }
   }
 
   public getUsername(): string {
 
-    console.log('Casper Auth Mode: ' + environment.authEnabled);    
+    console.log('Casper Auth Mode: ' + environment.authEnabled);
     if (!environment.authEnabled) {
       return environment.devModeUser;
     }
@@ -115,5 +124,5 @@ export class AuthService {
 
 export interface DecodedToken{
   roles: Array<string>;
-  sub: string;  
+  sub: string;
 }
