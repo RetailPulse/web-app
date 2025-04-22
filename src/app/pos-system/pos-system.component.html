@@ -76,6 +76,14 @@
           <div class="product-sku">{{ product.sku }}</div>
           <div class="product-description">{{ product.description }}</div>
           <div class="product-price">{{ product.rrp | currency }}</div>
+          <div class="inventory-quantity">
+            <span *ngIf="getAvailableQuantity(product.id) > 0; else outOfStock">
+            {{ getAvailableQuantity(product.id) }} in stock
+            </span>
+            <ng-template #outOfStock>
+              <span class="out-of-stock">Out of stock</span>
+            </ng-template>
+          </div>
         </div>
         <button mat-raised-button color="primary" (click)="addToCart(product)">
           <mat-icon>add</mat-icon>
