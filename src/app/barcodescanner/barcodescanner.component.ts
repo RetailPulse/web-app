@@ -1,14 +1,14 @@
 import { AfterViewInit, ViewChild, Component } from '@angular/core';
-import { NgxScannerqrcodeAdapterComponent } from '../ngx-scannerqrcode-adapter/ngx-scannerqrcode-adapter.component';
+import { NgxScannerQRCodeAdapterComponent } from '../ngx-scannerqrcode-adapter/ngx-scannerqrcode-adapter.component';
 
 @Component({
   selector: 'app-barcodescanner',
-  imports: [NgxScannerqrcodeAdapterComponent],
+  imports: [NgxScannerQRCodeAdapterComponent],
   templateUrl: './barcodescanner.component.html',
   styleUrls: ['./barcodescanner.component.css']
 })
 export class BarcodescannerComponent implements AfterViewInit {
-  @ViewChild('scanner') scanner!: NgxScannerqrcodeAdapterComponent;
+  @ViewChild('scanner') scanner!: NgxScannerQRCodeAdapterComponent;
 
   ngAfterViewInit(): void {
     console.log('Casper: Init Scanner');
@@ -19,7 +19,7 @@ export class BarcodescannerComponent implements AfterViewInit {
     }
 
     // Start the scanner
-    this.scanner.StartScanner();
+    this.scanner.startScanner();
   }
 
   ngOnDestroy(): void {
@@ -27,7 +27,7 @@ export class BarcodescannerComponent implements AfterViewInit {
 
     if (this.scanner) {
       // Stop the scanner
-      this.scanner.StopScanner();
+      this.scanner.stopScanner();
     }
   }
 

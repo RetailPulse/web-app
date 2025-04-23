@@ -21,7 +21,7 @@ import { Product } from '../product-management/product.model';
 import { PosSystemService } from './pos-system.service';
 import { BusinessEntityService } from "../business-entity-management/business-entity.service";
 import { BusinessEntity } from "../business-entity-management/business-entity.model";
-import { Observable } from "rxjs";
+import {forkJoin, Observable} from "rxjs";
 import { MatOption, MatSelect } from '@angular/material/select';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
@@ -34,12 +34,13 @@ import {
   MatCardTitle
 } from '@angular/material/card';
 import {NgxScannerqrcodeAdapterComponent} from '../ngx-scannerqrcode-adapter/ngx-scannerqrcode-adapter.component';
+import {InventoryService} from '../inventory-management/inventory.service';
 
 @Component({
   selector: 'app-pos-system',
   templateUrl: './pos-system.component.html',
   imports: [
-    NgxScannerqrcodeAdapterComponent,
+    NgxScannerQRCodeAdapterComponent,
     MatFormField,
     MatIcon,
     ReactiveFormsModule,
@@ -80,6 +81,8 @@ export class PosComponent implements OnInit, AfterViewInit {
   isLoadingBusinessEntities: boolean = true;
   businessConfirmed = false;
   showBusinessSelection = true;
+  isLoading: boolean = false;
+  private inventoryMap = new Map<number, number>();
 
   // Barcode scanner properties
   showScannerView = false;
@@ -94,7 +97,7 @@ export class PosComponent implements OnInit, AfterViewInit {
     }
   };
 
-  @ViewChild('scanner') scanner!: NgxScannerqrcodeAdapterComponent;
+  @ViewChild('scanner') scanner!: NgxScannerQRCodeAdapterComponent;
   @ViewChild('barcodeInput') barcodeInput!: ElementRef;
 
   private destroyRef = inject(DestroyRef);
@@ -103,7 +106,8 @@ export class PosComponent implements OnInit, AfterViewInit {
     private snackBar: MatSnackBar,
     private productService: ProductService,
     private posService: PosSystemService,
-    private businessEntityService: BusinessEntityService
+    private businessEntityService: BusinessEntityService,
+    private inventoryService: InventoryService,
   ) {}
 
   ngOnInit(): void {
@@ -111,12 +115,12 @@ export class PosComponent implements OnInit, AfterViewInit {
   }
   ngAfterViewInit(): void {
     if (!this.scanner) {
-      console.error('Casper: Scanner not found!');
+      console.error('Scanner not found!');
       return;
     }
 
     // Start the scanner
-    this.scanner.StartScanner();
+    this.scanner.startScanner();
   }
   confirmBusinessSelection(): void {
     if (!this.selectedBusinessEntity) return;
@@ -193,12 +197,48 @@ export class PosComponent implements OnInit, AfterViewInit {
       this.isLoadingBusinessEntities = false;
     });
   }
+// Add this method to get available quantity
+  getAvailableQuantity(productId: number): number {
+    return this.inventoryMap.get(productId) || 0;
+  }
 
+// fliter the product by business
   loadProducts(): void {
-    this.productService.getProducts().subscribe(products => {
-      this.products = products.filter(p => p.active);
-      this.filteredProducts = [...this.products];
-      this.focusBarcodeInput();
+    this.isLoading = true;
+    if (!this.selectedBusinessEntity) {
+      this.isLoading = false;
+      return;
+    }
+
+    forkJoin([
+      this.productService.getProducts(),
+      this.inventoryService.getInventoryByBusinessEntity(this.selectedBusinessEntity.id)
+    ]).subscribe({
+      next: ([products, inventory]) => {
+        // Filter active products
+        const activeProducts = products.filter(p => p.active);
+
+        // Clear and rebuild the inventory map
+        this.inventoryMap.clear();
+        inventory.forEach(item => {
+          this.inventoryMap.set(item.productId, item.quantity);
+        });
+
+        // Only show products that have inventory > 0 at this location
+        this.products = activeProducts.filter(product => {
+          const quantity = this.inventoryMap.get(product.id) || 0;
+          return quantity > 0; // Only include products with available stock
+        });
+
+        this.filteredProducts = [...this.products];
+        this.focusBarcodeInput();
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading products:', error);
+        this.snackBar.open('Failed to load products', 'Close', { duration: 2000 });
+        this.isLoading = false;
+      }
     });
   }
 
@@ -208,12 +248,12 @@ export class PosComponent implements OnInit, AfterViewInit {
     if (this.showScannerView) {
       setTimeout(() => {
         if (this.scanner) {
-          this.scanner.StartScanner();
+          this.scanner.startScanner();
         }
       }, 100);
     } else {
       if (this.scanner) {
-        this.scanner.StopScanner();
+        this.scanner.stopScanner();
       }
       this.focusBarcodeInput();
     }
@@ -237,14 +277,8 @@ export class PosComponent implements OnInit, AfterViewInit {
       this.addToCart(product);
       this.snackBar.open(`${product.description} added`, 'OK', { duration: 1000 });
 
-      // Return to product list view after successful scan
-      setTimeout(() => {
-        this.showScannerView = false;
-        if (this.scanner) {
-          this.scanner.StopScanner();
-        }
-        this.focusBarcodeInput();
-      }, 500);
+     this.manualBarcode ='';
+
     } else {
       this.snackBar.open('Product not found', 'Close', { duration: 2000 });
     }
@@ -269,11 +303,22 @@ export class PosComponent implements OnInit, AfterViewInit {
   }
 
   addToCart(product: Product): void {
+    const availableQuantity = this.getAvailableQuantity(product.id);
     const existingItem = this.cart.find(item => item.product.sku === product.sku);
 
     if (existingItem) {
+      // Check if we're exceeding available stock
+      if (existingItem.quantity >= availableQuantity) {
+        this.snackBar.open(`Only ${availableQuantity} available in stock`, 'Close', { duration: 2000 });
+        return;
+      }
       existingItem.quantity += 1;
     } else {
+      // Check if product is in stock at all
+      if (availableQuantity <= 0) {
+        this.snackBar.open(`${product.description} is out of stock`, 'Close', { duration: 2000 });
+        return;
+      }
       this.cart.push({ product, quantity: 1 });
     }
 

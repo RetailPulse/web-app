@@ -5,10 +5,10 @@ import { Component, EventEmitter, Output } from '@angular/core';
 })
 export abstract class InputScanner {
   // Abstract method to initialize the scanner
-  abstract StartScanner(): void;
+  abstract startScanner(): void;
 
   // Abstract method to stop or clean up the scanner
-  abstract StopScanner(): void;
+  abstract stopScanner(): void;
 
   // Abstract event emitter for scan events
   @Output() abstract scannedEvent: EventEmitter<string>;

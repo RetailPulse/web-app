@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { NgxScannerqrcodeAdapterComponent } from './ngx-scannerqrcode-adapter.component';
+import { NgxScannerQRCodeAdapterComponent } from './ngx-scannerqrcode-adapter.component';
 
-describe('NgxScannerqrcodeAdapterComponent', () => {
-  let component: NgxScannerqrcodeAdapterComponent;
-  let fixture: ComponentFixture<NgxScannerqrcodeAdapterComponent>;
+describe('NgxScannerQRCodeAdapterComponent', () => {
+  let component: NgxScannerQRCodeAdapterComponent;
+  let fixture: ComponentFixture<NgxScannerQRCodeAdapterComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NgxScannerqrcodeAdapterComponent]
+      imports: [NgxScannerQRCodeAdapterComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(NgxScannerqrcodeAdapterComponent);
+    fixture = TestBed.createComponent(NgxScannerQRCodeAdapterComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
