@@ -40,7 +40,7 @@ import {InventoryService} from '../inventory-management/inventory.service';
   selector: 'app-pos-system',
   templateUrl: './pos-system.component.html',
   imports: [
-    NgxScannerqrcodeAdapterComponent,
+    NgxScannerQRCodeAdapterComponent,
     MatFormField,
     MatIcon,
     ReactiveFormsModule,
@@ -97,7 +97,7 @@ export class PosComponent implements OnInit, AfterViewInit {
     }
   };
 
-  @ViewChild('scanner') scanner!: NgxScannerqrcodeAdapterComponent;
+  @ViewChild('scanner') scanner!: NgxScannerQRCodeAdapterComponent;
   @ViewChild('barcodeInput') barcodeInput!: ElementRef;
 
   private destroyRef = inject(DestroyRef);
@@ -115,12 +115,12 @@ export class PosComponent implements OnInit, AfterViewInit {
   }
   ngAfterViewInit(): void {
     if (!this.scanner) {
-      console.error('Casper: Scanner not found!');
+      console.error('Scanner not found!');
       return;
     }
 
     // Start the scanner
-    this.scanner.StartScanner();
+    this.scanner.startScanner();
   }
   confirmBusinessSelection(): void {
     if (!this.selectedBusinessEntity) return;
@@ -248,12 +248,12 @@ export class PosComponent implements OnInit, AfterViewInit {
     if (this.showScannerView) {
       setTimeout(() => {
         if (this.scanner) {
-          this.scanner.StartScanner();
+          this.scanner.startScanner();
         }
       }, 100);
     } else {
       if (this.scanner) {
-        this.scanner.StopScanner();
+        this.scanner.stopScanner();
       }
       this.focusBarcodeInput();
     }
@@ -278,6 +278,7 @@ export class PosComponent implements OnInit, AfterViewInit {
       this.snackBar.open(`${product.description} added`, 'OK', { duration: 1000 });
 
      this.manualBarcode ='';
+
     } else {
       this.snackBar.open('Product not found', 'Close', { duration: 2000 });
     }
