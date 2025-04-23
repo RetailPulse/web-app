@@ -22,34 +22,36 @@ import {MatButton} from '@angular/material/button';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';
 import {MatOption} from '@angular/material/core';
 import {FormsModule} from '@angular/forms';
-import {MatFormField, MatLabel, MatSelect} from '@angular/material/select';
+import { MatLabel, MatSelect} from '@angular/material/select';
 import {MatTab, MatTabGroup} from '@angular/material/tabs';
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatCard, MatCardContent} from '@angular/material/card';
 import {MatSort} from '@angular/material/sort';
 import Fuse from 'fuse.js';
 import {MatInput} from '@angular/material/input';
+import {Column, InventoryTransaction, SummaryData} from './inventory.model';
+// import {InventoryTransaction} from './inventory.model';
 
-interface Column {
-  field: string;
-  header: string;
-}
+// interface Column {
+//   field: string;
+//   header: string;
+// }
 
-interface InventoryTransaction {
-  productSku: string;
-  quantity: number;
-  rrp: number;
-  source: string;
-  destination: string;
-  date: Date| null;
-}
+// interface InventoryTransaction {
+//   productSku: string;
+//   quantity: number;
+//   rrp: number;
+//   source: string;
+//   destination: string;
+//   date: Date| null;
+// }
 
-interface SummaryData {
-  productSKU: string;
-  businessEntityName: string;
-  quantity: number;
-  rrp: number;
-}
+// interface SummaryData {
+//   productSKU: string;
+//   businessEntityName: string;
+//   quantity: number;
+//   rrp: number;
+// }
 
 @Component({
   selector: 'app-inventory-management',
@@ -283,7 +285,7 @@ export class InventoryManagementComponent implements OnInit {
                 source: entities[index * 2].name,
                 destination: entities[index * 2 + 1].name,
                 date: transactionDate // This can be null
-              };
+              } as InventoryTransaction;
             });
           })
         );
