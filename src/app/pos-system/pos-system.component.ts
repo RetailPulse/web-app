@@ -230,8 +230,7 @@ export class PosComponent implements OnInit, AfterViewInit {
     if (!barcode) return;
 
     const product = this.products.find(p =>
-      p.barcode === barcode ||
-      p.sku === barcode
+      p.barcode === barcode
     );
 
     if (product) {
@@ -343,43 +342,34 @@ export class PosComponent implements OnInit, AfterViewInit {
   checkout(): void {
     if (!this.selectedBusinessEntity) return;
 
-    const totalWithTax = this.getTotalWithTax();
-
     const salesDetails = this.cart.map(item => ({
       productId: item.product.id,
       quantity: item.quantity,
       salesPricePerUnit: item.product.rrp.toString(),
-    } as SalesDetails));
+    }));
 
+    // Remove businessEntityId from the request body since it's now in the URL
     const salesTransactionRequest: SalesTransactionRequest = {
       businessEntityId: this.selectedBusinessEntity.id,
       taxAmount: this.salesTax.toString(),
-      totalAmount: totalWithTax.toString(),
+      totalAmount: this.getTotalWithTax().toString(),
       salesDetails
     };
 
-    let transactionResponse: SalesTransactionResponse;
-
-    const subscription = this.posService
+    this.posService
       .createTransaction(salesTransactionRequest)
       .subscribe({
         next: (response) => {
-          transactionResponse = response;
           this.snackBar.open(`Checkout completed. Total: $${response.totalAmount}`, 'Close', { duration: 2000 });
+          this.cart = [];
+          this.salesTax = 0;
+          this.focusBarcodeInput();
         },
-        error: (error: Error) => {
+        error: (error) => {
           console.error('Error creating transaction:', error);
           this.snackBar.open('Failed to create transaction', 'Close', { duration: 2000 });
         }
       });
-
-    this.destroyRef.onDestroy(() => {
-      subscription.unsubscribe();
-    });
-
-    this.cart = [];
-    this.salesTax = 0;
-    this.focusBarcodeInput();
   }
 
   freezeTransaction(): void {

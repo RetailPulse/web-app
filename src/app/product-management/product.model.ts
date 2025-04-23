@@ -1,6 +1,6 @@
 export class Product {
-  id!: number;            // Unique identifier for the product
-  sku!: string;           // SKU (Stock Keeping Unit)
+  id!: number;
+  sku! : string;// Unique identifier for the product
   brand!: string;         // Product brand
   category!: string;      // Product category
   subcategory!: string;   // Product subcategory

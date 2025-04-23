@@ -1,4 +1,7 @@
-/* Main dialog container */
+
+
+
+
 .dialog-content {
   padding: 24px;
   min-width: 800px;
@@ -173,5 +176,28 @@
   .displayed-columns {
     display: flex;
     flex-direction: column;
+  }
+}
+/* Add to inventory-modal.component.css or your global styles */
+.success-snackbar {
+  background-color: #4caf50; /* Pastel green */
+  color: white;
+}
+
+.error-snackbar {
+  background-color: #f44336; /* Pastel red */
+  color: white;
+}
+
+/* Optional: Add animation for snackbar */
+.mat-mdc-snack-bar-container {
+  &.success-snackbar {
+    --mdc-snackbar-container-color: #4caf50;
+    --mat-mdc-snack-bar-button-color: white;
+  }
+
+  &.error-snackbar {
+    --mdc-snackbar-container-color: #f44336;
+    --mat-mdc-snack-bar-button-color: white;
   }
 }

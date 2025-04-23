@@ -34,7 +34,8 @@ import {
 import {CurrencyMaskModule} from 'ng2-currency-mask';
 import {MatButton, MatIconButton} from '@angular/material/button';
 import {MatCheckbox} from '@angular/material/checkbox';
-import {NgForOf, NgIf} from '@angular/common';
+import {CurrencyPipe, NgForOf, NgIf} from '@angular/common';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-inventory-modal',
@@ -66,7 +67,8 @@ import {NgForOf, NgIf} from '@angular/common';
     MatError,
     MatLabel,
     MatDialogClose,
-    MatIconButton
+    MatIconButton,
+    CurrencyPipe
   ],
   styleUrls: ['./inventory-modal.component.css']
 })
@@ -75,7 +77,7 @@ export class InventoryModalComponent implements OnInit {
   products: Product[] = [];
   stores: BusinessEntity[] = [];
   filteredProducts: Product[] = [];
-  displayedColumns = ['select', 'sku', 'quantity', 'costPerUnit'];
+  displayedColumns = ['select', 'sku', 'quantity', 'rrp'];
   selection = new SelectionModel<Product>(true, []);
   searchTerm = '';
   quantityTouched:boolean[] =[];
@@ -88,10 +90,10 @@ export class InventoryModalComponent implements OnInit {
     private businessEntityService: BusinessEntityService,
     private fb: FormBuilder,
     private inventoryModalService: InventoryModalService,
+    private snackBar: MatSnackBar
   ) {
     this.importForm = this.fb.group({
       productQuantities: this.fb.array([]),
-      costPerUnits: this.fb.array([]),
       sourceBusinessEntity: [null, Validators.required],
       destinationBusinessEntity: [null, Validators.required]
     }, { validators: this.duplicateEntitiesValidator });
@@ -137,7 +139,6 @@ export class InventoryModalComponent implements OnInit {
 
   initProductControls(): void {
     this.productQuantities.clear();
-    this.costPerUnits.clear();
     this.quantityTouched = [];
     this.costTouched = [];
 
@@ -157,10 +158,6 @@ export class InventoryModalComponent implements OnInit {
     return this.productQuantities.at(index) as FormControl;
   }
 
-  getCostPerUnitControl(index: number): FormControl {
-    return this.costPerUnits.at(index) as FormControl;
-  }
-
   loadProducts(): void {
     this.productService.getProducts().subscribe(products => {
       this.products = products.filter(p => p.active);
@@ -178,19 +175,11 @@ export class InventoryModalComponent implements OnInit {
     this.quantityTouched[index] = true;
   }
 
-  markCostAsTouched(index: number): void {
-    this.costTouched[index] = true;
-  }
 
 // Helper methods for error display
   shouldShowQuantityError(index: number): boolean {
     const control = this.getProductQuantityControl(index);
     return this.quantityTouched[index] && control.invalid;
-  }
-
-  shouldShowCostError(index: number): boolean {
-    const control = this.getCostPerUnitControl(index);
-    return this.costTouched[index] && control.invalid;
   }
 
   getQuantityErrorMessage(index: number): string {
@@ -201,31 +190,21 @@ export class InventoryModalComponent implements OnInit {
     return control.hasError('min') ? 'Must be positive!' : '';
   }
 
-  getCostErrorMessage(index: number): string {
-    const control = this.getCostPerUnitControl(index);
-    if (control.hasError('required')) {
-      return 'Cost per unit is required';
-    }
-    return control.hasError('min') ? 'Cost must be at least $0.01' : '';
-  }
+
 
 
   toggleProduct(product: Product): void {
     this.selection.toggle(product);
     const index = this.filteredProducts.indexOf(product);
     const quantityControl = this.getProductQuantityControl(index);
-    const costControl = this.getCostPerUnitControl(index);
 
     if (this.selection.isSelected(product)) {
       quantityControl.enable();
-      costControl.enable();
       this.quantityTouched[index] = false;
       this.costTouched[index] = false;
     } else {
       quantityControl.disable();
-      costControl.disable();
       quantityControl.reset(1);
-      costControl.reset(0.01);
     }
   }
 
@@ -256,19 +235,39 @@ export class InventoryModalComponent implements OnInit {
     const transactions: InventoryTransaction[] = this.selection.selected.map((product, index) => ({
       productId: product.id,
       quantity: this.getProductQuantityControl(index).value,
-      costPerUnit: this.getCostPerUnitControl(index).value,
       source: this.importForm.value.sourceBusinessEntity,
       destination: this.importForm.value.destinationBusinessEntity,
     }));
 
-    this.inventoryModalService.createInventoryTransaction(transactions).subscribe(
-      response => {
+    this.inventoryModalService.createInventoryTransaction(transactions).subscribe({
+      next: (response) => {
+        this.showSuccessNotification('Inventory allocated successfully!');
         this.dialogRef.close(response);
       },
-      error => {
+      error: (error) => {
         console.error('Error creating inventory transaction:', error);
+        console.log(error);
+        this.showErrorNotification('Failed to allocate inventory. Please try again.');
       }
-    );
+    });
+  }
+
+  private showSuccessNotification(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 5000,
+      panelClass: ['success-snackbar'],
+      horizontalPosition: 'right',
+      verticalPosition: 'top'
+    });
+  }
+
+  private showErrorNotification(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 5000,
+      panelClass: ['error-snackbar'],
+      horizontalPosition: 'right',
+      verticalPosition: 'top'
+    });
   }
 
   onBusinessEntitySelected(value: number): void {

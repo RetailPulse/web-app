@@ -1,29 +1,34 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import {
-  MatCell, MatCellDef,
+  MatCell,
+  MatCellDef,
   MatColumnDef,
   MatHeaderCell, MatHeaderCellDef,
-  MatHeaderRow, MatHeaderRowDef, MatRow, MatRowDef,
-  MatTable,
+  MatHeaderRow, MatHeaderRowDef,
+  MatRow, MatRowDef, MatTable,
   MatTableDataSource
 } from '@angular/material/table';
-import Fuse from 'fuse.js';
 import { forkJoin, map, switchMap } from 'rxjs';
 import { InventoryService } from './inventory.service';
 import { BusinessEntityService } from '../business-entity-management/business-entity.service';
 import { ProductService } from '../product-management/product.service';
 import { InventoryModalComponent } from '../inventory-modal/inventory-modal.component';
 import { BusinessEntity } from '../business-entity-management/business-entity.model';
-import {MatFormField, MatLabel} from '@angular/material/form-field';
+import {MatPaginator} from '@angular/material/paginator';
+import {CurrencyPipe, DatePipe, NgForOf, NgIf} from '@angular/common';
 import {MatIcon} from '@angular/material/icon';
-import {MatInput} from '@angular/material/input';
 import {MatButton} from '@angular/material/button';
+import {MatProgressSpinner} from '@angular/material/progress-spinner';
+import {MatOption} from '@angular/material/core';
 import {FormsModule} from '@angular/forms';
+import {MatFormField, MatLabel, MatSelect} from '@angular/material/select';
 import {MatTab, MatTabGroup} from '@angular/material/tabs';
+import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatCard, MatCardContent} from '@angular/material/card';
-import {MatOption, MatSelect} from '@angular/material/select';
-import {NgForOf, NgIf} from '@angular/common';
+import {MatSort} from '@angular/material/sort';
+import Fuse from 'fuse.js';
+import {MatInput} from '@angular/material/input';
 
 interface Column {
   field: string;
@@ -33,76 +38,81 @@ interface Column {
 interface InventoryTransaction {
   productSku: string;
   quantity: number;
-  costPerUnit: number;
+  rrp: number;
   source: string;
   destination: string;
+  date: Date| null;
 }
 
 interface SummaryData {
   productSKU: string;
   businessEntityName: string;
   quantity: number;
-  totalCostPrice: number;
+  rrp: number;
 }
 
 @Component({
   selector: 'app-inventory-management',
   templateUrl: './inventory-management.component.html',
   imports: [
-    MatFormField,
-    MatIcon,
-    MatInput,
-    MatButton,
-    FormsModule,
-    MatTabGroup,
-    MatTab,
-    MatCard,
-    MatCardContent,
-    MatTable,
-    MatColumnDef,
-    MatHeaderCell,
-    MatCell,
-    MatHeaderRow,
+    MatFormFieldModule,
+    MatPaginator,
     MatRow,
-    MatSelect,
-    MatOption,
-    MatHeaderRowDef,
-    MatRowDef,
-    NgForOf,
+    MatHeaderRow,
+    MatCell,
+    MatHeaderCell,
+    MatColumnDef,
     MatCellDef,
     MatHeaderCellDef,
+    MatHeaderRowDef,
+    MatRowDef,
+    CurrencyPipe,
     NgIf,
-    MatLabel
+    MatTable,
+    MatIcon,
+    MatButton,
+    MatProgressSpinner,
+    MatOption,
+    FormsModule,
+    MatSelect,
+    NgForOf,
+    MatLabel,
+    MatTab,
+    DatePipe,
+    MatTabGroup,
+    MatCard,
+    MatCardContent,
+    MatInput,
   ],
   styleUrls: ['./inventory-management.component.css']
 })
 export class InventoryManagementComponent implements OnInit {
   searchTerm: string = '';
   isModalOpen: boolean = false;
+  isLoading: boolean = false;
 
   // Table configurations
   inventoryTransactionCols: Column[] = [
     { field: 'productSku', header: 'Product SKU' },
     { field: 'quantity', header: 'Quantity' },
-    { field: 'costPerUnit', header: 'Cost Per Unit' },
+    { field: 'rrp', header: 'Retail Price' },
     { field: 'source', header: 'Source' },
-    { field: 'destination', header: 'Destination' }
+    { field: 'destination', header: 'Destination' },
+    { field: 'date', header: 'Date' }
   ];
 
   summaryCols: Column[] = [
     { field: 'productSKU', header: 'SKU' },
     { field: 'quantity', header: 'Quantity' },
+    { field: 'rrp', header: 'Retail Price' },
     { field: 'businessEntityName', header: 'Business Entity' },
-    { field: 'totalCostPrice', header: 'Total Cost Price' }
   ];
 
-  displayedTransactionColumns: string[] = this.inventoryTransactionCols.map(col => col.field);
-  displayedSummaryColumns: string[] = this.summaryCols.map(col => col.field);
-
+  displayedTransactionColumns = this.inventoryTransactionCols.map(col => col.field);
+  displayedSummaryColumns = this.summaryCols.map(col => col.field);
   // Data sources
   inventoryTransactions = new MatTableDataSource<InventoryTransaction>([]);
   tableData = new MatTableDataSource<SummaryData>([]);
-
   businessOptions: BusinessEntity[] = [];
   selectedFilter: number | null = null;
   errorMessage: string = '';
@@ -114,11 +124,65 @@ export class InventoryManagementComponent implements OnInit {
     private productService: ProductService,
     private dialog: MatDialog
   ) {}
+  private fuseTransactionOptions = {
+    keys: ['productSku', 'source', 'destination'],
+    threshold: 0.3,
+    includeScore: true,
+    ignoreLocation: true
+  };
+
+  private fuseSummaryOptions = {
+    keys: ['productSKU', 'businessEntityName'],
+    threshold: 0.3,
+    includeScore: true,
+    ignoreLocation: true
+  };
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   ngOnInit(): void {
-    this.loadInventoryTransaction();
-    this.fetchBusinessEntities();
+    this.loadData();
   }
+
+  loadData(): void {
+    this.isLoading = true;
+    this.fetchBusinessEntities();
+    this.loadInventoryTransaction();
+  }
+
+  private refreshData(): void {
+    this.loadInventoryTransaction();
+    if (this.selectedFilter) {
+      this.onFilterChange(this.selectedFilter);
+    }
+  }
+
+  applyFilter(): void {
+    const term = this.searchTerm.trim();
+
+    if (!term) {
+      // If search term is empty, show all data
+      this.inventoryTransactions.filter = '';
+      this.tableData.filter = '';
+      return;
+    }
+
+    // Filter transactions table
+    if (this.inventoryTransactions.data.length) {
+      const fuse = new Fuse(this.inventoryTransactions.data, this.fuseTransactionOptions);
+      const results = fuse.search(term).map(r => r.item);
+      this.inventoryTransactions.filteredData = results;
+    }
+
+    // Filter summary table
+    if (this.tableData.data.length) {
+      const fuse = new Fuse(this.tableData.data, this.fuseSummaryOptions);
+      const results = fuse.search(term).map(r => r.item);
+      this.tableData.filteredData = results;
+    }
+  }
+
 
   fetchBusinessEntities(): void {
     this.businessEntityService.getBusinessEntities().subscribe({
@@ -130,15 +194,18 @@ export class InventoryManagementComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error fetching business entities:', error);
+        this.isLoading = false;
       },
     });
   }
 
   onFilterChange(filterValue: number): void {
+    this.isLoading = true;
     this.inventoryService.getInventoryByBusinessEntity(filterValue).subscribe({
       next: (inventoryData) => {
         if (!inventoryData || inventoryData.length === 0) {
           this.tableData.data = [];
+          this.isLoading = false;
           return;
         }
 
@@ -149,25 +216,36 @@ export class InventoryManagementComponent implements OnInit {
           ]).pipe(
             map(([product, businessEntity]) => ({
               productSKU: product.sku,
+              rrp: product.rrp,
               businessEntityName: businessEntity.name,
-              quantity: item.quantity,
-              totalCostPrice: item.totalCostPrice
+              quantity: item.quantity
             }))
           )
         );
 
-        forkJoin(requests).subscribe(results => {
-          this.tableData.data = results;
+        forkJoin(requests).subscribe({
+          next: results => {
+            this.tableData= new MatTableDataSource(results);
+            this.tableData.paginator = this.paginator;
+            this.tableData.sort = this.sort;
+            this.isLoading = false;
+          },
+          error: error => {
+            console.error('Error processing inventory data:', error);
+            this.isLoading = false;
+          }
         });
       },
       error: (error) => {
         console.error('Error fetching filtered inventory:', error);
-        this.errorMessage = 'An error occurred while fetching filtered inventory.';
+        this.errorMessage = 'Failed to load inventory data';
+        this.isLoading = false;
       },
     });
   }
 
   private loadInventoryTransaction(): void {
+    this.isLoading = true;
     this.inventoryService.getInventoryTransaction().pipe(
       switchMap((data: any[]) => {
         if (!data || data.length === 0) {
@@ -182,13 +260,31 @@ export class InventoryManagementComponent implements OnInit {
 
         return forkJoin(entityRequests).pipe(
           map((entities) => {
-            return data.map((item, index) => ({
-              productSku: item.product.sku,
-              quantity: item.inventoryTransaction.quantity,
-              costPerUnit: item.inventoryTransaction.costPricePerUnit,
-              source: entities[index * 2].name,
-              destination: entities[index * 2 + 1].name,
-            }));
+            return data.map((item, index) => {
+              // Safely parse the date
+              let transactionDate: Date | null = null;
+              const dateString = item.inventoryTransaction.createdAt;
+
+              if (dateString) {
+                try {
+                  transactionDate = new Date(dateString);
+                  if (isNaN(transactionDate.getTime())) {
+                    transactionDate = null;
+                  }
+                } catch (e) {
+                  transactionDate = null;
+                }
+              }
+
+              return {
+                productSku: item.product.sku,
+                quantity: item.inventoryTransaction.quantity,
+                rrp: item.product.rrp,
+                source: entities[index * 2].name,
+                destination: entities[index * 2 + 1].name,
+                date: transactionDate // This can be null
+              };
+            });
           })
         );
       })
@@ -196,43 +292,31 @@ export class InventoryManagementComponent implements OnInit {
       next: (result) => {
         this.inventoryTransactions.data = result;
         this.errorMessage = '';
+        this.isLoading = false;
       },
       error: (error) => {
         console.error('Error fetching inventory transactions:', error);
         this.inventoryTransactions.data = [];
-        this.errorMessage = 'An error occurred while fetching inventory transactions.';
+        this.errorMessage = 'Failed to load transactions';
+        this.isLoading = false;
       },
     });
   }
 
-  filterProducts(): void {
-    const term = this.searchTerm.trim().toLowerCase();
-    if (!term) {
-      this.inventoryTransactions.filter = '';
-      return;
-    }
-
-    const fuse = new Fuse(this.inventoryTransactions.data, {
-      keys: ['productSku', 'source', 'destination'],
-      includeScore: true,
-      threshold: 0.3,
-      ignoreLocation: true,
-    });
-
-    this.inventoryTransactions.filter = term;
-  }
-
   openModal(): void {
+    this.isModalOpen = true;
     const dialogRef = this.dialog.open(InventoryModalComponent, {
-      width: '60%',
+      width: '80%',
+      maxWidth: '1000px',
       height: 'auto',
+      disableClose: true
     });
 
     dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        console.log('Selected Options:', result.selectedOption1, result.selectedOption2);
-      }
       this.isModalOpen = false;
+      if (result) {
+        this.refreshData();
+      }
     });
   }
 }
