@@ -2,7 +2,7 @@
   <div class="date-range-container">
     <mat-form-field appearance="outline" class="date-picker-field">
       <mat-label>Start Date</mat-label>
-      <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+      <input matInput [matDatepicker]="startPicker" formControlName="startDate" />
       <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
       <mat-datepicker #startPicker></mat-datepicker>
       <mat-error *ngIf="dateRangeForm.get('startDate')?.hasError('required')">
@@ -12,7 +12,8 @@
 
     <mat-form-field appearance="outline" class="date-picker-field">
       <mat-label>End Date</mat-label>
-      <input matInput [matDatepicker]="endPicker" formControlName="endDate" [min]="dateRangeForm.get('startDate')?.value">
+      <input matInput [matDatepicker]="endPicker" formControlName="endDate"
+        [min]="dateRangeForm.get('startDate')?.value" />
       <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
       <mat-datepicker #endPicker></mat-datepicker>
       <mat-error *ngIf="dateRangeForm.get('endDate')?.hasError('required')">
@@ -21,6 +22,16 @@
       <mat-error *ngIf="dateRangeForm.hasError('endBeforeStart')">
         End date must be after start date
       </mat-error>
+    </mat-form-field>
+
+    <!-- Dropdown list for report type -->
+    <mat-form-field appearance="outline" class="report-type-field">
+      <mat-label>Report Type</mat-label>
+      <mat-select formControlName="reportType">
+        <mat-option *ngFor="let option of reportTypeOptions" [value]="option.value">
+          {{ option.label }}
+        </mat-option>
+      </mat-select>
     </mat-form-field>
   </div>
 
@@ -38,5 +49,6 @@
 
 <div *ngIf="inventoryTransactions()" class="report-status">
   <mat-icon class="success-icon">check_circle</mat-icon>
-  <span>Report generated successfully for {{ inventoryTransactions()?.length }} transactions</span>
+  <span>Report generated successfully for
+    {{ inventoryTransactions()?.length }} transactions</span>
 </div>

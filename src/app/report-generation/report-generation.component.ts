@@ -1,5 +1,10 @@
 import { Component, DestroyRef, inject, signal, OnInit } from '@angular/core'; // Added OnInit
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+} from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { InventoryTransactionModel } from './inventory-transaction.model';
 import { InventoryTransactionService } from './inventory-transaction.service';
@@ -12,7 +17,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatError } from '@angular/material/form-field';
 import { CommonModule } from '@angular/common';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-report-generation',
@@ -28,19 +34,30 @@ import { MatNativeDateModule } from '@angular/material/core';
     MatProgressSpinnerModule,
     MatError,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatSelectModule,
+    MatOptionModule,
+    MatNativeDateModule,
   ],
   providers: [DatePipe],
   templateUrl: './report-generation.component.html',
-  styleUrls: ['./report-generation.component.css']
+  styleUrls: ['./report-generation.component.css'],
 })
-export class ReportGenerationComponent implements OnInit { // Implemented OnInit
+export class ReportGenerationComponent implements OnInit {
+  // Implemented OnInit
   dateFormat = 'dd-MM-yyyy HH:mm:ss';
   dateRangeForm: FormGroup;
   loading = signal(false);
-  inventoryTransactions = signal<InventoryTransactionModel[] | undefined>(undefined);
+  inventoryTransactions = signal<InventoryTransactionModel[] | undefined>(
+    undefined
+  );
   error = signal('');
   private destroyRef = inject(DestroyRef);
+
+  // Options array for report type dropdown
+  reportTypeOptions = [
+    { value: 'pdf', label: 'PDF' },
+    { value: 'excel', label: 'Excel' },
+  ];
 
   constructor(
     private fb: FormBuilder,
@@ -48,10 +65,14 @@ export class ReportGenerationComponent implements OnInit { // Implemented OnInit
     private inventoryTransactionService: InventoryTransactionService,
     private pdfService: PdfService
   ) {
-    this.dateRangeForm = this.fb.group({
-      startDate: [new Date(), Validators.required],
-      endDate: [new Date(), Validators.required]
-    }, { validator: this.dateRangeValidator });
+    this.dateRangeForm = this.fb.group(
+      {
+        startDate: [new Date(), Validators.required],
+        endDate: [new Date(), Validators.required],
+        reportType: ['pdf', Validators.required],
+      },
+      { validator: this.dateRangeValidator }
+    );
   }
 
   // Added ngOnInit lifecycle hook
@@ -75,15 +96,43 @@ export class ReportGenerationComponent implements OnInit { // Implemented OnInit
     this.error.set('');
     this.inventoryTransactions.set(undefined);
 
-    const startDateParam = this.datePipe.transform(this.dateRangeForm.value.startDate, this.dateFormat) ?? '';
-    const endDateParam = this.datePipe.transform(this.dateRangeForm.value.endDate, this.dateFormat) ?? '';
+    const startDateParam =
+      this.datePipe.transform(
+        this.dateRangeForm.value.startDate,
+        this.dateFormat
+      ) ?? '';
+    const endDateParam =
+      this.datePipe.transform(
+        this.dateRangeForm.value.endDate,
+        this.dateFormat
+      ) ?? '';
 
     const subscription = this.inventoryTransactionService
-      .fetchInventoryTransactions(startDateParam, endDateParam, this.dateFormat)
+      .exportReport(
+        startDateParam,
+        endDateParam,
+        this.dateFormat,
+        this.dateRangeForm.value.reportType
+      )
       .subscribe({
-        next: (transactions: InventoryTransactionModel[]) => {
-          this.inventoryTransactions.set(transactions);
-          this.pdfService.generatePdf(startDateParam, endDateParam, transactions);
+        next: (blob: Blob) => {
+          // Create a URL for the Blob and trigger download
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+
+          // Use yyyyMMdd_HHmmss format for the filename
+          const currentDateTime =
+            this.datePipe.transform(new Date(), 'yyyyMMdd_HHmmss') ?? '';
+          const reportType = this.dateRangeForm.value.reportType;
+          const extension = reportType === 'excel' ? '.xlsx' : '.pdf';
+          a.download = `Report_InventoryTransaction_${currentDateTime}${extension}`;
+
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+
+          window.URL.revokeObjectURL(url);
         },
         error: (err: Error) => {
           this.error.set(err.message);
@@ -91,7 +140,7 @@ export class ReportGenerationComponent implements OnInit { // Implemented OnInit
         },
         complete: () => {
           this.loading.set(false);
-        }
+        },
       });
 
     this.destroyRef.onDestroy(() => {
