@@ -9,6 +9,7 @@ import { DatePipe } from '@angular/common';
 import { InventoryTransactionModel } from './inventory-transaction.model';
 import { InventoryTransactionService } from './inventory-transaction.service';
 import { PdfService } from './pdf.service';
+import { ProductService } from './product.service'; // Added ProductService import
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -59,10 +60,16 @@ export class ReportGenerationComponent implements OnInit {
     { value: 'excel', label: 'Excel' },
   ];
 
+  reportCategoryOptions = [
+    { value: 'inventoryTransaction', label: 'Inventory Transaction' },
+    { value: 'products', label: 'Products' },
+  ];
+
   constructor(
     private fb: FormBuilder,
     private datePipe: DatePipe,
     private inventoryTransactionService: InventoryTransactionService,
+    private productService: ProductService, // Added ProductService injection
     private pdfService: PdfService
   ) {
     this.dateRangeForm = this.fb.group(
@@ -70,6 +77,11 @@ export class ReportGenerationComponent implements OnInit {
         startDate: [new Date(), Validators.required],
         endDate: [new Date(), Validators.required],
         reportType: ['pdf', Validators.required],
+        // Set default to the first report category option
+        reportCategory: [
+          this.reportCategoryOptions[0].value,
+          Validators.required,
+        ],
       },
       { validator: this.dateRangeValidator }
     );
@@ -107,41 +119,55 @@ export class ReportGenerationComponent implements OnInit {
         this.dateFormat
       ) ?? '';
 
-    const subscription = this.inventoryTransactionService
-      .exportReport(
+    const reportType = this.dateRangeForm.value.reportType;
+    const reportCategory = this.dateRangeForm.value.reportCategory;
+
+    // Select the proper service based on the selected report category
+    let reportObservable;
+    if (reportCategory === 'inventoryTransaction') {
+      reportObservable = this.inventoryTransactionService.exportReport(
         startDateParam,
         endDateParam,
         this.dateFormat,
-        this.dateRangeForm.value.reportType
-      )
-      .subscribe({
-        next: (blob: Blob) => {
-          // Create a URL for the Blob and trigger download
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
+        reportType
+      );
+    } else if (reportCategory === 'products') {
+      reportObservable = this.productService.exportReport(reportType);
+    }
 
-          // Use yyyyMMdd_HHmmss format for the filename
-          const currentDateTime =
-            this.datePipe.transform(new Date(), 'yyyyMMdd_HHmmss') ?? '';
-          const reportType = this.dateRangeForm.value.reportType;
-          const extension = reportType === 'excel' ? '.xlsx' : '.pdf';
-          a.download = `Report_InventoryTransaction_${currentDateTime}${extension}`;
+    if (!reportObservable) {
+      this.error.set('No report observable found for the selected category.');
+      this.loading.set(false);
+      return;
+    }
 
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
+    const subscription = reportObservable.subscribe({
+      next: (blob: Blob) => {
+        // Create a URL for the Blob and trigger download
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
 
-          window.URL.revokeObjectURL(url);
-        },
-        error: (err: Error) => {
-          this.error.set(err.message);
-          this.loading.set(false);
-        },
-        complete: () => {
-          this.loading.set(false);
-        },
-      });
+        // Use yyyyMMdd_HHmmss format for the filename
+        const currentDateTime =
+          this.datePipe.transform(new Date(), 'yyyyMMdd_HHmmss') ?? '';
+        const extension = reportType === 'excel' ? '.xlsx' : '.pdf';
+        a.download = `Report_InventoryTransaction_${currentDateTime}${extension}`;
+
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err: Error) => {
+        this.error.set(err.message);
+        this.loading.set(false);
+      },
+      complete: () => {
+        this.loading.set(false);
+      },
+    });
 
     this.destroyRef.onDestroy(() => {
       subscription.unsubscribe();
