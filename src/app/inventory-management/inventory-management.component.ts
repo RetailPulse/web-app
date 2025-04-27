@@ -31,7 +31,6 @@ import Fuse from 'fuse.js';
 import {MatInput} from '@angular/material/input';
 import {Column, InventoryTransaction, SummaryData} from './inventory.model';
 
-
 @Component({
   selector: 'app-inventory-management',
   templateUrl: './inventory-management.component.html',
