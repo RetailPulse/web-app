@@ -10,7 +10,7 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, A
 
 import { User } from '../models/user.model';
 import { UserService } from '../services/user.service';
-import { AuthService } from '../services/auth.service';
+import {OAuthAuthenticationService} from '../services/oauth-authentication.service';
 
 
 // Custom validator to check for at least one number in the password
@@ -27,7 +27,7 @@ function containsNumber(control: AbstractControl): { [key: string]: boolean } | 
     ConfirmDialogModule,
     CardModule,
     PasswordModule,
-    DialogModule,    
+    DialogModule,
     ButtonModule,
   ],
   templateUrl: './profile.component.html',
@@ -36,7 +36,7 @@ function containsNumber(control: AbstractControl): { [key: string]: boolean } | 
 
 export class ProfileComponent {
   private userService = inject(UserService);
-  private authService = inject(AuthService);
+  private authService = inject(OAuthAuthenticationService);
   private formBuilder = inject(FormBuilder);
   private confirmationService = inject(ConfirmationService);
 
@@ -50,7 +50,7 @@ export class ProfileComponent {
   changePassword_visible = signal(false);
   changePassword_error_msg = signal<string | null>(null);
 
-  constructor() {    
+  constructor() {
     // Fetch the user profile
     const userName: string = this.authService.getUsername();
     this.userService.getUserByUsername(userName).subscribe({
@@ -68,9 +68,9 @@ export class ProfileComponent {
     // Initialize the Change Password Form
     this.changePasswordForm = this.formBuilder.group({
       ctlOldPassword: ['', Validators.required],
-      ctlNewPassword: ['', 
+      ctlNewPassword: ['',
         [
-          Validators.required, 
+          Validators.required,
           Validators.minLength(8),
           containsNumber // Custom validator to ensure at least one number
         ]
@@ -115,7 +115,7 @@ export class ProfileComponent {
   }
 
   changePassword(): void {
-    this.resetMessages();    
+    this.resetMessages();
     const oldPassword: string = this.changePasswordForm.get('ctlOldPassword')?.value;
     const newPassword: string = this.changePasswordForm.get('ctlNewPassword')?.value;
 
