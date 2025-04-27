@@ -28,7 +28,7 @@ export interface InventoryTransaction {
   rrp: number;
   source: string;
   destination: string;
-  date: Date | null;
+  insertedAt: Date | null;
 }
 
 export interface SummaryData {

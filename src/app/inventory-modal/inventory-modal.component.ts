@@ -182,8 +182,6 @@ export class InventoryModalComponent implements OnInit {
   }
 
 
-
-
   toggleProduct(product: Product): void {
     this.selection.toggle(product);
     const index = this.filteredProducts.indexOf(product);
@@ -224,6 +222,7 @@ export class InventoryModalComponent implements OnInit {
       source: this.importForm.value.sourceBusinessEntity,
       destination: this.importForm.value.destinationBusinessEntity,
     }));
+
 
     this.inventoryModalService.createInventoryTransaction(transactions).subscribe({
       next: (response) => {
