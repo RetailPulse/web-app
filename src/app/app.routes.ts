@@ -36,7 +36,7 @@ export const routes: Routes = [
       {path: 'profile', loadComponent: lazyProfile},
       {path: 'barcodescanner', loadComponent: lazyBarcodeScanner},
       {path: 'pos-system', loadComponent: lazyPOS},
-      { path: '', redirectTo: 'user-management', pathMatch: 'full' }, // Default childroute
+      { path: '', redirectTo: 'pos-system', pathMatch: 'full' }, // Default childroute
     ],
   },
 
@@ -54,7 +54,7 @@ export const routes: Routes = [
       {path: 'profile', loadComponent: lazyProfile},
       {path: 'barcodescanner', loadComponent: lazyBarcodeScanner},
       {path: 'pos-system', loadComponent: lazyPOS},
-      { path: '', redirectTo: 'product-management', pathMatch: 'full' }, // Default childroute
+      { path: '', redirectTo: 'pos-system', pathMatch: 'full' }, // Default childroute
     ],
   },
   {
@@ -65,7 +65,7 @@ export const routes: Routes = [
     children: [
       {path: 'profile', loadComponent: lazyProfile},
       {path: 'pos-system', loadComponent: lazyPOS},
-      { path: '', redirectTo: 'profile', pathMatch: 'full' }, // Default childroute
+      { path: '', redirectTo: 'pos-system', pathMatch: 'full' }, // Default childroute
     ],
   },
 
