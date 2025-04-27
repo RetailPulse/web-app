@@ -81,7 +81,6 @@ export class InventoryModalComponent implements OnInit {
   selection = new SelectionModel<Product>(true, []);
   searchTerm = '';
   quantityTouched:boolean[] =[];
-  costTouched:boolean[] =[];
 
   constructor(
     private dialogRef: MatDialogRef<InventoryModalComponent>,
@@ -115,9 +114,6 @@ export class InventoryModalComponent implements OnInit {
     return this.importForm.get('productQuantities') as FormArray;
   }
 
-  get costPerUnits(): FormArray {
-    return this.importForm.get('costPerUnits') as FormArray;
-  }
 
   get allSelected(): boolean {
     return this.selection.selected.length === this.filteredProducts.length && this.filteredProducts.length > 0;
@@ -140,17 +136,12 @@ export class InventoryModalComponent implements OnInit {
   initProductControls(): void {
     this.productQuantities.clear();
     this.quantityTouched = [];
-    this.costTouched = [];
 
     this.filteredProducts.forEach(() => {
       this.productQuantities.push(
         new FormControl(1, [Validators.required, Validators.min(1)])
       );
-      this.costPerUnits.push(
-        new FormControl(0.01, [Validators.required, Validators.min(0.01)])
-      );
       this.quantityTouched.push(false);
-      this.costTouched.push(false);
     });
   }
 
@@ -201,7 +192,6 @@ export class InventoryModalComponent implements OnInit {
     if (this.selection.isSelected(product)) {
       quantityControl.enable();
       this.quantityTouched[index] = false;
-      this.costTouched[index] = false;
     } else {
       quantityControl.disable();
       quantityControl.reset(1);
@@ -215,14 +205,10 @@ export class InventoryModalComponent implements OnInit {
         control.disable();
         control.reset(1);
       });
-      this.costPerUnits.controls.forEach(control => {
-        control.disable();
-        control.reset(0.01);
-      });
+
     } else {
       this.filteredProducts.forEach(product => this.selection.select(product));
       this.productQuantities.controls.forEach(control => control.enable());
-      this.costPerUnits.controls.forEach(control => control.enable());
     }
   }
 
