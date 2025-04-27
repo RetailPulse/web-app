@@ -6,12 +6,10 @@ import { OAuthAuthenticationService } from '../services/oauth-authentication.ser
 export const roleGuard: CanActivateFn = (route) => {
   const authService = inject(OAuthAuthenticationService);
   const router = inject(Router);
-  const requiredRoles = route.data['roles'] as string[];
 
   if (!authService.getUserRole()) {
     router.navigate(['/access-denied']);
     return false;
   }
   return true;
-
 };
