@@ -217,11 +217,10 @@ export class InventoryModalComponent implements OnInit {
 
     const transactions: InventoryTransaction[] = this.selection.selected.map((product, index) => ({
       productId: product.id,
-      quantity: this.getProductQuantityControl(index).value,
+      quantity: this.getProductQuantityControl(this.filteredProducts.indexOf(product)).value,
       source: this.importForm.value.sourceBusinessEntity,
       destination: this.importForm.value.destinationBusinessEntity,
     }));
-
 
     this.inventoryModalService.createInventoryTransaction(transactions).subscribe({
       next: (response) => {
