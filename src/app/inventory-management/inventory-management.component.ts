@@ -20,7 +20,7 @@ import {CurrencyPipe, DatePipe, NgForOf, NgIf} from '@angular/common';
 import {MatIcon} from '@angular/material/icon';
 import {MatButton} from '@angular/material/button';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';
-import {MatOption} from '@angular/material/core';
+import {MatOptgroup, MatOption} from '@angular/material/core';
 import {FormsModule} from '@angular/forms';
 import { MatLabel, MatSelect} from '@angular/material/select';
 import {MatTab, MatTabGroup} from '@angular/material/tabs';
@@ -30,28 +30,7 @@ import {MatSort} from '@angular/material/sort';
 import Fuse from 'fuse.js';
 import {MatInput} from '@angular/material/input';
 import {Column, InventoryTransaction, SummaryData} from './inventory.model';
-// import {InventoryTransaction} from './inventory.model';
 
-// interface Column {
-//   field: string;
-//   header: string;
-// }
-
-// interface InventoryTransaction {
-//   productSku: string;
-//   quantity: number;
-//   rrp: number;
-//   source: string;
-//   destination: string;
-//   date: Date| null;
-// }
-
-// interface SummaryData {
-//   productSKU: string;
-//   businessEntityName: string;
-//   quantity: number;
-//   rrp: number;
-// }
 
 @Component({
   selector: 'app-inventory-management',
@@ -80,11 +59,12 @@ import {Column, InventoryTransaction, SummaryData} from './inventory.model';
     NgForOf,
     MatLabel,
     MatTab,
-    DatePipe,
     MatTabGroup,
     MatCard,
     MatCardContent,
     MatInput,
+    DatePipe,
+    MatOptgroup,
   ],
   styleUrls: ['./inventory-management.component.css']
 })
@@ -100,7 +80,7 @@ export class InventoryManagementComponent implements OnInit {
     { field: 'rrp', header: 'Retail Price' },
     { field: 'source', header: 'Source' },
     { field: 'destination', header: 'Destination' },
-    { field: 'date', header: 'Date' }
+    { field: 'insertedAt', header: 'Date' },
   ];
 
   summaryCols: Column[] = [
@@ -145,6 +125,17 @@ export class InventoryManagementComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadData();
+    setTimeout(() => {
+      if (this.sort) {
+        this.inventoryTransactions.sort = this.sort;
+        // Set default sort to insertedAt descending
+        this.sort.sort({
+          id: 'insertedAt',
+          start: 'asc',
+          disableClear: false
+        });
+      }
+    });
   }
 
   loadData(): void {
@@ -263,28 +254,13 @@ export class InventoryManagementComponent implements OnInit {
         return forkJoin(entityRequests).pipe(
           map((entities) => {
             return data.map((item, index) => {
-              // Safely parse the date
-              let transactionDate: Date | null = null;
-              const dateString = item.inventoryTransaction.createdAt;
-
-              if (dateString) {
-                try {
-                  transactionDate = new Date(dateString);
-                  if (isNaN(transactionDate.getTime())) {
-                    transactionDate = null;
-                  }
-                } catch (e) {
-                  transactionDate = null;
-                }
-              }
-
               return {
                 productSku: item.product.sku,
                 quantity: item.inventoryTransaction.quantity,
                 rrp: item.product.rrp,
                 source: entities[index * 2].name,
                 destination: entities[index * 2 + 1].name,
-                date: transactionDate // This can be null
+                insertedAt: new Date(item.inventoryTransaction.insertedAt) // Make sure this is included
               } as InventoryTransaction;
             });
           })
@@ -293,6 +269,7 @@ export class InventoryManagementComponent implements OnInit {
     ).subscribe({
       next: (result) => {
         this.inventoryTransactions.data = result;
+        this.inventoryTransactions.sort = this.sort; // Set sort here as well
         this.errorMessage = '';
         this.isLoading = false;
       },

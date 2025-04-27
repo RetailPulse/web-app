@@ -155,12 +155,6 @@ export class PosComponent implements OnInit, AfterViewInit {
   }
 
 
-  changeBusiness(): void {
-    this.businessConfirmed = false;
-    this.selectedBusinessEntity = null;
-    this.cart = [];
-    this.salesTax = 0;
-  }
 
   setupSearch(): void {
     const fuse = new Fuse<Product>(this.products, {
@@ -414,6 +408,7 @@ export class PosComponent implements OnInit, AfterViewInit {
           this.cart = [];
           this.salesTax = 0;
           this.focusBarcodeInput();
+          this.loadProducts(); // Reload products to refresh inventory
         },
         error: (error) => {
           console.error('Error creating transaction:', error);

@@ -3,7 +3,6 @@ import {BusinessEntity} from '../business-entity-management/business-entity.mode
 export class InventoryTransaction {
   productId!: number;
   quantity!: number;
-  costPerUnit!: number;
   source!:  string;
   destination!: string; // Destination
 }
@@ -29,7 +28,7 @@ export interface InventoryTransaction {
   rrp: number;
   source: string;
   destination: string;
-  date: Date | null;
+  insertedAt: Date | null;
 }
 
 export interface SummaryData {
