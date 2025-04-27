@@ -222,6 +222,7 @@ export class InventoryModalComponent implements OnInit {
       destination: this.importForm.value.destinationBusinessEntity,
     }));
 
+
     this.inventoryModalService.createInventoryTransaction(transactions).subscribe({
       next: (response) => {
         this.showSuccessNotification('Inventory allocated successfully!');
