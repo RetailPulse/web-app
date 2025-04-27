@@ -1,44 +1,31 @@
-import {MessageModule} from 'primeng/message';
-
-import {Component, OnInit} from '@angular/core';
-import {AuthService} from '../services/auth.service';
-import {Router} from '@angular/router';
-
+import { MessageModule } from 'primeng/message';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import {AuthFacade} from '../services/auth.facade';
 
 @Component({
   selector: 'app-login-form',
   templateUrl: './login-form.component.html',
-  styleUrls: ['./login-form.component.css'], // Corrected from styleUrl to styleUrls
+  styleUrls: ['./login-form.component.css'],
   imports: [MessageModule]
 })
 export class LoginFormComponent implements OnInit {
-
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(private router: Router, private authFacade: AuthFacade) {}
 
   ngOnInit(): void {
-    this.authService.initializeAuth().then(() => {
-      if (this.authService.isAuthenticated) {
-        console.log("User is already authenticated.");
-        let userRoles = this.authService.getUserRole();
-        console.log("User roles: " + userRoles);
-        if (userRoles.includes("ADMIN") || userRoles.includes("SUPER")) {
-          console.log("Going to admin page");
-          this.router.navigate(['/admin']);
-        } else if (userRoles.includes("MANAGER")) {
-          this.router.navigate(['/manager']);
-        }
-        else if (userRoles.includes("CASHIER")) {
-          this.router.navigate(['/cashier']);
-        }
+    this.authFacade.initialize().then(() => {
+      if (this.authFacade.isAuthenticated()) {
+        console.log("User is authenticated.");
+        this.authFacade.navigateToAuthenticatedUser();
+      } else {
+        console.log("User is not logged in.");
+        this.router.navigate(['/login']);
       }
     });
   }
 
-  // Method to handle login action
   onLogin(): void {
-    // Perform login logic here (e.g., authentication)
     console.log("Logging in...");
-    this.authService.login();
+    this.authFacade.login();
   }
-
 }

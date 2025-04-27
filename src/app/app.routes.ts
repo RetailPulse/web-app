@@ -1,6 +1,6 @@
 import {Routes} from '@angular/router';
-import {authGuard} from './guards/auth.guard';
 import {LoginPageComponent} from './login-page/login-page.component';
+import {authGuard} from './guards/auth.guard';
 
 // Lazy-loaded components
 const lazyAdminPage = () => import('./admin-page/admin-page.component').then(mod => mod.AdminPageComponent);
