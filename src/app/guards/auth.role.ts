@@ -1,10 +1,10 @@
 // role.guard.ts
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { OAuthAuthenticationService } from '../services/oauth-authentication.service';
+import {AuthFacade} from '../services/auth.facade';
 
 export const roleGuard: CanActivateFn = (route) => {
-  const authService = inject(OAuthAuthenticationService);
+  const authService = inject(AuthFacade);
   const router = inject(Router);
 
   if (!authService.getUserRole()) {

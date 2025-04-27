@@ -1,21 +1,21 @@
 // mocks/auth-service.mock.ts
-import { OauthAuthenticationService } from '../services/oauth-authentication.service';
+import {AuthFacade} from '../services/auth.facade';
 
-export const createMockAuthService = (): jasmine.SpyObj<OauthAuthenticationService> => {
+export const createMockAuthService = (): jasmine.SpyObj<AuthFacade> => {
 
-  const mockAuthService = jasmine.createSpyObj<OauthAuthenticationService>('AuthService', [
+  const mockAuthService = jasmine.createSpyObj<AuthFacade>('AuthFacade', [
+    'initialize',
     'login',
     'logout',
-    'initializeAuth',
     'isAuthenticated',
     'getUserRole',
     'getUsername',
-    'accessToken',
+    'getAccessToken',
     'getDecodedToken',
   ]);
 
   // Add properties for isAuthenticated and accessToken
-  mockAuthService.initializeAuth.and.returnValue(Promise.resolve());
+  mockAuthService.initialize.and.returnValue(Promise.resolve());
   mockAuthService.getUserRole.and.returnValue(['ADMIN']);
   mockAuthService.getUsername.and.returnValue('superadmin');
   mockAuthService.getDecodedToken.and.returnValue({

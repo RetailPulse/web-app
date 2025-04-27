@@ -3,8 +3,7 @@ import { Component } from '@angular/core';
 import { RouterModule, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import {apiConfig} from '../../environments/environment';
-import {OAuthAuthenticationService} from '../services/oauth-authentication.service';
-
+import {AuthFacade} from '../services/auth.facade';
 @Component({
   selector: 'admin-page',
   imports: [
@@ -21,11 +20,11 @@ export class AdminPageComponent {
 
   constructor(
     private router: Router,
-    private authService: OAuthAuthenticationService,
+    private authService: AuthFacade,
     private http: HttpClient
   ) {
 
-    console.log('Token: ' + this.authService.accessToken);
+    console.log('Token: ' + this.authService.getAccessToken());
     console.log('Decoded Token: ' + this.authService.getDecodedToken());
     if (!this.authService.isAuthenticated) {
       console.log("User is not authenticated. Going back to login page.");
