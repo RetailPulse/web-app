@@ -6,12 +6,12 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { routes } from '../app.routes';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
-import { OauthAuthenticationService } from '../services/oauth-authentication.service';
 
 import { createMockAuthService } from '../mock/auth.service.mock';
 import { ConfirmationService } from 'primeng/api';
 
 import { OperatorPageComponent } from './operator-page.component';
+import {AuthFacade} from '../services/auth.facade';
 
 describe('OperatorPageComponent', () => {
   let component: OperatorPageComponent;
@@ -29,7 +29,7 @@ describe('OperatorPageComponent', () => {
         provideRouter(routes),
         provideAnimations(),
         provideAnimationsAsync(),
-        { provide: OauthAuthenticationService, useValue: mockAuthService }, // Mock OauthAuthenticationService
+        { provide: AuthFacade, useValue: mockAuthService }, // Mock OauthAuthenticationService
         ConfirmationService,
       ]
     })

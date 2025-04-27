@@ -10,7 +10,7 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, A
 
 import { User } from '../models/user.model';
 import { UserService } from '../services/user.service';
-import {OAuthAuthenticationService} from '../services/oauth-authentication.service';
+import {AuthFacade} from '../services/auth.facade';
 
 
 // Custom validator to check for at least one number in the password
@@ -36,7 +36,7 @@ function containsNumber(control: AbstractControl): { [key: string]: boolean } | 
 
 export class ProfileComponent {
   private userService = inject(UserService);
-  private authService = inject(OAuthAuthenticationService);
+  private authService = inject(AuthFacade);
   private formBuilder = inject(FormBuilder);
   private confirmationService = inject(ConfirmationService);
 

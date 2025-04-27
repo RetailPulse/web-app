@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { AdminSidebarStrategy } from '../strategyMethod/admin-sidebar.strategy';
 import { ManagerSidebarStrategy } from '../strategyMethod/manager-sidebar.strategy';
 import { CashierSidebarStrategy } from '../strategyMethod/cashier-sidebar.strategy';
-import {OAuthAuthenticationService} from '../../services/oauth-authentication.service';
 import { ISidebarStrategy } from '../strategyMethod/sidebar.strategy';
+import {AuthFacade} from '../../services/auth.facade';
 
 @Injectable({ providedIn: 'root' })
 export class SidebarFactory {
@@ -11,7 +11,7 @@ export class SidebarFactory {
     private adminStrategy: AdminSidebarStrategy,
     private managerStrategy: ManagerSidebarStrategy,
     private cashierStrategy: CashierSidebarStrategy,
-    private authService: OAuthAuthenticationService
+    private authService: AuthFacade
   ) {}
 
   createStrategy(): ISidebarStrategy {

@@ -1,12 +1,12 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { OauthAuthenticationService } from '../services/oauth-authentication.service';
 
 import { createMockAuthService } from '../mock/auth.service.mock';
 import { ConfirmationService } from 'primeng/api';
 
 import { LogoutButtonComponent } from './logout-button.component';
+import {AuthFacade} from '../services/auth.facade';
 
 describe('LogoutButtonComponent', () => {
   let component: LogoutButtonComponent;
@@ -21,7 +21,7 @@ describe('LogoutButtonComponent', () => {
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
-        { provide: OauthAuthenticationService, useValue: mockAuthService }, // Mock OauthAuthenticationService
+        { provide: AuthFacade, useValue: mockAuthService }, // Mock OauthAuthenticationService
         ConfirmationService,
       ]
     })

@@ -1,6 +1,6 @@
 import { Router } from '@angular/router';
 import { Component } from '@angular/core';
-import { OAuthAuthenticationService } from '../services/oauth-authentication.service';
+import {AuthFacade} from '../services/auth.facade';
 
 @Component({
   selector: 'logout-button',
@@ -10,14 +10,14 @@ import { OAuthAuthenticationService } from '../services/oauth-authentication.ser
 })
 export class LogoutButtonComponent {
 
-  constructor(private router:Router, private authService: OAuthAuthenticationService) { }
+  constructor(private router:Router, private authService: AuthFacade) { }
 
   // Method to handle login action
   onLogout(): void {
     // Perform login logic here (e.g., authentication)
     console.log("Logging out...");
 
-    if (this.authService.isAuthenticated) {
+    if (this.authService.isAuthenticated()) {
       this.authService.logout();
     }
 

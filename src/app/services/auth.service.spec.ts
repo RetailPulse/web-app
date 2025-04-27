@@ -1,10 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 
 import { OAuthService } from 'angular-oauth2-oidc';
-import {OAuthAuthenticationService} from './oauth-authentication.service';
+import {AuthFacade} from './auth.facade';
 
 describe('AuthService', () => {
-  let service: OAuthAuthenticationService;
+  let service: AuthFacade;
 
   beforeEach(() => {
 
@@ -21,11 +21,11 @@ describe('AuthService', () => {
 
     TestBed.configureTestingModule({
       providers: [
-        OAuthAuthenticationService,
+        AuthFacade,
         { provide: OAuthService, useValue: mockOAuthService }, // Provide the mock OAuthService
       ],
     });
-    service = TestBed.inject(OAuthAuthenticationService);
+    service = TestBed.inject(AuthFacade);
   });
 
   it('should be created', () => {

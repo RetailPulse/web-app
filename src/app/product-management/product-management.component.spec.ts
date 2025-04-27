@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
-import { OauthAuthenticationService } from '../services/oauth-authentication.service';
 
 import { createMockAuthService } from '../mock/auth.service.mock';
 import { ConfirmationService } from 'primeng/api';
@@ -9,6 +8,7 @@ import { ConfirmationService } from 'primeng/api';
 import { ProductManagementComponent } from './product-management.component';
 import { HttpClientModule } from '@angular/common/http';
 import {BusinessEntityService} from '../business-entity-management/business-entity.service';
+import {AuthFacade} from '../services/auth.facade';
 
 beforeEach(async () => {
   await TestBed.configureTestingModule({
@@ -30,7 +30,7 @@ describe('ProductManagementComponent', () => {
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
-        { provide: OauthAuthenticationService, useValue: mockAuthService }, // Mock OauthAuthenticationService
+        { provide: AuthFacade, useValue: mockAuthService }, // Mock OauthAuthenticationService
         ConfirmationService,
       ]
     })
