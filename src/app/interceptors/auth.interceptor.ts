@@ -1,6 +1,6 @@
 import {inject} from '@angular/core';
 import {HttpInterceptorFn} from '@angular/common/http';
-import {AuthService} from '../services/auth.service';
+import {OAuthAuthenticationService} from '../services/oauth-authentication.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   console.log('Processing authInterceptor...');
@@ -12,10 +12,10 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     '/login'
   ];
 
-  // Inject the AuthService
-  const authService = inject(AuthService);
+  // Inject the OauthAuthenticationService
+  const authService = inject(OAuthAuthenticationService);
 
-  // Get the token from the AuthService
+  // Get the token from the OauthAuthenticationService
   const token = authService.accessToken;
 
   // Skip the interceptor for OPTIONS requests (Preflight request)

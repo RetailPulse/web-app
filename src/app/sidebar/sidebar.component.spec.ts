@@ -6,10 +6,10 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { routes } from '../app.routes';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
-import { AuthService } from '../services/auth.service';
+import { OauthAuthenticationService } from '../services/oauth-authentication.service';
 
 import { createMockAuthService } from '../mock/auth.service.mock';
-import { ConfirmationService } from 'primeng/api'; 
+import { ConfirmationService } from 'primeng/api';
 
 import { SidebarComponent } from './sidebar.component';
 
@@ -18,7 +18,7 @@ describe('SidebarComponent', () => {
   let fixture: ComponentFixture<SidebarComponent>;
 
   beforeEach(async () => {
-    // Mock AuthService
+    // Mock OauthAuthenticationService
     const mockAuthService = createMockAuthService();
 
     await TestBed.configureTestingModule({
@@ -29,7 +29,7 @@ describe('SidebarComponent', () => {
         provideRouter(routes),
         provideAnimations(),
         provideAnimationsAsync(),
-        { provide: AuthService, useValue: mockAuthService }, // Mock AuthService
+        { provide: OauthAuthenticationService, useValue: mockAuthService }, // Mock OauthAuthenticationService
         ConfirmationService,
       ]
     })
