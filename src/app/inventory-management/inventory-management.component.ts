@@ -311,7 +311,12 @@ export class InventoryManagementComponent implements OnInit {
       width: '80%',
       maxWidth: '1000px',
       height: 'auto',
-      disableClose: true
+      disableClose: true, 
+      data: {          
+          isModalOpen: this.isModalOpen,
+          businessOptions: this.businessOptions,
+          shopMap: this.shopMap,
+      }
     });
 
     dialogRef.afterClosed().subscribe((result) => {

@@ -181,9 +181,6 @@ export class InventoryModalComponent implements OnInit {
     return control.hasError('min') ? 'Must be positive!' : '';
   }
 
-
-
-
   toggleProduct(product: Product): void {
     this.selection.toggle(product);
     const index = this.filteredProducts.indexOf(product);
