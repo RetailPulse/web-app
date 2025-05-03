@@ -36,7 +36,7 @@ export const routes: Routes = [
       {path: 'profile', loadComponent: lazyProfile},
       {path: 'barcodescanner', loadComponent: lazyBarcodeScanner},
       {path: 'pos-system', loadComponent: lazyPOS},
-      { path: '', redirectTo: 'pos-system', pathMatch: 'full' }, // Default childroute
+      {path: '', redirectTo: 'pos-system', pathMatch: 'full' }, // Default childroute
     ],
   },
 
@@ -54,7 +54,7 @@ export const routes: Routes = [
       {path: 'profile', loadComponent: lazyProfile},
       {path: 'barcodescanner', loadComponent: lazyBarcodeScanner},
       {path: 'pos-system', loadComponent: lazyPOS},
-      { path: '', redirectTo: 'pos-system', pathMatch: 'full' }, // Default childroute
+      {path: '', redirectTo: 'pos-system', pathMatch: 'full' }, // Default childroute
     ],
   },
   {
@@ -63,9 +63,9 @@ export const routes: Routes = [
     canActivate: [authGuard],
     data: {roles: ['CASHIER']},
     children: [
-      {path: 'profile', loadComponent: lazyProfile},
       {path: 'pos-system', loadComponent: lazyPOS},
-      { path: '', redirectTo: 'pos-system', pathMatch: 'full' }, // Default childroute
+      {path: 'profile', loadComponent: lazyProfile},
+      {path: '', redirectTo: 'pos-system', pathMatch: 'full' }, // Default childroute
     ],
   },
 

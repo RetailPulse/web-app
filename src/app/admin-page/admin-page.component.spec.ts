@@ -11,7 +11,7 @@ import { createMockAuthService } from '../mock/auth.service.mock';
 import { ConfirmationService } from 'primeng/api';
 
 import { AdminPageComponent } from './admin-page.component';
-import {AuthFacade} from '../services/auth.facade';
+import { AuthFacade } from '../services/auth.facade';
 
 describe('AdminPageComponent', () => {
   let component: AdminPageComponent;

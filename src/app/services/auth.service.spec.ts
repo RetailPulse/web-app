@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 
 import { OAuthService } from 'angular-oauth2-oidc';
-import {AuthFacade} from './auth.facade';
+import { AuthFacade } from './auth.facade';
 
 describe('AuthService', () => {
   let service: AuthFacade;

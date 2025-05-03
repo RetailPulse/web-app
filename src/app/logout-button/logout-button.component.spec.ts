@@ -6,7 +6,7 @@ import { createMockAuthService } from '../mock/auth.service.mock';
 import { ConfirmationService } from 'primeng/api';
 
 import { LogoutButtonComponent } from './logout-button.component';
-import {AuthFacade} from '../services/auth.facade';
+import { AuthFacade } from '../services/auth.facade';
 
 describe('LogoutButtonComponent', () => {
   let component: LogoutButtonComponent;

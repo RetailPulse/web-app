@@ -156,8 +156,8 @@ export class BusinessEntityManagementComponent {
       },
       reject: () => {
         // User rejected, do nothing
-        this.error_msg.set('Deletion canceled.');
-        console.log('Deletion canceled.');
+        this.error_msg.set('Save Business Entity canceled.');
+        console.log('Save Business Entity canceled.');
       }
     });
   }

@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { RouterModule, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import {apiConfig} from '../../environments/environment';
-import {AuthFacade} from '../services/auth.facade';
+import { AuthFacade } from '../services/auth.facade';
 @Component({
   selector: 'admin-page',
   imports: [

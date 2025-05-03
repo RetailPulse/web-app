@@ -8,7 +8,7 @@ import { ConfirmationService } from 'primeng/api';
 import { ProductManagementComponent } from './product-management.component';
 import { HttpClientModule } from '@angular/common/http';
 import {BusinessEntityService} from '../business-entity-management/business-entity.service';
-import {AuthFacade} from '../services/auth.facade';
+import { AuthFacade } from '../services/auth.facade';
 
 beforeEach(async () => {
   await TestBed.configureTestingModule({

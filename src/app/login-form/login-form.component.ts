@@ -1,7 +1,7 @@
 import { MessageModule } from 'primeng/message';
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import {AuthFacade} from '../services/auth.facade';
+import { AuthFacade } from '../services/auth.facade';
 
 @Component({
   selector: 'app-login-form',
