@@ -4,9 +4,9 @@ env:
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches: 
-  #     - "main"
+  push:
+    branches: 
+      - "main"
   # pull_request:
   #   branches: 
   #     - "main"
@@ -17,6 +17,7 @@ on:
 
 jobs:
   web-app-unit-tests:
+    name: Web App Unit Test
     runs-on: ubuntu-latest
     steps:
     - name: Checkout the repository
@@ -33,11 +34,18 @@ jobs:
     - name: Test RP Web App
       run: npm run test:ci
 
+    - name: Upload Code Coverage Report
+      uses: actions/upload-artifact@v4
+      with:
+        name: code-coverage-report
+        path: coverage/
+
+
     - name: Build RP Web App
       run: npm run build:prod
 
   web-app-sonarqube-scan:
-    name: SonarQube Frontend Scan
+    name: Web App SonarQube Scan
     needs: [web-app-unit-tests]
     runs-on: ubuntu-latest
     steps:
@@ -61,7 +69,7 @@ jobs:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   web-app-snyk-scan:
-    name: Snyk SCA Scan (Frontend)
+    name: Web App Snyk SCA Scan
     needs: [web-app-unit-tests]
     runs-on: ubuntu-latest
     steps:

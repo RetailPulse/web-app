@@ -5,7 +5,7 @@ import { createMockAuthService } from '../mock/auth.service.mock';
 import { ConfirmationService } from 'primeng/api';
 
 import { BusinessEntityManagementComponent } from './business-entity-management.component';
-import {AuthFacade} from '../services/auth.facade';
+import { AuthFacade } from '../services/auth.facade';
 
 describe('BusinessEntityManagementComponent', () => {
   let component: BusinessEntityManagementComponent;

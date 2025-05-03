@@ -10,7 +10,7 @@ import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, A
 
 import { User } from '../models/user.model';
 import { UserService } from '../services/user.service';
-import {AuthFacade} from '../services/auth.facade';
+import { AuthFacade } from '../services/auth.facade';
 
 
 // Custom validator to check for at least one number in the password

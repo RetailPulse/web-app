@@ -1,6 +1,6 @@
 import { Router } from '@angular/router';
 import { Component } from '@angular/core';
-import {AuthFacade} from '../services/auth.facade';
+import { AuthFacade } from '../services/auth.facade';
 
 @Component({
   selector: 'logout-button',

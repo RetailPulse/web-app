@@ -1,5 +1,5 @@
 // mocks/auth-service.mock.ts
-import {AuthFacade} from '../services/auth.facade';
+import { AuthFacade } from '../services/auth.facade';
 
 export const createMockAuthService = (): jasmine.SpyObj<AuthFacade> => {
 

@@ -11,7 +11,7 @@ import { createMockAuthService } from '../mock/auth.service.mock';
 import { ConfirmationService } from 'primeng/api';
 
 import { OperatorPageComponent } from './operator-page.component';
-import {AuthFacade} from '../services/auth.facade';
+import { AuthFacade } from '../services/auth.facade';
 
 describe('OperatorPageComponent', () => {
   let component: OperatorPageComponent;

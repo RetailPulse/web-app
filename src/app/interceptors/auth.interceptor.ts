@@ -1,6 +1,6 @@
 import {inject} from '@angular/core';
 import {HttpInterceptorFn} from '@angular/common/http';
-import {AuthFacade} from '../services/auth.facade';
+import { AuthFacade } from '../services/auth.facade';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   console.log('Processing authInterceptor...');

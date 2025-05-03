@@ -3,7 +3,7 @@ import { AdminSidebarStrategy } from '../strategyMethod/admin-sidebar.strategy';
 import { ManagerSidebarStrategy } from '../strategyMethod/manager-sidebar.strategy';
 import { CashierSidebarStrategy } from '../strategyMethod/cashier-sidebar.strategy';
 import { ISidebarStrategy } from '../strategyMethod/sidebar.strategy';
-import {AuthFacade} from '../../services/auth.facade';
+import { AuthFacade } from '../../services/auth.facade';
 
 @Injectable({ providedIn: 'root' })
 export class SidebarFactory {

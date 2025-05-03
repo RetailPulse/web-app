@@ -5,7 +5,7 @@ import { createMockAuthService } from '../mock/auth.service.mock';
 import { ConfirmationService } from 'primeng/api';
 
 import { ProfileComponent } from './profile.component';
-import {AuthFacade} from '../services/auth.facade';
+import { AuthFacade } from '../services/auth.facade';
 
 describe('ProfileComponent', () => {
   let component: ProfileComponent;
