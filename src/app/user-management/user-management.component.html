@@ -43,24 +43,24 @@
     <p-table [value]="filteredUsers()" stripedRows [responsiveLayout]="'scroll'" class="table table-hover"> 
       <ng-template pTemplate="header">
         <tr>
-          <th>ID</th>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Name</th>
-          <th>Role</th>
-          <th>Status</th>
-          <th>Actions</th>
+          <th id="headerPID">ID</th>
+          <th id="headerUsername">Username</th>
+          <th id="headerEmail">Email</th>
+          <th id="headerName">Name</th>
+          <th id="headerRole">Role</th>
+          <th id="headerStatus">Status</th>
+          <th id="headerAction">Actions</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-user>
         <tr>
-          <td>{{ user.id }}</td>
-          <td>{{ user.username }}</td>
-          <td>{{ user.email }}</td>
-          <td>{{ user.name }}</td>
-          <td>{{ user.roles[0] }}</td>
-          <td>{{ user.enabled ? 'Enabled' : 'Disabled' }}</td>
-          <td>
+          <td scope="row">{{ user.id }}</td>
+          <td scope="row">{{ user.username }}</td>
+          <td scope="row">{{ user.email }}</td>
+          <td scope="row">{{ user.name }}</td>
+          <td scope="row">{{ user.roles[0] }}</td>
+          <td scope="row">{{ user.enabled ? 'Enabled' : 'Disabled' }}</td>
+          <td scope="row">
             <div class="button-container">
               <!-- <button pButton type="button" icon="pi pi-sync" class="p-button-help p-button-sm mr-2" (click)="confirmResetPassword(user)"></button> -->
               <button pButton type="button" icon="pi pi-trash" class="p-button-danger p-button-sm mr-2" (click)="confirmDeleteUser(user)"></button>
