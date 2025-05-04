@@ -11,7 +11,11 @@ COPY package*.json ./
 RUN npm ci --quiet --ignore-scripts
 
 # Copy the rest of the application source code
-COPY . .
+COPY src/ ./src/
+COPY public/ ./public/
+COPY angular.json .
+COPY tsconfig*.json . 
+COPY nginx.conf .
 
 ARG BUILD_CONFIG=production
 
@@ -33,11 +37,11 @@ RUN rm -rf /usr/share/nginx/html/*
 # Copy the built Angular app from the builder stage to NGINX's serving directory
 COPY --from=builder /app/dist/browser /usr/share/nginx/html
 
-# Ensure correct file permissions
-RUN chmod -R 755 /usr/share/nginx/html
-
 # Copy custom NGINX configuration (optional)
 COPY ./nginx.conf /etc/nginx/nginx.conf
+
+# Switch to non-root user
+USER nginx-user
 
 # Expose port 80 for HTTP traffic
 EXPOSE 8080
