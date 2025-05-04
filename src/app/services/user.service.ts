@@ -11,7 +11,7 @@ import {apiConfig, environment} from '../../environments/environment';
 export class UserService {
   private http: HttpClient = inject(HttpClient);
   private apiUrl = apiConfig.user_api_url + 'api/users'; 
-  private defaultPassword = environment.defaultPassword; 
+  private readonly defaultPassword = environment.defaultPassword; 
 
   constructor() { }
 

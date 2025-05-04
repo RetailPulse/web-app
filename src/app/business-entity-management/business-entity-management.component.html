@@ -38,7 +38,7 @@
 
 @if (!isLoading()) {
   <!-- Confirmation Dialog -->
-  <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+  <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>  
   <div class="table-responsive">
     <p-table [value]="filteredBusinessEntities()" stripedRows [responsiveLayout]="'scroll'" class="table table-hover"> 
       <ng-template pTemplate="header">
@@ -53,12 +53,12 @@
       </ng-template>
       <ng-template pTemplate="body" let-businessEntity>
         <tr>
-          <td scope="row">{{ businessEntity.id }}</td>
-          <td scope="row">{{ businessEntity.name }}</td>
-          <td scope="row">{{ businessEntity.location }}</td>          
-          <td scope="row">{{ businessEntity.type }}</td>    
-          <td scope="row">{{ businessEntity.external }}</td>        
-          <td scope="row">
+          <td>{{ businessEntity.id }}</td>
+          <td>{{ businessEntity.name }}</td>
+          <td>{{ businessEntity.location }}</td>          
+          <td>{{ businessEntity.type }}</td>    
+          <td>{{ businessEntity.external }}</td>        
+          <td>
             <div class="button-container">
               <button pButton type="button" icon="pi pi-pencil" class="p-button-primary p-button-sm mr-2" (click)="showEditBusinessEntityForm(businessEntity)"></button>
               <button pButton type="button" icon="pi pi-trash" class="p-button-danger p-button-sm mr-2" (click)="confirmDeleteBusinessEntity(businessEntity)"></button>
