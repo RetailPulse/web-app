@@ -29,10 +29,8 @@ FROM nginx:alpine
 # Create a non-root user and group
 RUN addgroup -g 1001 -S nginx-group && \
     adduser -u 1001 -S nginx-user -G nginx-group && \
-    mkdir -p /usr/share/nginx/html && \
-    mkdir -p /var/cache/nginx/ && \
-    chown -R nginx-user:nginx-group /usr/share/nginx/html && \
-    chown -R nginx-user:nginx-group /var/cache/nginx/ && \
+    mkdir -p /usr/share/nginx/html /var/cache/nginx /var/log/nginx /etc/nginx && \
+    chown -R nginx-user:nginx-group /usr/share/nginx/html /var/cache/nginx /var/log/nginx /etc/nginx && \
     chmod -R 755 /usr/share/nginx/html
 
 # Remove default NGINX configuration
