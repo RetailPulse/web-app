@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, Observable } from 'rxjs';
 import {User, CreateUserDTO, UpdateUserDTO, ChangePasswordDTO} from '../models/user.model';
-import {apiConfig} from '../../environments/environment';
+import {apiConfig, environment} from '../../environments/environment';
 
 
 @Injectable({
@@ -11,6 +11,7 @@ import {apiConfig} from '../../environments/environment';
 export class UserService {
   private http: HttpClient = inject(HttpClient);
   private apiUrl = apiConfig.user_api_url + 'api/users'; 
+  private defaultPassword = environment.defaultPassword; 
 
   constructor() { }
 
@@ -38,7 +39,7 @@ export class UserService {
 
     const create_user_dto: CreateUserDTO = {
       username: newUser.username,
-      password: 'password1',
+      password: this.defaultPassword,
       email: newUser.email,
       name: newUser.name,
       roles: newUser.roles,

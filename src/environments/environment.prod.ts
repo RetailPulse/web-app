@@ -22,5 +22,6 @@ export const environment = {
   production: true,
   authEnabled: true,
   devModeUser: 'superadmin',
-  devModeRole: 'ADMIN' //'OPERATOR' //
+  devModeRole: 'ADMIN', //'OPERATOR', //
+  defaultPassword: 'password1'
 };

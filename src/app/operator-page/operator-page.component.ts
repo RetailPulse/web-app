@@ -1,5 +1,3 @@
-import { LogoutButtonComponent } from '../logout-button/logout-button.component';
-
 import { Component } from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {SidebarComponent} from '../sidebar/sidebar.component';
