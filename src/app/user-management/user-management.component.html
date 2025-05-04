@@ -43,13 +43,13 @@
     <p-table [value]="filteredUsers()" stripedRows [responsiveLayout]="'scroll'" class="table table-hover"> 
       <ng-template pTemplate="header">
         <tr>
-          <th>ID</th>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Name</th>
-          <th>Role</th>
-          <th>Status</th>
-          <th>Actions</th>
+          <th id="headerPID">ID</th>
+          <th id="headerUsername">Username</th>
+          <th id="headerEmail">Email</th>
+          <th id="headerName">Name</th>
+          <th id="headerRole">Role</th>
+          <th id="headerStatus">Status</th>
+          <th id="headerActions">Actions</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-user>
@@ -154,6 +154,7 @@
         <label for="txtUsername">Username</label>
         <input pInputText id="txtUsername" 
           formControlName="ctlUsername" 
+          readonly="true" 
           placeholder= "" 
         />          
       </div>

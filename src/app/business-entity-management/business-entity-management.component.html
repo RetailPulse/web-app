@@ -38,16 +38,17 @@
 
 @if (!isLoading()) {
   <!-- Confirmation Dialog -->
-  <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+  <p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>  
   <div class="table-responsive">
     <p-table [value]="filteredBusinessEntities()" stripedRows [responsiveLayout]="'scroll'" class="table table-hover"> 
       <ng-template pTemplate="header">
         <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Location</th>          
-          <th>Type</th>
-          <th>External</th>        
+          <th id="headerbeID">ID</th>
+          <th id="headerName">Name</th>
+          <th id="headerLocation">Location</th>          
+          <th id="headerType">Type</th>
+          <th id="headerExternal">External</th>
+          <th id="headerActions">Actions</th>
         </tr>
       </ng-template>
       <ng-template pTemplate="body" let-businessEntity>

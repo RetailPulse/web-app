@@ -90,8 +90,6 @@ export class UserManagementComponent {
       ctlRole: ['', Validators.required],
       ctlStatus: ['', Validators.required],
     });
-
-    this.editUserForm.get('ctlUsername')?.disable();
   }
 
   resetMessages(): void {
@@ -175,7 +173,7 @@ export class UserManagementComponent {
     const newUser: User = {
       id: 0,
       username: this.newUserForm.value.ctlUsername,
-      password: 'password1', // Default password
+      password: '', // not in used
       email: this.newUserForm.value.ctlEmail,
       name: this.newUserForm.value.ctlName,
       roles: [this.newUserForm.value.ctlRole],
@@ -197,28 +195,6 @@ export class UserManagementComponent {
       },
     });
   }
-
-  // confirmResetPassword(selectedUser: User): void {
-  //   this.resetMessages();
-  //   this.confirmationService.confirm({
-  //     message: 'Are you sure to reset password for user: <strong>' + selectedUser.username + '</strong>?',
-  //     header: 'Confirm Reset Password',
-  //     icon: 'pi pi-exclamation-triangle',
-  //     accept: () => {
-  //       // User confirmed, proceed with deletion
-  //       console.log('Resetting password for user:', selectedUser.username);
-  //     },
-  //     reject: () => {
-  //       // User rejected, do nothing
-  //       this.error_msg.set('Reset Password canceled.');
-  //       console.log('Reset Password canceled.');
-  //     }
-  //   });
-  // }
-
-  // resetPassword(selectedUser: User): void {
-  //   this.resetMessages();   
-  // }
 
   confirmDeleteUser(deletedUser: User): void {
     this.resetMessages();
@@ -295,12 +271,11 @@ export class UserManagementComponent {
   editUser(): void {
     this.resetMessages();
     console.log('Editing user');
-    console.log('User State:', this.editUserForm.value.ctlStatus === 'true');
 
     const editedUser: User = {
       id: this.selectedUser()?.id || 0,
       username: this.editUserForm.value.ctlUsername,
-      password: 'dummy', // not in used
+      password: '', // not in used
       email: this.editUserForm.value.ctlEmail,
       name: this.editUserForm.value.ctlName,
       roles: [this.editUserForm.value.ctlRole],

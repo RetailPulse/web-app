@@ -25,7 +25,7 @@ export const appConfig: ApplicationConfig = {
       theme: {
         preset: RetailPulsePreset,
         options: {
-          darkModeSelector: false || 'none'
+          darkModeSelector: 'none'
         }
       }
     }),

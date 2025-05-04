@@ -13,9 +13,6 @@ const lazyReportGeneration = () => import('./report-generation/report-generation
 const lazyInvenotryManagement = () => import ('./inventory-management/inventory-management.component').then(mod => mod.InventoryManagementComponent);
 const lazyPOS = () => import('./pos-system/pos-system.component').then(mod => mod.PosComponent);
 
-//Casper working
-const lazyBarcodeScanner = () => import ('./barcodescanner/barcodescanner.component').then(mod => mod.BarcodescannerComponent);
-
 export const routes: Routes = [
   // Login route
   {path: '', component: LoginPageComponent},
@@ -34,7 +31,6 @@ export const routes: Routes = [
       {path: 'business-entity-management', loadComponent: lazyBusinessEntityManagement},
       {path: 'report-generation', loadComponent: lazyReportGeneration},
       {path: 'profile', loadComponent: lazyProfile},
-      {path: 'barcodescanner', loadComponent: lazyBarcodeScanner},
       {path: 'pos-system', loadComponent: lazyPOS},
       {path: '', redirectTo: 'pos-system', pathMatch: 'full' }, // Default childroute
     ],
@@ -52,7 +48,6 @@ export const routes: Routes = [
       {path: 'business-entity-management', loadComponent: lazyBusinessEntityManagement},
       {path: 'report-generation', loadComponent: lazyReportGeneration},
       {path: 'profile', loadComponent: lazyProfile},
-      {path: 'barcodescanner', loadComponent: lazyBarcodeScanner},
       {path: 'pos-system', loadComponent: lazyPOS},
       {path: '', redirectTo: 'pos-system', pathMatch: 'full' }, // Default childroute
     ],
