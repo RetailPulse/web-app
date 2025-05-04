@@ -17,6 +17,7 @@ COPY angular.json .
 COPY tsconfig*.json . 
 COPY nginx.conf .
 
+
 ARG BUILD_CONFIG=production
 
 # Build the Angular application for production
@@ -29,7 +30,10 @@ FROM nginx:alpine
 RUN addgroup -g 1001 -S nginx-group && \
     adduser -u 1001 -S nginx-user -G nginx-group && \
     mkdir -p /usr/share/nginx/html && \
-    chown -R nginx-user:nginx-group /usr/share/nginx/html
+    mkdir -p /var/cache/nginx/ && \
+    chown -R nginx-user:nginx-group /usr/share/nginx/html && \
+    chown -R nginx-user:nginx-group /var/cache/nginx/ && \
+    chmod -R 755 /usr/share/nginx/html
 
 # Remove default NGINX configuration
 RUN rm -rf /usr/share/nginx/html/*
