@@ -54,13 +54,13 @@
       </ng-template>
       <ng-template pTemplate="body" let-user>
         <tr>
-          <td scope="row">{{ user.id }}</td>
-          <td scope="row">{{ user.username }}</td>
-          <td scope="row">{{ user.email }}</td>
-          <td scope="row">{{ user.name }}</td>
-          <td scope="row">{{ user.roles[0] }}</td>
-          <td scope="row">{{ user.enabled ? 'Enabled' : 'Disabled' }}</td>
-          <td scope="row">
+          <td>{{ user.id }}</td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.name }}</td>
+          <td>{{ user.roles[0] }}</td>
+          <td>{{ user.enabled ? 'Enabled' : 'Disabled' }}</td>
+          <td>
             <div class="button-container">
               <!-- <button pButton type="button" icon="pi pi-sync" class="p-button-help p-button-sm mr-2" (click)="confirmResetPassword(user)"></button> -->
               <button pButton type="button" icon="pi pi-trash" class="p-button-danger p-button-sm mr-2" (click)="confirmDeleteUser(user)"></button>
