@@ -62,6 +62,9 @@ jobs:
 
     - name: Install Dependencies for RP Web App
       run: npm ci
+    
+    - name: Test RP Web App
+      run: npm run test:ci
 
     - name: Analyze Frontend with SonarQube
       uses: SonarSource/sonarqube-scan-action@v5
