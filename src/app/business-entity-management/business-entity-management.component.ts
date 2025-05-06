@@ -97,6 +97,7 @@ export class BusinessEntityManagementComponent {
     this.error_msg.set(null);
     this.success_msg.set(null);
     this.newDialog_error_msg.set(null);
+    this.editDialog_error_msg.set(null);
   }
 
   filterBusinessEntity(event: Event): void {
@@ -235,6 +236,12 @@ export class BusinessEntityManagementComponent {
   }
 
   showEditBusinessEntityForm(businessEntity: BusinessEntity): void {
+
+    if (businessEntity == null) {
+      this.error_msg.set('No Business Entity selected for editing.');
+      return;
+    }
+
     this.selectedBusinessEntity.set(businessEntity);
     this.resetMessages();
     this.editBusinessEntityForm.reset();
@@ -271,6 +278,11 @@ export class BusinessEntityManagementComponent {
   editBusinessEntity(): void {
     this.resetMessages();
     console.log('Editing Business Entity');
+
+    if (this.selectedBusinessEntity()?.id == null) {
+      this.error_msg.set('No Business Entity selected for editing.'); 
+      return;
+    }
 
     const editedBusinessEntity: BusinessEntity = {
       id: this.selectedBusinessEntity()?.id || 0,
