@@ -32,7 +32,7 @@ export const routes: Routes = [
       {path: 'report-generation', loadComponent: lazyReportGeneration},
       {path: 'profile', loadComponent: lazyProfile},
       {path: 'pos-system', loadComponent: lazyPOS},
-      {path: '', redirectTo: 'pos-system', pathMatch: 'full' }, // Default childroute
+      {path: '', redirectTo: 'profile', pathMatch: 'full' }, // Default childroute
     ],
   },
 
@@ -49,7 +49,7 @@ export const routes: Routes = [
       {path: 'report-generation', loadComponent: lazyReportGeneration},
       {path: 'profile', loadComponent: lazyProfile},
       {path: 'pos-system', loadComponent: lazyPOS},
-      {path: '', redirectTo: 'pos-system', pathMatch: 'full' }, // Default childroute
+      {path: '', redirectTo: 'profile', pathMatch: 'full' }, // Default childroute
     ],
   },
   {
@@ -60,7 +60,7 @@ export const routes: Routes = [
     children: [
       {path: 'pos-system', loadComponent: lazyPOS},
       {path: 'profile', loadComponent: lazyProfile},
-      {path: '', redirectTo: 'pos-system', pathMatch: 'full' }, // Default childroute
+      {path: '', redirectTo: 'profile', pathMatch: 'full' }, // Default childroute
     ],
   },
 
