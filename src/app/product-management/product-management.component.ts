@@ -63,6 +63,9 @@ export class ProductManagementComponent implements OnInit {
   searchTerm: string = '';
   modalMode: 'create' | 'update' = 'create';
   productForm: FormGroup;
+  isLoading = false; // Added for loading indicator
+  errorMessage: string | null = null;
+
 
   cols = [
     {field: 'sku', header: 'SKU'},
@@ -102,9 +105,22 @@ export class ProductManagementComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.productService.getProducts().subscribe((data: Product[]) => {
-      this.products = data;
-      this.filteredProducts = this.products;
+    this.loadProducts();
+  }
+
+  loadProducts(): void {
+    this.isLoading = true;
+    this.errorMessage = null;
+    this.productService.getProducts().subscribe({
+      next: (data: Product[]) => {
+        this.products = data;
+        this.filteredProducts = this.products;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        this.handleError('Failed to load products', error);
+        this.isLoading = false;
+      }
     });
   }
 
