@@ -2,16 +2,15 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ConfirmationService } from 'primeng/api';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { createMockAuthService } from '../mock/auth.service.mock';
+import { of, throwError } from 'rxjs';
+import { Subject } from 'rxjs';
 import { AuthFacade } from '../services/auth.facade';
 
 import { BusinessEntityManagementComponent } from './business-entity-management.component';
 import { BusinessEntityService } from './business-entity.service';
-import { of, throwError } from 'rxjs';
 import { BusinessEntity } from './business-entity.model';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-
-import { Subject } from 'rxjs';
 
 describe('BusinessEntityManagementComponent', () => {
   let component: BusinessEntityManagementComponent;
