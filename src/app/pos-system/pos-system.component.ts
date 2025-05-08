@@ -1,3 +1,18 @@
+import {ProductService} from '../product-management/product.service';
+import {Product} from '../product-management/product.model';
+import {PosSystemService} from './pos-system.service';
+import {BusinessEntityService} from "../business-entity-management/business-entity.service";
+import {BusinessEntity} from "../business-entity-management/business-entity.model";
+import {
+  CartItem,
+  SalesDetails,
+  SalesTransactionRequest,
+  SuspendedTransactionRequest,
+  TaxResult,
+  Transaction,
+  TransientTransaction
+} from './pos-system.model';
+
 import {AfterViewInit, Component, DestroyRef, ElementRef, inject, OnInit, ViewChild} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -8,20 +23,6 @@ import {CommonModule, CurrencyPipe} from '@angular/common';
 import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
-import {
-  CartItem,
-  SalesDetails,
-  SalesTransactionRequest,
-  SuspendedTransactionRequest,
-  TaxResult,
-  Transaction,
-  TransientTransaction
-} from './pos-system.model';
-import {ProductService} from '../product-management/product.service';
-import {Product} from '../product-management/product.model';
-import {PosSystemService} from './pos-system.service';
-import {BusinessEntityService} from "../business-entity-management/business-entity.service";
-import {BusinessEntity} from "../business-entity-management/business-entity.model";
 import {forkJoin} from "rxjs";
 import {MatOption, MatSelect} from '@angular/material/select';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';

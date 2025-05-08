@@ -56,7 +56,17 @@ export class NgxScannerQRCodeAdapterComponent extends InputScanner implements Af
   }
 
   public handle(codeScanner: any, fn: string): void {
-    // Fix issue #27, #29
+
+    if (codeScanner === null) {
+      console.error('CodeScanner is null, use the codeScanner instance from the component.');
+      return;
+    }
+    
+    if (codeScanner === undefined) {
+      console.error('CodeScanner is undefined, use the codeScanner instance from the component.');
+      codeScanner = this.codeScanner;
+    }
+    
     const playDeviceFacingBack = (devices: any[]) => {
       // front camera or back camera check here!
       const device = devices.find(f => (/back|rear|environment/gi.test(f.label))); // Default Back Facing Camera

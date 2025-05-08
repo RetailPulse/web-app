@@ -4,11 +4,9 @@ import {catchError, forkJoin, map, Observable, throwError} from 'rxjs';
 import {apiConfig} from '../../environments/environment';
 import {Inventory, InventoryTransaction} from "./inventory-modal.model";
 
-
 @Injectable({
   providedIn: 'root'
 })
-
 
 export class InventoryModalService {
 
@@ -18,6 +16,11 @@ export class InventoryModalService {
   constructor(private http: HttpClient) { }
 
   createInventoryTransaction(inventoryTransactionList: InventoryTransaction[]): Observable<string> {
+   
+    if (!inventoryTransactionList || inventoryTransactionList.length === 0) {
+      return throwError(() => new Error('No transactions to process.'));
+    }
+
     const requests: Observable<HttpResponse<InventoryTransaction>>[] = inventoryTransactionList.map(inventoryTransaction =>
       this.http.post<InventoryTransaction>(this.inventoryTransactionApiUrl, inventoryTransaction, { observe: 'response' })
     );

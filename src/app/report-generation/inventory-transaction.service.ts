@@ -1,7 +1,8 @@
+import { InventoryTransactionModel } from './inventory-transaction.model';
+
 import { Injectable, signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { apiConfig } from '../../environments/environment';
-import { InventoryTransactionModel } from './inventory-transaction.model';
 import { catchError, throwError } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })

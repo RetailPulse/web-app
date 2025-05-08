@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, of, throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Product } from './product.model';
 import { apiConfig } from '../../environments/environment';
@@ -9,9 +9,10 @@ import { apiConfig } from '../../environments/environment';
   providedIn: 'root'
 })
 export class ProductService {
+  private readonly http: HttpClient = inject(HttpClient);
   private apiUrl = apiConfig.backend_api_url + 'api/products';
 
-  constructor(private http: HttpClient) { }
+  constructor() { }
 
   getProducts(): Observable<Product[]> {
     return this.http.get<Product[] | null>(this.apiUrl).pipe(

@@ -55,7 +55,7 @@ describe('ProductService', () => {
   });
 
   afterEach(() => {
-    httpTestingController.verify(); // Ensure no outstanding HTTP requests
+    httpTestingController.verify();
   });
 
   it('should be created', () => {
@@ -85,20 +85,29 @@ describe('ProductService', () => {
       const req = httpTestingController.expectOne(apiUrl);
       req.flush(null);
     });
-    // it('should handle error when fetching products', () => {
-    //   const errorMessage = 'Failed to load products';
-    //
-    //   service.getProducts().subscribe({
-    //     next: () => fail('Expected an error, but got a response'),
-    //     error: (error) => {
-    //       expect(error.message).toBe(errorMessage);
-    //     },
-    //   });
-    //
-    // });
 
+    it('should handle 404 error', () => {
+      service.getProducts().subscribe({
+        next: () => fail('should have failed with 404 error'),
+        error: (error) => {
+          expect(error.message).toContain('Not found');
+        }
+      });
+      const req = httpTestingController.expectOne(apiUrl);
+      req.flush('Not found', { status: 404, statusText: 'Not Found' });
+    });
+
+    it('should handle network error', () => {
+      service.getProducts().subscribe({
+        next: () => fail('should have failed with network error'),
+        error: (error) => {
+          expect(error.message).toContain('Network error');
+        }
+      });
+      const req = httpTestingController.expectOne(apiUrl);
+      req.error(new ProgressEvent('error'), { status: 0, statusText: 'Unknown Error' });
+    });
   });
-
 
   describe('createProduct', () => {
     const newProduct: Product = {
@@ -157,6 +166,28 @@ describe('ProductService', () => {
       const req = httpTestingController.expectOne(apiUrl);
       req.flush(errorMessage, { status: 409, statusText: 'Conflict' });
     });
+
+    it('should handle 404 error', () => {
+      service.createProduct(newProduct).subscribe({
+        next: () => fail('should have failed with 404 error'),
+        error: (error) => {
+          expect(error.message).toContain('Not found');
+        }
+      });
+      const req = httpTestingController.expectOne(apiUrl);
+      req.flush('Not found', { status: 404, statusText: 'Not Found' });
+    });
+
+    it('should handle network error', () => {
+      service.createProduct(newProduct).subscribe({
+        next: () => fail('should have failed with network error'),
+        error: (error) => {
+          expect(error.message).toContain('Network error');
+        }
+      });
+      const req = httpTestingController.expectOne(apiUrl);
+      req.error(new ProgressEvent('error'), { status: 0, statusText: 'Unknown Error' });
+    });
   });
 
   describe('updateProduct', () => {
@@ -199,6 +230,28 @@ describe('ProductService', () => {
       const req = httpTestingController.expectOne(updateUrl);
       req.flush(errorMessage, { status: 400, statusText: 'Bad Request' });
     });
+
+    it('should handle 404 error', () => {
+      service.updateProduct(updatedProduct).subscribe({
+        next: () => fail('should have failed with 404 error'),
+        error: (error) => {
+          expect(error.message).toContain('Not found');
+        }
+      });
+      const req = httpTestingController.expectOne(updateUrl);
+      req.flush('Not found', { status: 404, statusText: 'Not Found' });
+    });
+
+    it('should handle network error', () => {
+      service.updateProduct(updatedProduct).subscribe({
+        next: () => fail('should have failed with network error'),
+        error: (error) => {
+          expect(error.message).toContain('Network error');
+        }
+      });
+      const req = httpTestingController.expectOne(updateUrl);
+      req.error(new ProgressEvent('error'), { status: 0, statusText: 'Unknown Error' });
+    });
   });
 
   describe('deleteProduct', () => {
@@ -224,6 +277,28 @@ describe('ProductService', () => {
       const req = httpTestingController.expectOne(deleteUrl);
       req.flush('Not authorized', { status: 403, statusText: 'Forbidden' });
     });
+
+    it('should handle 404 error', () => {
+      service.deleteProduct(productId).subscribe({
+        next: () => fail('should have failed with 404 error'),
+        error: (error) => {
+          expect(error.message).toContain('Not found');
+        }
+      });
+      const req = httpTestingController.expectOne(deleteUrl);
+      req.flush('Not found', { status: 404, statusText: 'Not Found' });
+    });
+
+    it('should handle network error', () => {
+      service.deleteProduct(productId).subscribe({
+        next: () => fail('should have failed with network error'),
+        error: (error) => {
+          expect(error.message).toContain('Network error');
+        }
+      });
+      const req = httpTestingController.expectOne(deleteUrl);
+      req.error(new ProgressEvent('error'), { status: 0, statusText: 'Unknown Error' });
+    });
   });
 
   describe('reverseProduct', () => {
@@ -248,7 +323,6 @@ describe('ProductService', () => {
       req.flush(reactivatedProduct);
     });
 
-
     it('should handle 400 Bad Request when product is already active', () => {
       service.reverseProduct(productId).subscribe({
         next: () => fail('should have failed with 400 error'),
@@ -260,6 +334,28 @@ describe('ProductService', () => {
 
       const req = httpTestingController.expectOne(reverseUrl);
       req.flush('Product is already active', { status: 400, statusText: 'Bad Request' });
+    });
+
+    it('should handle 404 error', () => {
+      service.reverseProduct(productId).subscribe({
+        next: () => fail('should have failed with 404 error'),
+        error: (error) => {
+          expect(error.message).toContain('Not found');
+        }
+      });
+      const req = httpTestingController.expectOne(reverseUrl);
+      req.flush('Not found', { status: 404, statusText: 'Not Found' });
+    });
+
+    it('should handle network error', () => {
+      service.reverseProduct(productId).subscribe({
+        next: () => fail('should have failed with network error'),
+        error: (error) => {
+          expect(error.message).toContain('Network error');
+        }
+      });
+      const req = httpTestingController.expectOne(reverseUrl);
+      req.error(new ProgressEvent('error'), { status: 0, statusText: 'Unknown Error' });
     });
   });
 
@@ -295,6 +391,28 @@ describe('ProductService', () => {
 
       const req = httpTestingController.expectOne(getByIdUrl);
       req.flush('Not authorized', { status: 403, statusText: 'Forbidden' });
+    });
+
+    it('should handle 404 error', () => {
+      service.getProductById(productId).subscribe({
+        next: () => fail('should have failed with 404 error'),
+        error: (error) => {
+          expect(error.message).toContain('Not found');
+        }
+      });
+      const req = httpTestingController.expectOne(getByIdUrl);
+      req.flush('Not found', { status: 404, statusText: 'Not Found' });
+    });
+
+    it('should handle network error', () => {
+      service.getProductById(productId).subscribe({
+        next: () => fail('should have failed with network error'),
+        error: (error) => {
+          expect(error.message).toContain('Network error');
+        }
+      });
+      const req = httpTestingController.expectOne(getByIdUrl);
+      req.error(new ProgressEvent('error'), { status: 0, statusText: 'Unknown Error' });
     });
   });
 });

@@ -1,3 +1,8 @@
+import { InventoryTransactionModel } from './inventory-transaction.model';
+import { InventoryTransactionService } from './inventory-transaction.service';
+import { PdfService } from './pdf.service';
+import { ProductService } from './product.service'; // Added ProductService import
+
 import { Component, DestroyRef, inject, signal, OnInit } from '@angular/core'; // Added OnInit
 import {
   FormBuilder,
@@ -6,10 +11,6 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { DatePipe } from '@angular/common';
-import { InventoryTransactionModel } from './inventory-transaction.model';
-import { InventoryTransactionService } from './inventory-transaction.service';
-import { PdfService } from './pdf.service';
-import { ProductService } from './product.service'; // Added ProductService import
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';

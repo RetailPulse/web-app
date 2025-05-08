@@ -1,10 +1,14 @@
+import { Product } from '../product-management/product.model';
+import { ProductService } from '../product-management/product.service';
+import { BusinessEntityService } from '../business-entity-management/business-entity.service';
+import { InventoryModalService } from './inventory-modal.service';
+import { BusinessEntity } from '../business-entity-management/business-entity.model';
+import { InventoryTransaction } from './inventory-modal.model';
+
 import { Component, Inject, OnInit } from '@angular/core';
 import {MatDialogRef, MAT_DIALOG_DATA, MatDialogContent, MatDialogClose} from '@angular/material/dialog';
 import { SelectionModel } from '@angular/cdk/collections';
 import Fuse from 'fuse.js';
-import { Product } from '../product-management/product.model';
-import { ProductService } from '../product-management/product.service';
-import { BusinessEntityService } from '../business-entity-management/business-entity.service';
 import {
   FormArray,
   FormBuilder,
@@ -15,9 +19,6 @@ import {
   FormsModule,
   ReactiveFormsModule
 } from '@angular/forms';
-import { InventoryModalService } from './inventory-modal.service';
-import { BusinessEntity } from '../business-entity-management/business-entity.model';
-import { InventoryTransaction } from './inventory-modal.model';
 import {MatError, MatFormField, MatLabel} from '@angular/material/form-field';
 import {MatIcon} from '@angular/material/icon';
 import {MatInput} from '@angular/material/input';
