@@ -1,7 +1,3 @@
-import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {catchError, Observable, throwError} from 'rxjs';
-import {apiConfig} from '../../environments/environment';
 import {
   SalesDetails,
   SalesTransactionRequest,
@@ -10,7 +6,11 @@ import {
   TransientTransaction
 } from './pos-system.model';
 import {TransactionAdapter} from './transaction-adapter';
+import {apiConfig} from '../../environments/environment';
 
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {catchError, Observable, throwError} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +22,7 @@ export class PosSystemService {
   }
 
   calculateSalesTax(transaction: Transaction) {
+   
     const salesDetails: SalesDetails[] = TransactionAdapter.mapTransactionToSalesDetails(transaction);
     console.log(salesDetails);
 

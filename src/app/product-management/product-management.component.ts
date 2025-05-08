@@ -164,6 +164,7 @@ export class ProductManagementComponent implements OnInit {
     this.modalMode = 'update';
     this.openDialog();
   }
+
   saveProduct(): void {
     if (this.productForm.invalid) {
       return;
@@ -246,41 +247,7 @@ export class ProductManagementComponent implements OnInit {
       panelClass: ['error-snackbar']
     });
   }
-  // saveProduct(): void {
-  //   if (this.productForm.invalid) {
-  //     return;
-  //   }
-  //   const formData = this.productForm.value;
-  //   const productData = {
-  //     ...formData,
-  //     active: formData.active
-  //   };
-  //
-  //   if (this.modalMode === 'create') {
-  //     this.productService.createProduct(productData).subscribe({
-  //       next: (createdProduct) => {
-  //         this.products.push(createdProduct);
-  //         this.filteredProducts = [...this.products];
-  //         this.dialog.closeAll();
-  //       },
-  //       error: (error) => console.error('Error creating product:', error)
-  //     });
-  //   } else {
-  //     this.productService.updateProduct(productData).subscribe({
-  //       next: (updatedProduct) => {
-  //         const index = this.products.findIndex(p => p.id === updatedProduct.id);
-  //         this.products[index] = updatedProduct;
-  //         this.filteredProducts = [...this.products];
-  //         this.dialog.closeAll();
-  //       },
-  //       error: (error) => {
-  //         alert("Error updating product");
-  //         console.error('Error updating product:', error)
-  //       }
-  //     });
-  //   }
-  // }
-
+  
   deleteProduct(product: Product): void {
     if (confirm('Are you sure you want to deactivate this product?')) {
       // Update the product's active status to false (soft delete)
@@ -309,7 +276,5 @@ export class ProductManagementComponent implements OnInit {
         }
       });
     }
-  }
-
-
+  }  
 }

@@ -1,3 +1,7 @@
+import { User } from '../models/user.model';
+import { UserService } from '../services/user.service';
+import { AuthFacade } from '../services/auth.facade';
+
 import { Component, signal, inject } from '@angular/core';
 
 import { CardModule } from 'primeng/card';
@@ -7,11 +11,6 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
-
-import { User } from '../models/user.model';
-import { UserService } from '../services/user.service';
-import { AuthFacade } from '../services/auth.facade';
-
 
 // Custom validator to check for at least one number in the password
 function containsNumber(control: AbstractControl): { [key: string]: boolean } | null {
@@ -116,6 +115,16 @@ export class ProfileComponent {
 
   changePassword(): void {
     this.resetMessages();
+
+    if (this.changePasswordForm.get('ctlOldPassword') === null || 
+        this.changePasswordForm.get('ctlNewPassword') === null) {
+          
+          console.error('Form controls are null. Cannot proceed with password change.');
+          this.error_msg.set('Form controls are null. Cannot proceed with password change.');
+          return;          
+    }
+
+
     const oldPassword: string = this.changePasswordForm.get('ctlOldPassword')?.value;
     const newPassword: string = this.changePasswordForm.get('ctlNewPassword')?.value;
 

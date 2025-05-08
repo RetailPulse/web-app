@@ -96,6 +96,7 @@ export class UserManagementComponent {
     this.error_msg.set(null);
     this.success_msg.set(null);
     this.newDialog_error_msg.set(null);
+    this.editDialog_error_msg.set(null);
   }
 
   filterUsers(event: Event): void {
@@ -197,6 +198,12 @@ export class UserManagementComponent {
   }
 
   confirmDeleteUser(deletedUser: User): void {
+
+    if (deletedUser == null) {
+      this.error_msg.set('User not found');
+      return;
+    }
+
     this.resetMessages();
     this.confirmationService.confirm({
       message: 'Are you sure to delete user: <strong>' + deletedUser.username + '</strong>?',
@@ -215,6 +222,10 @@ export class UserManagementComponent {
   }
 
   deleteUser(deletedUser: User): void {
+    if (deletedUser == null) {
+      this.error_msg.set('User not found');
+      return;
+    }
     this.resetMessages();
     console.log(`Deleting user ${deletedUser.name}`);
     this.userService.deleteUser(deletedUser.id).subscribe({
@@ -235,6 +246,12 @@ export class UserManagementComponent {
   }
 
   showEditUserForm(user: User): void {
+
+    if (user === null) {
+      this.error_msg.set('User not found');
+      return;
+    }
+
     this.selectedUser.set(user);
     this.resetMessages();
     this.editUserForm.reset();
@@ -269,6 +286,12 @@ export class UserManagementComponent {
   }
 
   editUser(): void {
+
+    if (this.selectedUser() === null) {
+      this.error_msg.set('User not found');
+      return;
+    }
+
     this.resetMessages();
     console.log('Editing user');
 

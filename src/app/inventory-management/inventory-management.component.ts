@@ -1,4 +1,10 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import { InventoryService } from './inventory.service';
+import { BusinessEntityService } from '../business-entity-management/business-entity.service';
+import { ProductService } from '../product-management/product.service';
+import { InventoryModalComponent } from '../inventory-modal/inventory-modal.component';
+import { BusinessEntity } from '../business-entity-management/business-entity.model';
+
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import {
   MatCell,
@@ -10,26 +16,21 @@ import {
   MatTableDataSource
 } from '@angular/material/table';
 import { forkJoin, map, switchMap } from 'rxjs';
-import { InventoryService } from './inventory.service';
-import { BusinessEntityService } from '../business-entity-management/business-entity.service';
-import { ProductService } from '../product-management/product.service';
-import { InventoryModalComponent } from '../inventory-modal/inventory-modal.component';
-import { BusinessEntity } from '../business-entity-management/business-entity.model';
-import {MatPaginator} from '@angular/material/paginator';
-import {CurrencyPipe, DatePipe, NgForOf, NgIf} from '@angular/common';
-import {MatIcon} from '@angular/material/icon';
-import {MatButton} from '@angular/material/button';
-import {MatProgressSpinner} from '@angular/material/progress-spinner';
-import {MatOptgroup, MatOption} from '@angular/material/core';
-import {FormsModule} from '@angular/forms';
-import { MatLabel, MatSelect} from '@angular/material/select';
-import {MatTab, MatTabGroup} from '@angular/material/tabs';
-import {MatFormFieldModule} from '@angular/material/form-field';
-import {MatCard, MatCardContent} from '@angular/material/card';
-import {MatSort} from '@angular/material/sort';
+import { MatPaginator } from '@angular/material/paginator';
+import { CurrencyPipe, DatePipe, NgForOf, NgIf } from '@angular/common';
+import { MatIcon } from '@angular/material/icon';
+import { MatButton } from '@angular/material/button';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
+import { MatOptgroup, MatOption } from '@angular/material/core';
+import { FormsModule } from '@angular/forms';
+import { MatLabel, MatSelect } from '@angular/material/select';
+import { MatTab, MatTabGroup } from '@angular/material/tabs';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatCard, MatCardContent } from '@angular/material/card';
+import { MatSort } from '@angular/material/sort';
+import { MatInput } from '@angular/material/input';
+import { Column, InventoryTransaction, SummaryData } from './inventory.model';
 import Fuse from 'fuse.js';
-import {MatInput} from '@angular/material/input';
-import {Column, InventoryTransaction, SummaryData} from './inventory.model';
 
 @Component({
   selector: 'app-inventory-management',
@@ -175,7 +176,6 @@ export class InventoryManagementComponent implements OnInit {
     }
   }
 
-
   fetchBusinessEntities(): void {
     this.businessEntityService.getBusinessEntities().subscribe({
       next: (businessEntities) => {
@@ -242,6 +242,7 @@ export class InventoryManagementComponent implements OnInit {
       switchMap((data: any[]) => {
         if (!data || data.length === 0) {
           this.errorMessage = 'No inventory transactions found.';
+          this.isLoading = false;          
           return [];
         }
 
@@ -267,6 +268,13 @@ export class InventoryManagementComponent implements OnInit {
       })
     ).subscribe({
       next: (result) => {
+        if (result === null || result.length === 0) {
+          this.errorMessage = 'No inventory transactions found.';
+          this.inventoryTransactions.data = [];
+          this.isLoading = false;
+          return;
+        }
+
         this.inventoryTransactions.data = result;
         this.inventoryTransactions.sort = this.sort; // Set sort here as well
         this.errorMessage = '';
@@ -282,6 +290,11 @@ export class InventoryManagementComponent implements OnInit {
   }
 
   openModal(): void {
+
+    if (this.isModalOpen) {
+      return; // Prevent opening multiple modals
+    }
+
     this.isModalOpen = true;
     const dialogRef = this.dialog.open(InventoryModalComponent, {
       width: '80%',

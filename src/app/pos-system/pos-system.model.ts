@@ -1,6 +1,5 @@
 import {Product} from '../product-management/product.model';
 
-
 export interface CartItem {
   product: Product;
   quantity: number;
@@ -16,7 +15,6 @@ export interface SalesDetails {
   quantity: number;
   salesPricePerUnit: string;
 }
-
 
 export interface TransientTransaction {
   transactionId: string;

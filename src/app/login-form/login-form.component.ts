@@ -21,6 +21,11 @@ export class LoginFormComponent implements OnInit {
         console.log("User is not logged in.");
         this.router.navigate(['/login']);
       }
+    }).catch(error => {
+      // Handle the error here
+      console.error('Initialization failed:', error);
+      // Optionally, show a message or redirect
+      this.router.navigate(['/login']);
     });
   }
 
