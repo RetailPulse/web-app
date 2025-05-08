@@ -27,7 +27,7 @@ describe('BusinessEntityManagementComponent', () => {
 
   beforeEach(async () => {
     serviceSpy = jasmine.createSpyObj('BusinessEntityService', ['getBusinessEntities', 'createBusinessEntity', 'editUser', 'deleteBusinessEntity']);
-    
+
     requireConfirmation$ = new Subject<any>();
     confirmSpy = jasmine.createSpyObj('ConfirmationService', ['confirm'], {
       requireConfirmation$: requireConfirmation$.asObservable()
@@ -68,7 +68,7 @@ describe('BusinessEntityManagementComponent', () => {
       expect(component.businessEntities()).toEqual(mockEntities);
       expect(component.filteredBusinessEntities()).toEqual(mockEntities);
     }));
-    
+
     it('handles init error', fakeAsync(() => {
       serviceSpy.getBusinessEntities.and.returnValue(throwError(() => new Error('fail')));
 
