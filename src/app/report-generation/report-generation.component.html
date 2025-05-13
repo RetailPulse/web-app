@@ -10,7 +10,7 @@
 </mat-form-field>
 
   <div class="date-range-container">
-    <mat-form-field appearance="outline" class="date-picker-field">
+    <mat-form-field *ngIf="isSelectDateRange()" appearance="outline" class="date-picker-field">
       <mat-label>Start Date</mat-label>
       <input matInput [matDatepicker]="startPicker" formControlName="startDate" />
       <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
@@ -20,7 +20,7 @@
       </mat-error>
     </mat-form-field>
 
-    <mat-form-field appearance="outline" class="date-picker-field">
+    <mat-form-field *ngIf="isSelectDateRange()" appearance="outline" class="date-picker-field">
       <mat-label>End Date</mat-label>
       <input matInput [matDatepicker]="endPicker" formControlName="endDate"
         [min]="dateRangeForm.get('startDate')?.value" />
