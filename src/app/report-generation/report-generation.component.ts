@@ -102,6 +102,13 @@ export class ReportGenerationComponent implements OnInit {
     return start && end && start > end ? { endBeforeStart: true } : null;
   }
 
+  isSelectDateRange() {
+    const dateRangeCategories = ['inventoryTransaction'];
+    return dateRangeCategories.some(category =>
+      category.toLowerCase() === this.dateRangeForm.value.reportCategory.toLowerCase()
+    );
+  }
+
   onSubmit() {
     if (this.dateRangeForm.invalid) return;
 
