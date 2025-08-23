@@ -14,6 +14,7 @@ export const authConfig: AuthConfig = {
 
 export const apiConfig = {
   backend_api_url: 'http://localhost:8085/',
+  report_api_url: 'http://localhost:8088/',
   user_api_url: 'http://localhost:8083/'
 };
 
