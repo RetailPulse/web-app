@@ -7,14 +7,25 @@
   padding: 24px;
 }
 
+/* Container for the date range and report type */
 .date-range-container {
   display: flex;
+  flex-direction: row;
+    align-items: center;
   gap: 20px;
-  align-items: flex-start;
+  flex-wrap: nowrap;
 }
 
+/* Date pickers should expand to fill available space */
 .date-picker-field {
   flex: 1;
+  min-width: 150px;
+  }
+  
+  /* Report type dropdown given a fixed width */
+  .report-type-field {
+    flex: 0 0 150px;
+    min-width: 150px;
 }
 
 .form-actions {
@@ -25,8 +36,10 @@
 }
 
 .error-message {
-  order: 1; /* This will place it below the button */
-  color: #f44336; /* Material red color for errors */
+  order: 1;
+    /* This will place it below the button */
+    color: #f44336;
+    /* Material red color for errors */
   text-align: center;
   width: 100%;
 }
@@ -60,7 +73,13 @@ button[mat-raised-button][disabled] {
   }
 
   .date-picker-field {
-    width: 100%;
+    max-height: 200px !important;
+      overflow-y: auto;
+    }
+    
+    .report-type-panel {
+      max-height: 200px !important;
+      overflow-y: auto;
   }
 
   .form-actions {

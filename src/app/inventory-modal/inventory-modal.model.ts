@@ -3,7 +3,6 @@ import {BusinessEntity} from '../business-entity-management/business-entity.mode
 export class InventoryTransaction {
   productId!:number;
   quantity!:number;
-  costPerUnit!:number;
   source!: number;
   destination!: number;
 }

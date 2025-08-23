@@ -18,7 +18,7 @@
       <th mat-header-cell *matHeaderCellDef>{{ col.header }}</th>
       <td mat-cell *matCellDef="let product">
         <ng-container [ngSwitch]="col.field">
-          <ng-container *ngSwitchCase="'is_active'">
+          <ng-container *ngSwitchCase="'active'">
             <mat-chip-listbox>
               <mat-chip [color]="product[col.field] ? 'primary' : 'warn'">
                 {{ product[col.field] ? 'Active' : 'Inactive' }}
@@ -83,11 +83,6 @@
                 <mat-label>Subcategory</mat-label>
                 <input matInput formControlName="subcategory">
               </mat-form-field>
-
-              <mat-form-field appearance="outline" class="form-field">
-                <mat-label>SKU</mat-label>
-                <input matInput formControlName="sku" required>
-              </mat-form-field>
             </div>
           </div>
 
@@ -135,12 +130,11 @@
                 <mat-label>Vendor Code</mat-label>
                 <input matInput formControlName="vendorCode">
               </mat-form-field>
-
-              <div class="toggle-container">
-                <mat-slide-toggle formControlName="is_active" color="primary">
-                  Active Status
-                </mat-slide-toggle>
-              </div>
+            </div>
+            <div class="toggle-container">
+              <mat-slide-toggle formControlName="active" color="primary">
+                {{ productForm.get('active')?.value ? 'Active' : 'Inactive' }}
+              </mat-slide-toggle>
             </div>
           </div>
         </form>

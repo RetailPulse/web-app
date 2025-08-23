@@ -1,31 +1,31 @@
 import { TestBed } from '@angular/core/testing';
 
 import { OAuthService } from 'angular-oauth2-oidc';
-import { AuthService } from './auth.service';
+import { AuthFacade } from './auth.facade';
 
 describe('AuthService', () => {
-  let service: AuthService;
-  
+  let service: AuthFacade;
+
   beforeEach(() => {
 
     let mockOAuthService = jasmine.createSpyObj('OAuthService', [
       'configure',
       'setupAutomaticSilentRefresh',
-      'loadDiscoveryDocumentAndLogin', 
-      'logOut', 
-      'hasValidAccessToken', 
-      'getAccessToken', 
-      'getIdentityClaims', 
+      'loadDiscoveryDocumentAndLogin',
+      'logOut',
+      'hasValidAccessToken',
+      'getAccessToken',
+      'getIdentityClaims',
       'getAccessTokenExpiration'
     ]);
-    
+
     TestBed.configureTestingModule({
       providers: [
-        AuthService,
-        { provide: OAuthService, useValue: mockOAuthService }, // Provide the mock OAuthService        
+        AuthFacade,
+        { provide: OAuthService, useValue: mockOAuthService }, // Provide the mock OAuthService
       ],
     });
-    service = TestBed.inject(AuthService);
+    service = TestBed.inject(AuthFacade);
   });
 
   it('should be created', () => {

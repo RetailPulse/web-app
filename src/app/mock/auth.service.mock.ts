@@ -1,21 +1,21 @@
 // mocks/auth-service.mock.ts
-import { AuthService } from '../services/auth.service';
+import { AuthFacade } from '../services/auth.facade';
 
-export const createMockAuthService = (): jasmine.SpyObj<AuthService> => {
+export const createMockAuthService = (): jasmine.SpyObj<AuthFacade> => {
 
-  const mockAuthService = jasmine.createSpyObj<AuthService>('AuthService', [
+  const mockAuthService = jasmine.createSpyObj<AuthFacade>('AuthFacade', [
+    'initialize',
     'login',
     'logout',
-    'initializeAuth',
-    'isAuthenticated',    
+    'isAuthenticated',
     'getUserRole',
     'getUsername',
-    'accessToken',
+    'getAccessToken',
     'getDecodedToken',
   ]);
 
   // Add properties for isAuthenticated and accessToken
-  mockAuthService.initializeAuth.and.returnValue(Promise.resolve());    
+  mockAuthService.initialize.and.returnValue(Promise.resolve());
   mockAuthService.getUserRole.and.returnValue(['ADMIN']);
   mockAuthService.getUsername.and.returnValue('superadmin');
   mockAuthService.getDecodedToken.and.returnValue({
@@ -34,6 +34,6 @@ export const createMockAuthService = (): jasmine.SpyObj<AuthService> => {
     writable: false, // Make it read-only
     configurable: true, // Allow redefining if needed
   });
-  
+
   return mockAuthService;
 };

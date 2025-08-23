@@ -1,30 +1,32 @@
-import {AfterViewInit, Component, DestroyRef, ElementRef, inject, OnInit, ViewChild} from '@angular/core';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import Fuse from 'fuse.js';
-import { MatFormField, MatLabel } from '@angular/material/form-field';
-import { MatIcon } from '@angular/material/icon';
-import { CommonModule, CurrencyPipe } from '@angular/common';
-import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
-import { MatButton, MatIconButton } from "@angular/material/button";
-import { MatInput } from "@angular/material/input";
+import {ProductService} from '../product-management/product.service';
+import {Product} from '../product-management/product.model';
+import {PosSystemService} from './pos-system.service';
+import {BusinessEntityService} from "../business-entity-management/business-entity.service";
+import {BusinessEntity} from "../business-entity-management/business-entity.model";
 import {
   CartItem,
   SalesDetails,
   SalesTransactionRequest,
-  SalesTransactionResponse, SuspendedTransactionRequest, TaxResult,
+  SuspendedTransactionRequest,
+  TaxResult,
   Transaction,
   TransientTransaction
 } from './pos-system.model';
-import { ProductService } from '../product-management/product.service';
-import { Product } from '../product-management/product.model';
-import { PosSystemService } from './pos-system.service';
-import { BusinessEntityService } from "../business-entity-management/business-entity.service";
-import { BusinessEntity } from "../business-entity-management/business-entity.model";
-import { Observable } from "rxjs";
-import { MatOption, MatSelect } from '@angular/material/select';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
+
+import {AfterViewInit, Component, DestroyRef, ElementRef, inject, OnInit, ViewChild} from '@angular/core';
+import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {MatSnackBar} from '@angular/material/snack-bar';
+import Fuse from 'fuse.js';
+import {MatFormField, MatLabel} from '@angular/material/form-field';
+import {MatIcon} from '@angular/material/icon';
+import {CommonModule, CurrencyPipe} from '@angular/common';
+import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
+import {MatButton, MatIconButton} from "@angular/material/button";
+import {MatInput} from "@angular/material/input";
+import {forkJoin} from "rxjs";
+import {MatOption, MatSelect} from '@angular/material/select';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {MatProgressSpinner} from '@angular/material/progress-spinner';
 import {
   MatCard,
   MatCardActions,
@@ -33,13 +35,14 @@ import {
   MatCardSubtitle,
   MatCardTitle
 } from '@angular/material/card';
-import {NgxScannerqrcodeAdapterComponent} from '../ngx-scannerqrcode-adapter/ngx-scannerqrcode-adapter.component';
+import {NgxScannerQRCodeAdapterComponent} from '../ngx-scannerqrcode-adapter/ngx-scannerqrcode-adapter.component';
+import {InventoryService} from '../inventory-management/inventory.service';
 
 @Component({
   selector: 'app-pos-system',
   templateUrl: './pos-system.component.html',
   imports: [
-    NgxScannerqrcodeAdapterComponent,
+    NgxScannerQRCodeAdapterComponent,
     MatFormField,
     MatIcon,
     ReactiveFormsModule,
@@ -80,6 +83,8 @@ export class PosComponent implements OnInit, AfterViewInit {
   isLoadingBusinessEntities: boolean = true;
   businessConfirmed = false;
   showBusinessSelection = true;
+  isLoading: boolean = false;
+  private inventoryMap = new Map<number, number>();
 
   // Barcode scanner properties
   showScannerView = false;
@@ -87,14 +92,14 @@ export class PosComponent implements OnInit, AfterViewInit {
   scannerConfig = {
     constraints: {
       video: {
-        width: { ideal: 640 },
-        height: { ideal: 480 },
+        width: {ideal: 640},
+        height: {ideal: 480},
         facingMode: 'environment'
       }
     }
   };
 
-  @ViewChild('scanner') scanner!: NgxScannerqrcodeAdapterComponent;
+  @ViewChild('scanner') scanner!: NgxScannerQRCodeAdapterComponent;
   @ViewChild('barcodeInput') barcodeInput!: ElementRef;
 
   private destroyRef = inject(DestroyRef);
@@ -103,21 +108,25 @@ export class PosComponent implements OnInit, AfterViewInit {
     private snackBar: MatSnackBar,
     private productService: ProductService,
     private posService: PosSystemService,
-    private businessEntityService: BusinessEntityService
-  ) {}
+    private businessEntityService: BusinessEntityService,
+    private inventoryService: InventoryService,
+  ) {
+  }
 
   ngOnInit(): void {
     this.loadBusinessEntities();
   }
+
   ngAfterViewInit(): void {
     if (!this.scanner) {
-      console.error('Casper: Scanner not found!');
+      console.error('Scanner not found!');
       return;
     }
 
     // Start the scanner
-    this.scanner.StartScanner();
+    this.scanner.startScanner();
   }
+
   confirmBusinessSelection(): void {
     if (!this.selectedBusinessEntity) return;
 
@@ -147,12 +156,6 @@ export class PosComponent implements OnInit, AfterViewInit {
   }
 
 
-  changeBusiness(): void {
-    this.businessConfirmed = false;
-    this.selectedBusinessEntity = null;
-    this.cart = [];
-    this.salesTax = 0;
-  }
 
   setupSearch(): void {
     const fuse = new Fuse<Product>(this.products, {
@@ -189,16 +192,53 @@ export class PosComponent implements OnInit, AfterViewInit {
       this.isLoadingBusinessEntities = false;
     }, error => {
       console.error('Error loading business entities:', error);
-      this.snackBar.open('Failed to load business entities', 'Close', { duration: 2000 });
+      this.snackBar.open('Failed to load business entities', 'Close', {duration: 2000});
       this.isLoadingBusinessEntities = false;
     });
   }
 
+// Add this method to get available quantity
+  getAvailableQuantity(productId: number): number {
+    return this.inventoryMap.get(productId) || 0;
+  }
+
+// fliter the product by business
   loadProducts(): void {
-    this.productService.getProducts().subscribe(products => {
-      this.products = products.filter(p => p.active);
-      this.filteredProducts = [...this.products];
-      this.focusBarcodeInput();
+    this.isLoading = true;
+    if (!this.selectedBusinessEntity) {
+      this.isLoading = false;
+      return;
+    }
+
+    forkJoin([
+      this.productService.getProducts(),
+      this.inventoryService.getInventoryByBusinessEntity(this.selectedBusinessEntity.id)
+    ]).subscribe({
+      next: ([products, inventory]) => {
+        // Filter active products
+        const activeProducts = products.filter(p => p.active);
+
+        // Clear and rebuild the inventory map
+        this.inventoryMap.clear();
+        inventory.forEach(item => {
+          this.inventoryMap.set(item.productId, item.quantity);
+        });
+
+        // Only show products that have inventory > 0 at this location
+        this.products = activeProducts.filter(product => {
+          const quantity = this.inventoryMap.get(product.id) || 0;
+          return quantity > 0; // Only include products with available stock
+        });
+
+        this.filteredProducts = [...this.products];
+        this.focusBarcodeInput();
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading products:', error);
+        this.snackBar.open('Failed to load products', 'Close', {duration: 2000});
+        this.isLoading = false;
+      }
     });
   }
 
@@ -208,12 +248,12 @@ export class PosComponent implements OnInit, AfterViewInit {
     if (this.showScannerView) {
       setTimeout(() => {
         if (this.scanner) {
-          this.scanner.StartScanner();
+          this.scanner.startScanner();
         }
       }, 100);
     } else {
       if (this.scanner) {
-        this.scanner.StopScanner();
+        this.scanner.stopScanner();
       }
       this.focusBarcodeInput();
     }
@@ -230,24 +270,17 @@ export class PosComponent implements OnInit, AfterViewInit {
     if (!barcode) return;
 
     const product = this.products.find(p =>
-      p.barcode === barcode ||
-      p.sku === barcode
+      p.barcode === barcode
     );
 
     if (product) {
       this.addToCart(product);
-      this.snackBar.open(`${product.description} added`, 'OK', { duration: 1000 });
+      this.snackBar.open(`${product.description} added`, 'OK', {duration: 1000});
 
-      // Return to product list view after successful scan
-      setTimeout(() => {
-        this.showScannerView = false;
-        if (this.scanner) {
-          this.scanner.StopScanner();
-        }
-        this.focusBarcodeInput();
-      }, 500);
+      this.manualBarcode = '';
+
     } else {
-      this.snackBar.open('Product not found', 'Close', { duration: 2000 });
+      this.snackBar.open('Product not found', 'Close', {duration: 2000});
     }
 
     this.manualBarcode = '';
@@ -265,21 +298,32 @@ export class PosComponent implements OnInit, AfterViewInit {
     if (product) {
       this.addToCart(product);
     } else {
-      this.snackBar.open('Product not found', 'Close', { duration: 2000 });
+      this.snackBar.open('Product not found', 'Close', {duration: 2000});
     }
   }
 
   addToCart(product: Product): void {
+    const availableQuantity = this.getAvailableQuantity(product.id);
     const existingItem = this.cart.find(item => item.product.sku === product.sku);
 
     if (existingItem) {
+      // Check if we're exceeding available stock
+      if (existingItem.quantity >= availableQuantity) {
+        this.snackBar.open(`Only ${availableQuantity} available in stock`, 'Close', {duration: 2000});
+        return;
+      }
       existingItem.quantity += 1;
     } else {
-      this.cart.push({ product, quantity: 1 });
+      // Check if product is in stock at all
+      if (availableQuantity <= 0) {
+        this.snackBar.open(`${product.description} is out of stock`, 'Close', {duration: 2000});
+        return;
+      }
+      this.cart.push({product, quantity: 1});
     }
 
     this.calculateSalesTax();
-    this.snackBar.open(`${product.description} added to cart`, 'Close', { duration: 1000 });
+    this.snackBar.open(`${product.description} added to cart`, 'Close', {duration: 1000});
     this.focusBarcodeInput();
   }
 
@@ -323,7 +367,7 @@ export class PosComponent implements OnInit, AfterViewInit {
         },
         error: (error: Error) => {
           console.error('Error calculating sales tax:', error);
-          this.snackBar.open('Failed to calculate sales tax', 'Close', { duration: 2000 });
+          this.snackBar.open('Failed to calculate sales tax', 'Close', {duration: 2000});
           this.taxLoading = false;
         },
         complete: () => {
@@ -343,49 +387,41 @@ export class PosComponent implements OnInit, AfterViewInit {
   checkout(): void {
     if (!this.selectedBusinessEntity) return;
 
-    const totalWithTax = this.getTotalWithTax();
-
     const salesDetails = this.cart.map(item => ({
       productId: item.product.id,
       quantity: item.quantity,
       salesPricePerUnit: item.product.rrp.toString(),
-    } as SalesDetails));
+    }));
 
+    // Remove businessEntityId from the request body since it's now in the URL
     const salesTransactionRequest: SalesTransactionRequest = {
       businessEntityId: this.selectedBusinessEntity.id,
       taxAmount: this.salesTax.toString(),
-      totalAmount: totalWithTax.toString(),
+      totalAmount: this.getTotalWithTax().toString(),
       salesDetails
     };
 
-    let transactionResponse: SalesTransactionResponse;
-
-    const subscription = this.posService
+    this.posService
       .createTransaction(salesTransactionRequest)
       .subscribe({
         next: (response) => {
-          transactionResponse = response;
-          this.snackBar.open(`Checkout completed. Total: $${response.totalAmount}`, 'Close', { duration: 2000 });
+          this.snackBar.open(`Checkout completed. Total: $${response.totalAmount}`, 'Close', {duration: 2000});
+          this.cart = [];
+          this.salesTax = 0;
+          this.focusBarcodeInput();
+          this.loadProducts(); // Reload products to refresh inventory
         },
-        error: (error: Error) => {
+        error: (error) => {
           console.error('Error creating transaction:', error);
-          this.snackBar.open('Failed to create transaction', 'Close', { duration: 2000 });
+          this.snackBar.open('Failed to create transaction', 'Close', {duration: 2000});
         }
       });
-
-    this.destroyRef.onDestroy(() => {
-      subscription.unsubscribe();
-    });
-
-    this.cart = [];
-    this.salesTax = 0;
-    this.focusBarcodeInput();
   }
 
   freezeTransaction(): void {
     if (!this.selectedBusinessEntity) return;
     if (this.cart.length === 0) {
-      this.snackBar.open('Cart is empty', 'Close', { duration: 2000 });
+      this.snackBar.open('Cart is empty', 'Close', {duration: 2000});
       return;
     }
 
@@ -408,7 +444,7 @@ export class PosComponent implements OnInit, AfterViewInit {
         },
         error: (error: Error) => {
           console.error('Error suspending transaction:', error);
-          this.snackBar.open('Failed to suspend transaction', 'Close', { duration: 2000 });
+          this.snackBar.open('Failed to suspend transaction', 'Close', {duration: 2000});
         }
       });
 
@@ -417,7 +453,7 @@ export class PosComponent implements OnInit, AfterViewInit {
     });
 
     this.cart = [];
-    this.snackBar.open('Transaction frozen', 'Close', { duration: 2000 });
+    this.snackBar.open('Transaction frozen', 'Close', {duration: 2000});
     this.focusBarcodeInput();
   }
 
@@ -436,7 +472,7 @@ export class PosComponent implements OnInit, AfterViewInit {
         },
         error: (error: Error) => {
           console.error('Error resuming transaction:', error);
-          this.snackBar.open('Failed to resume transaction', 'Close', { duration: 2000 });
+          this.snackBar.open('Failed to resume transaction', 'Close', {duration: 2000});
         }
       });
 
@@ -444,7 +480,7 @@ export class PosComponent implements OnInit, AfterViewInit {
       subscription.unsubscribe();
     });
 
-    this.snackBar.open('Transaction is resumed', 'Close', { duration: 2000 });
+    this.snackBar.open('Transaction is resumed', 'Close', {duration: 2000});
     this.focusBarcodeInput();
   }
 

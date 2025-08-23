@@ -1,57 +1,26 @@
-<!-- Sidebar Toggle Button -->
-<button class="btn btn-outline-primary sidebar-toggle-btn" (click)="toggleSidebar()">
-    <i class="pi pi-bars"></i>
+<button class="sidebar-toggle pastel-toggle" (click)="toggleSidebar()" [attr.aria-expanded]="sidebarVisible">
+  <i class="pi" [class.pi-bars]="!sidebarVisible" [class.pi-times]="sidebarVisible"></i>
 </button>
 
+<aside class="sidebar-wrapper pastel-sidebar-wrapper" [class.collapsed]="!sidebarVisible">
+  <nav class="sidebar pastel-sidebar" [@sidebarState]="sidebarVisible ? 'open' : 'closed'">
+    <div class="sidebar-header pastel-header">
+      <h2 class="sidebar-title">Menu</h2>
+    </div>
 
-<!-- Sidebar -->
-<div class="sidebar" [@sidebarState]="sidebarVisible ? 'open' : 'closed'">
-    <br>
-    <br>
-    <br>
-    <div class="sidebar-header">
-        <h1>Menu</h1>
-    </div>
     <div class="sidebar-body">
-        <ul class="list-unstyled">
-          <li>
-            <button class="btn btn-outline-secondary w-100 mb-2 text-left" routerLink="/admin/pos-system">
-              <i class="pi pi-shopping-bag"></i> POS System
-            </button>
-          </li>
-          <li>
-            <button class="btn btn-outline-secondary w-100 mb-2 text-left" routerLink="/admin/business-entity-management">
-                <i class="pi pi-shop"></i> Biz Entity Management
-            </button>
-          </li>
-          <li>
-              <button class="btn btn-outline-secondary w-100 mb-2 text-left" routerLink="/admin/product-management">
-                  <i class="pi pi-box"></i> Product Management
-              </button>
-          </li>          
-          <li>
-            <button class="btn btn-outline-secondary w-100 mb-2 text-left" routerLink="/admin/inventory-management">
-              <i class="pi pi-book"></i> Inventory Management
-            </button>
-          </li>
-          <li>
-            <button class="btn btn-outline-secondary w-100 mb-2 text-left" routerLink="/admin/user-management">
-                <i class="pi pi-users"></i> User Management
-            </button>
-          </li>
-          <li>
-            <button class="btn btn-outline-secondary w-100 mb-2 text-left" routerLink="/admin/report-generation">
-                <i class="pi pi-chart-bar"></i> Report Generation
-            </button>
-          </li>
-          <li>
-            <button class="btn btn-outline-secondary w-100 mb-2 text-left" routerLink="/admin/profile">
-                <i class="pi pi-user"></i> My Profile
-            </button>
-          </li>
-          <li>
-            <logout-button></logout-button>
-          </li>
-        </ul>
+      <ul class="sidebar-menu">
+        <li class="menu-item" *ngFor="let item of sidebarItems">
+          <a [routerLink]="item.route"
+             routerLinkActive="active"
+             class="menu-link pastel-link">
+            <i class="pi {{item.icon}} menu-icon pastel-icon"></i>
+            <span class="menu-text">{{item.text}}</span>
+          </a>
+        <li class="menu-item logout-item">
+          <logout-button class="pastel-logout"></logout-button>
+        </li>
+      </ul>
     </div>
-</div>
+  </nav>
+</aside>

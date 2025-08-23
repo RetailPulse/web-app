@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './ngx-scannerqrcode-adapter.component.html',
   styleUrl: './ngx-scannerqrcode-adapter.component.css'
 })
-export class NgxScannerqrcodeAdapterComponent extends InputScanner implements AfterViewInit {
+export class NgxScannerQRCodeAdapterComponent extends InputScanner implements AfterViewInit {
   public config: ScannerQRCodeConfig = {
     constraints: {
       video: {
@@ -22,54 +22,63 @@ export class NgxScannerqrcodeAdapterComponent extends InputScanner implements Af
     },
   };
 
-  public qrCodeResult: ScannerQRCodeSelectedFiles[] = [];
-  private qrcode: NgxScannerQrcodeService;
+  public scannedResults: ScannerQRCodeSelectedFiles[] = [];
+  private scanCodeService: NgxScannerQrcodeService;
 
-  @ViewChild('action') action!: NgxScannerQrcodeComponent;
+  @ViewChild('action') codeScanner!: NgxScannerQrcodeComponent;
   @Output() scannedEvent = new EventEmitter<string>();
 
   constructor() { 
     super(); 
-    this.qrcode = new NgxScannerQrcodeService();
+    this.scanCodeService= new NgxScannerQrcodeService();
   } 
 
   ngAfterViewInit(): void {
-    this.action.isReady.subscribe((res: any) => {
-      // this.handle(this.action, 'start');
+    this.codeScanner.isReady.subscribe((res: any) => {
+      // this.handle(this.codeScanner, 'start');
     });
   }
 
-  StartScanner() {
+  startScanner() {
     console.log('Start Scanner');
-    this.handle(this.action, 'start');
+    this.handle(this.codeScanner, 'start');
   }
 
-  StopScanner() {
-    this.handle(this.action, 'stop');
+  stopScanner() {
+    this.handle(this.codeScanner, 'stop');
   }
 
-  public onEvent(e: ScannerQRCodeResult[], action?: any): void {
-    // e && action && action.pause();    
+  public onEvent(e: ScannerQRCodeResult[], codeScanner?: any): void {
+    // e && codeScanner && codeScanner.pause();    
     console.log(e[0].data);
     const decodedData = new TextDecoder().decode(e[0].data);
     this.scannedEvent.emit(decodedData); // Emit the scanned data
   }
 
-  public handle(action: any, fn: string): void {
-    // Fix issue #27, #29
+  public handle(codeScanner: any, fn: string): void {
+
+    if (codeScanner === null) {
+      console.error('CodeScanner is null, use the codeScanner instance from the component.');
+      return;
+    }
+    
+    if (codeScanner === undefined) {
+      console.error('CodeScanner is undefined, use the codeScanner instance from the component.');
+      codeScanner = this.codeScanner;
+    }
+    
     const playDeviceFacingBack = (devices: any[]) => {
       // front camera or back camera check here!
       const device = devices.find(f => (/back|rear|environment/gi.test(f.label))); // Default Back Facing Camera
-      action.playDevice(device ? device.deviceId : devices[0].deviceId);
+      codeScanner.playDevice(device ? device.deviceId : devices[0].deviceId);
     }
     
     console.log('Function:', fn);
 
     if (fn === 'start') {
-      action[fn](playDeviceFacingBack).subscribe((r: any) => console.log(fn, r), alert);
+      codeScanner[fn](playDeviceFacingBack).subscribe((r: any) => console.log(fn, r), alert);
     } else {
-      action[fn]().subscribe((r: any) => console.log(fn, r), alert);
+      codeScanner[fn]().subscribe((r: any) => console.log(fn, r), alert);
     }
   }
-
 }

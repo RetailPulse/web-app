@@ -1,3 +1,7 @@
+import { User } from '../models/user.model';
+import { UserService } from '../services/user.service';
+import { AuthFacade } from '../services/auth.facade';
+
 import { Component, signal, inject } from '@angular/core';
 
 import { CardModule } from 'primeng/card';
@@ -7,11 +11,6 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
-
-import { User } from '../models/user.model';
-import { UserService } from '../services/user.service';
-import { AuthService } from '../services/auth.service';
-
 
 // Custom validator to check for at least one number in the password
 function containsNumber(control: AbstractControl): { [key: string]: boolean } | null {
@@ -27,7 +26,7 @@ function containsNumber(control: AbstractControl): { [key: string]: boolean } | 
     ConfirmDialogModule,
     CardModule,
     PasswordModule,
-    DialogModule,    
+    DialogModule,
     ButtonModule,
   ],
   templateUrl: './profile.component.html',
@@ -36,7 +35,7 @@ function containsNumber(control: AbstractControl): { [key: string]: boolean } | 
 
 export class ProfileComponent {
   private userService = inject(UserService);
-  private authService = inject(AuthService);
+  private authService = inject(AuthFacade);
   private formBuilder = inject(FormBuilder);
   private confirmationService = inject(ConfirmationService);
 
@@ -50,7 +49,7 @@ export class ProfileComponent {
   changePassword_visible = signal(false);
   changePassword_error_msg = signal<string | null>(null);
 
-  constructor() {    
+  constructor() {
     // Fetch the user profile
     const userName: string = this.authService.getUsername();
     this.userService.getUserByUsername(userName).subscribe({
@@ -68,9 +67,9 @@ export class ProfileComponent {
     // Initialize the Change Password Form
     this.changePasswordForm = this.formBuilder.group({
       ctlOldPassword: ['', Validators.required],
-      ctlNewPassword: ['', 
+      ctlNewPassword: ['',
         [
-          Validators.required, 
+          Validators.required,
           Validators.minLength(8),
           containsNumber // Custom validator to ensure at least one number
         ]
@@ -115,7 +114,17 @@ export class ProfileComponent {
   }
 
   changePassword(): void {
-    this.resetMessages();    
+    this.resetMessages();
+
+    if (this.changePasswordForm.get('ctlOldPassword') === null || 
+        this.changePasswordForm.get('ctlNewPassword') === null) {
+          
+          console.error('Form controls are null. Cannot proceed with password change.');
+          this.error_msg.set('Form controls are null. Cannot proceed with password change.');
+          return;          
+    }
+
+
     const oldPassword: string = this.changePasswordForm.get('ctlOldPassword')?.value;
     const newPassword: string = this.changePasswordForm.get('ctlNewPassword')?.value;
 

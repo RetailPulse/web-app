@@ -6,19 +6,19 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { routes } from '../app.routes';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
-import { AuthService } from '../services/auth.service';
 
 import { createMockAuthService } from '../mock/auth.service.mock';
-import { ConfirmationService } from 'primeng/api'; 
+import { ConfirmationService } from 'primeng/api';
 
 import { OperatorPageComponent } from './operator-page.component';
+import { AuthFacade } from '../services/auth.facade';
 
 describe('OperatorPageComponent', () => {
   let component: OperatorPageComponent;
   let fixture: ComponentFixture<OperatorPageComponent>;
 
   beforeEach(async () => {
-    // Mock AuthService
+    // Mock OauthAuthenticationService
     const mockAuthService = createMockAuthService();
 
     await TestBed.configureTestingModule({
@@ -29,7 +29,7 @@ describe('OperatorPageComponent', () => {
         provideRouter(routes),
         provideAnimations(),
         provideAnimationsAsync(),
-        { provide: AuthService, useValue: mockAuthService }, // Mock AuthService
+        { provide: AuthFacade, useValue: mockAuthService }, // Mock OauthAuthenticationService
         ConfirmationService,
       ]
     })

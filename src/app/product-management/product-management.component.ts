@@ -19,6 +19,7 @@ import {MatChip, MatChipListbox} from '@angular/material/chips';
 import {MatSlideToggle} from '@angular/material/slide-toggle';
 import {MatButton, MatFabButton, MatIconButton} from '@angular/material/button';
 import {MatInput} from '@angular/material/input';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-product-management',
@@ -33,7 +34,6 @@ import {MatInput} from '@angular/material/input';
     MatChip,
     CurrencyPipe,
     ReactiveFormsModule,
-    MatSlideToggle,
     MatButton,
     MatInput,
     MatFabButton,
@@ -52,16 +52,20 @@ import {MatInput} from '@angular/material/input';
     MatRowDef,
     MatLabel,
     MatDialogClose,
+    MatSlideToggle,
   ],
   styleUrls: ['./product-management.component.css']
 })
 export class ProductManagementComponent implements OnInit {
+  product: Product | undefined ;
   products: Product[] = [];
   filteredProducts: Product[] = [];
   searchTerm: string = '';
-  displayModal: boolean = false;
   modalMode: 'create' | 'update' = 'create';
   productForm: FormGroup;
+  isLoading = false; // Added for loading indicator
+  errorMessage: string | null = null;
+
 
   cols = [
     {field: 'sku', header: 'SKU'},
@@ -74,7 +78,7 @@ export class ProductManagementComponent implements OnInit {
     {field: 'origin', header: 'Origin'},
     {field: 'uom', header: 'UOM'},
     {field: 'vendorCode', header: 'Vendor Code'},
-    {field: 'is_active', header: 'Status'}
+    {field: 'active', header: 'Status'}
   ];
 
   displayedColumns: string[] = [...this.cols.map(col => col.field), 'actions'];
@@ -82,11 +86,11 @@ export class ProductManagementComponent implements OnInit {
   constructor(
     private productService: ProductService,
     private fb: FormBuilder,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) {
     this.productForm = this.fb.group({
       id: [''],
-      sku: ['', Validators.required],
       brand: ['', Validators.required],
       category: ['', Validators.required],
       subcategory: [''],
@@ -96,14 +100,27 @@ export class ProductManagementComponent implements OnInit {
       origin: [''],
       uom: [''],
       vendorCode: [''],
-      is_active: [true]
+      active: [true]
     });
   }
 
   ngOnInit(): void {
-    this.productService.getProducts().subscribe((data: Product[]) => {
-      this.products = data.filter(product => product.active);
-      this.filteredProducts = this.products;
+    this.loadProducts();
+  }
+
+  loadProducts(): void {
+    this.isLoading = true;
+    this.errorMessage = null;
+    this.productService.getProducts().subscribe({
+      next: (data: Product[]) => {
+        this.products = data;
+        this.filteredProducts = this.products;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        this.handleError('Failed to load products', error);
+        this.isLoading = false;
+      }
     });
   }
 
@@ -134,7 +151,7 @@ export class ProductManagementComponent implements OnInit {
 
 
   createProduct(): void {
-    this.productForm.reset({ is_active: true });
+    this.productForm.reset({ active: true });
     this.modalMode = 'create';
     this.openDialog();
   }
@@ -142,7 +159,7 @@ export class ProductManagementComponent implements OnInit {
   editProduct(product: Product): void {
     this.productForm.patchValue({
       ...product,
-      is_active: product.active || false
+      active: product.active || false
     });
     this.modalMode = 'update';
     this.openDialog();
@@ -153,39 +170,111 @@ export class ProductManagementComponent implements OnInit {
       return;
     }
 
-    const productData = this.productForm.value;
+    const formData = this.productForm.value;
+    const productData = {
+      ...formData,
+      active: formData.active
+    };
 
     if (this.modalMode === 'create') {
-      this.productService.createProduct(productData).subscribe({
-        next: (createdProduct) => {
-          this.products.push(createdProduct);
-          this.filteredProducts = [...this.products];
+      this.handleCreateProduct(productData);
+    } else {
+      this.handleUpdateProduct(productData);
+    }
+  }
+
+  private handleCreateProduct(productData: any) {
+    this.productService.createProduct(productData).subscribe({
+      next: (createdProduct) => {
+        this.products.push(createdProduct);
+        this.filteredProducts = [...this.products];
+        this.dialog.closeAll();
+        this.showSuccessSnackbar('Product created successfully');
+      },
+      error: (error) => this.handleError('Error creating product', error)
+    });
+  }
+
+  private handleUpdateProduct(productData: any) {
+    // Check if we're reactivating a previously inactive product
+    const wasInactive = !this.products.find(p => p.id === productData.id)?.active;
+    const isNowActive = productData.active;
+
+    if (wasInactive && isNowActive) {
+      // Use reverseProduct API for reactivation
+      this.productService.reverseProduct(productData.id).subscribe({
+        next: (reactivatedProduct) => {
+          this.updateLocalProduct(reactivatedProduct);
           this.dialog.closeAll();
+          this.showSuccessSnackbar('Product reactivated successfully');
         },
-        error: (error) => console.error('Error creating product:', error)
+        error: (error) => this.handleError('Error reactivating product', error)
       });
     } else {
+      // Normal update
       this.productService.updateProduct(productData).subscribe({
         next: (updatedProduct) => {
-          const index = this.products.findIndex(p => p.id === updatedProduct.id);
-          this.products[index] = updatedProduct;
-          this.filteredProducts = [...this.products];
+          this.updateLocalProduct(updatedProduct);
           this.dialog.closeAll();
+          this.showSuccessSnackbar('Product updated successfully');
         },
-        error: (error) => console.error('Error updating product:', error)
+        error: (error) => this.handleError('Error updating product', error)
       });
     }
   }
 
+  private updateLocalProduct(updatedProduct: Product) {
+    const index = this.products.findIndex(p => p.id === updatedProduct.id);
+    if (index > -1) {
+      this.products[index] = updatedProduct;
+    } else {
+      this.products.push(updatedProduct);
+    }
+    this.filteredProducts = [...this.products];
+  }
+
+  private showSuccessSnackbar(message: string) {
+    this.snackBar.open(message, 'Close', {
+      duration: 3000,
+      panelClass: ['success-snackbar']
+    });
+  }
+
+  private handleError(message: string, error: any) {
+    console.error(message, error);
+    this.snackBar.open(`${message}: ${error.message}`, 'Close', {
+      duration: 5000,
+      panelClass: ['error-snackbar']
+    });
+  }
+  
   deleteProduct(product: Product): void {
-    if (confirm('Are you sure you want to delete this product?')) {
-      this.productService.deleteProduct(product.id.toString()).subscribe({
-        next: () => {
-          this.products = this.products.filter(p => p.id !== product.id);
-          this.filteredProducts = this.filteredProducts.filter(p => p.id !== product.id);
+    if (confirm('Are you sure you want to deactivate this product?')) {
+      // Update the product's active status to false (soft delete)
+      const updatedProduct = { ...product, active: false };
+
+      this.productService.updateProduct(updatedProduct).subscribe({
+        next: (result) => {
+          // Update the product in both arrays
+          const updateArray = (arr: Product[]) =>
+            arr.map(p => p.id === product.id ? { ...p, active: false } : p);
+
+          this.products = updateArray(this.products);
+          this.filteredProducts = updateArray(this.filteredProducts);
+
+          // Optional: Show a confirmation message
+          this.snackBar.open('Product deactivated successfully', 'Close', {
+            duration: 3000
+          });
         },
-        error: (error) => console.error('Error deleting product:', error)
+        error: (error) => {
+          console.error('Error deactivating product:', error);
+          this.snackBar.open('Error deactivating product', 'Close', {
+            duration: 3000,
+            panelClass: ['error-snackbar']
+          });
+        }
       });
     }
-  }
+  }  
 }

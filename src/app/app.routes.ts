@@ -1,6 +1,6 @@
 import {Routes} from '@angular/router';
-import {authGuard} from './guards/auth.guard';
 import {LoginPageComponent} from './login-page/login-page.component';
+import {authGuard} from './guards/auth.guard';
 
 // Lazy-loaded components
 const lazyAdminPage = () => import('./admin-page/admin-page.component').then(mod => mod.AdminPageComponent);
@@ -12,9 +12,6 @@ const lazyProfile = () => import('./profile/profile.component').then(mod => mod.
 const lazyReportGeneration = () => import('./report-generation/report-generation.component').then(mod => mod.ReportGenerationComponent);
 const lazyInvenotryManagement = () => import ('./inventory-management/inventory-management.component').then(mod => mod.InventoryManagementComponent);
 const lazyPOS = () => import('./pos-system/pos-system.component').then(mod => mod.PosComponent);
-
-//Casper working
-const lazyBarcodeScanner = () => import ('./barcodescanner/barcodescanner.component').then(mod => mod.BarcodescannerComponent);
 
 export const routes: Routes = [
   // Login route
@@ -34,22 +31,36 @@ export const routes: Routes = [
       {path: 'business-entity-management', loadComponent: lazyBusinessEntityManagement},
       {path: 'report-generation', loadComponent: lazyReportGeneration},
       {path: 'profile', loadComponent: lazyProfile},
-      {path: 'barcodescanner', loadComponent: lazyBarcodeScanner},
       {path: 'pos-system', loadComponent: lazyPOS},
-      // {path: '', redirectTo: 'barcodescanner', pathMatch: 'full'}, // Default childroute
-      { path: '', redirectTo: 'user-management', pathMatch: 'full' }, // Default childroute
+      {path: '', redirectTo: 'profile', pathMatch: 'full' }, // Default childroute
     ],
   },
 
   // Operator route with guard and role-based access
   {
-    path: 'operator',
+    path: 'manager',
     loadComponent: lazyOperatorPage,
     canActivate: [authGuard],
-    data: {roles: ['CASHER', 'MANAGER']},
+    data: {roles: ['MANAGER']},
     children: [
+      {path: 'product-management', loadComponent: lazyProductManagement},
+      {path: 'inventory-management', loadComponent: lazyInvenotryManagement},
+      {path: 'business-entity-management', loadComponent: lazyBusinessEntityManagement},
+      {path: 'report-generation', loadComponent: lazyReportGeneration},
       {path: 'profile', loadComponent: lazyProfile},
-      {path: '', redirectTo: 'profile', pathMatch: 'full'}, // Default child route
+      {path: 'pos-system', loadComponent: lazyPOS},
+      {path: '', redirectTo: 'profile', pathMatch: 'full' }, // Default childroute
+    ],
+  },
+  {
+    path: 'cashier',
+    loadComponent: lazyOperatorPage,
+    canActivate: [authGuard],
+    data: {roles: ['CASHIER']},
+    children: [
+      {path: 'pos-system', loadComponent: lazyPOS},
+      {path: 'profile', loadComponent: lazyProfile},
+      {path: '', redirectTo: 'profile', pathMatch: 'full' }, // Default childroute
     ],
   },
 
