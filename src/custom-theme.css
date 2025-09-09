@@ -38,35 +38,35 @@
     /* ... your existing variables ... */
 
     /* Material Theme Variables */
-    --mdc-theme-primary: var(--pastel-primary);
-    --mdc-theme-on-primary: var(--pastel-dark); /* Text color on primary */
-    --mdc-theme-secondary: var(--pastel-secondary);
-    --mdc-theme-on-secondary: var(--pastel-dark);
-    --mdc-theme-error: var(--pastel-danger);
-    --mdc-theme-on-error: var(--pastel-dark);
-    --mdc-theme-surface: #ffffff;
-    --mdc-theme-on-surface: var(--pastel-dark);
-    --mdc-theme-background: var(--pastel-background);
+    --mat-theme-primary: var(--pastel-primary);
+    --mat-theme-on-primary: var(--pastel-dark); /* Text color on primary */
+    --mat-theme-secondary: var(--pastel-secondary);
+    --mat-theme-on-secondary: var(--pastel-dark);
+    --mat-theme-error: var(--pastel-danger);
+    --mat-theme-on-error: var(--pastel-dark);
+    --mat-theme-surface: #ffffff;
+    --mat-theme-on-surface: var(--pastel-dark);
+    --mat-theme-background: var(--pastel-background);
   }
 
   /* Specific component overrides */
 
   .mat-mdc-raised-button.mat-primary {
-    --mdc-protected-button-container-color: var(--pastel-yellow-background);
-    --mdc-protected-button-label-text-color: var(--pastel-dark);
+    --mat-button-protected-container-color: var(--pastel-yellow-background);
+    --mat-button-protected-label-text-color: var(--pastel-dark);
   }
 
   .mat-mdc-raised-button.mat-primary:hover {
-    --mdc-protected-button-hover-container-color: #c5d4e8; /* Slightly darker pastel */
+    --mat-button-protected-hover-container-color: #c5d4e8; /* Slightly darker pastel */
   }
 
   .mat-mdc-fab.mat-primary {
-    --mdc-fab-container-color: var(--pastel-primary);
-    --mdc-fab-icon-color: var(--pastel-dark);
+    --mat-fab-container-color: var(--pastel-primary);
+    --mat-fab-icon-color: var(--pastel-dark);
   }
 
   .mat-mdc-fab.mat-primary:hover {
-    --mdc-fab-hover-container-color: #c5d4e8;
+    --mat-fab-hover-container-color: #c5d4e8;
   }
 
   /* Base Styles */
@@ -129,15 +129,15 @@
   /* Snackbar Styles */
 
   .mat-mdc-snack-bar-container.success-snackbar {
-    --mdc-snackbar-container-color: #e0f2f1;
-    --mdc-snackbar-supporting-text-color: #00897b;
+    --mat-snackbar-container-color: #e0f2f1;
+    --mat-snackbar-supporting-text-color: #00897b;
     --mat-mdc-snack-bar-button-color: #26a69a;
   }
 
   /* Error */
   .mat-mdc-snack-bar-container.error-snackbar {
-    --mdc-snackbar-container-color: #f3e5f5;
-    --mdc-snackbar-supporting-text-color: #8e24aa;
+    --mat-snackbar-container-color: #f3e5f5;
+    --mat-snackbar-supporting-text-color: #8e24aa;
     --mat-mdc-snack-bar-button-color: #9c27b0;
   }
 
