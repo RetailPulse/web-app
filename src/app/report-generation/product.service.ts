@@ -13,7 +13,7 @@ export class ProductService {
 
     return this.http
       .get(
-        apiConfig.backend_api_url + 'api/reports/products/export',
+        apiConfig.report_api_url + 'api/reports/products/export',
         { params: searchParams, responseType: 'blob' }
       )
       .pipe(

@@ -1,8 +1,7 @@
 import { AuthConfig } from 'angular-oauth2-oidc';
 
 export const authConfig: AuthConfig = {
-  issuer: 'http://retailpulse.me:8081', // Update with your authorization server URL
-  requireHttps: false,
+  issuer: 'http://localhost:30081', // Update with your authorization server URL
   redirectUri: window.location.origin,
   clientId: 'client',
   responseType: 'code',
@@ -22,9 +21,10 @@ export const apiConfig = {
 };
 
 export const environment = {
-  production: true,
-  authEnabled: true,
+  production: false,
+  authEnabled: false,
   devModeUser: 'superadmin',
   devModeRole: 'ADMIN', //'OPERATOR', //
-  defaultPassword: 'password1'
+  defaultPassword: 'password1',
+  stripePublicKey: 'pk_test_51Rwa9JCTUDg2faMiUxYG28Di0rDMjD4C5xEPCkn0nv6bPc1Qy8WvivfAhhykVxGlAqfeF2tvILpEd0K9je6WPhLo00bfZAazGS'
 };

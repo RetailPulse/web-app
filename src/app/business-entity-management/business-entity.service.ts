@@ -10,7 +10,7 @@ import { apiConfig } from '../../environments/environment';
 export class BusinessEntityService {
 
   private http: HttpClient = inject(HttpClient);
-  private apiUrl = apiConfig.backend_api_url + 'api/businessEntity';
+  private apiUrl = apiConfig.business_entity_api_url + 'api/businessEntity';
 
   constructor() { }
 

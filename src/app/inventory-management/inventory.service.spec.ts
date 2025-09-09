@@ -10,8 +10,8 @@ describe('InventoryService', () => {
   let service: InventoryService;
   let httpMock: HttpTestingController;
 
-  const inventoryTransactionApiUrl = `${apiConfig.backend_api_url}api/inventoryTransaction`;
-  const inventoryApiUrl = `${apiConfig.backend_api_url}api/inventory`;
+  const inventoryTransactionApiUrl = `${apiConfig.inventory_api_url}api/inventoryTransaction`;
+  const inventoryApiUrl = `${apiConfig.inventory_api_url}api/inventory`;
 
   const mockTransactions: InventoryTransaction[] = [
     { productId: 1, quantity: 10, source: 100, destination: 200 },

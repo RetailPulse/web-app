@@ -1,0 +1,18 @@
+# This file will only be used for quick local development
+# Kubernetes will be used in production
+services:
+  rp-web-app:
+    image: rp-web-app:v0.1.0
+    container_name: app-rp-web
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"    
+    networks:
+      - retailpulse-network
+
+networks:
+  retailpulse-network:
+    driver: bridge
+

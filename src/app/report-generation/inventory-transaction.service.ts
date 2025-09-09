@@ -21,7 +21,7 @@ export class InventoryTransactionService {
 
     return this.http
       .get<InventoryTransactionModel[]>(
-        apiConfig.backend_api_url + 'api/reports/inventory-transactions',
+        apiConfig.report_api_url + 'api/reports/inventory-transactions',
         { params: searchParams }
       )
       .pipe(
@@ -48,7 +48,7 @@ export class InventoryTransactionService {
 
     return this.http
       .get(
-        apiConfig.backend_api_url + 'api/reports/inventory-transactions/export',
+        apiConfig.report_api_url + 'api/reports/inventory-transactions/export',
         { params: searchParams, responseType: 'blob' }
       )
       .pipe(

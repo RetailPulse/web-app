@@ -16,7 +16,7 @@ import {catchError, Observable, throwError} from 'rxjs';
   providedIn: 'root'
 })
 export class PosSystemService {
-  private apiUrl = apiConfig.backend_api_url + 'api/sales'; // Replace with your API URL
+  private apiUrl = apiConfig.sales_api_url + 'api/sales'; // Replace with your API URL
 
   constructor(private http: HttpClient) {
   }

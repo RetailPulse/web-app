@@ -53,7 +53,7 @@ describe('InventoryTransactionService', () => {
       service.fetchInventoryTransactions('2024-05-01', '2024-05-09', 'YYYY-MM-DD').subscribe(result => {
         expect(result).toEqual(mockTransactions);
         expect(httpSpy.get).toHaveBeenCalledWith(
-          apiConfig.backend_api_url + 'api/reports/inventory-transactions',
+          apiConfig.report_api_url + 'api/reports/inventory-transactions',
           jasmine.objectContaining({
             params: jasmine.any(HttpParams)
           })
@@ -113,7 +113,7 @@ describe('InventoryTransactionService', () => {
       service.exportReport('2024-05-01', '2024-05-09', 'YYYY-MM-DD', 'pdf').subscribe(result => {
         expect(result).toEqual(blob);
         expect(httpSpy.get).toHaveBeenCalledWith(
-          apiConfig.backend_api_url + 'api/reports/inventory-transactions/export',
+          apiConfig.report_api_url + 'api/reports/inventory-transactions/export',
           jasmine.objectContaining({
             params: jasmine.any(HttpParams),
             responseType: 'blob'

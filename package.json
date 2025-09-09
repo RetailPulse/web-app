@@ -1,6 +1,6 @@
 {
   "name": "rp-web-app",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -14,16 +14,17 @@
   "dependencies": {
     "@angular/animations": "^19.2.2",
     "@angular/cdk": "19.2.3",
-    "@angular/material": "19.2.3",
     "@angular/common": "^19.2.2",
     "@angular/compiler": "^19.2.2",
     "@angular/core": "^19.2.2",
     "@angular/forms": "^19.2.2",
+    "@angular/material": "19.2.3",
     "@angular/platform-browser": "^19.2.2",
     "@angular/platform-browser-dynamic": "^19.2.2",
     "@angular/router": "^19.2.2",
     "@ng-bootstrap/ng-bootstrap": "^18.0.0",
     "@primeng/themes": "^19.1.0",
+    "@stripe/stripe-js": "^7.9.0",
     "angular-oauth2-oidc": "^19.0.0",
     "bootstrap": "^5.3.3",
     "fuse.js": "^7.1.0",
