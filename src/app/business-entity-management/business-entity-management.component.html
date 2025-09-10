@@ -113,7 +113,9 @@
             formControlName="ctlType"
             placeholder="Select Entity Type"
             optionLabel="label"
-            optionValue="value">
+            optionValue="value"
+            appendTo="body"
+          >
           </p-select>
       </div>
       <div class="col-6 mb-3 external-container">
@@ -141,7 +143,7 @@
 <p-dialog id="editBusinessEntityDialog" [(visible)]="editDialog_visible" 
   [modal]="true" 
   [header]="'Edit Business Entity'"
-  [style]="{width: '70vw', height: '100vh'}">
+  [style]="{width: '70vw', height: '80vh'}">
   @if (editDialog_error_msg()) {
     <div class="error-message">
       <p>{{ editDialog_error_msg() }}</p>
@@ -188,7 +190,9 @@
             formControlName="ctlType"
             placeholder="Select Entity Type"
             optionLabel="label"
-            optionValue="value">
+            optionValue="value"
+            appendTo="body"
+          >
           </p-select>
       </div>
       <div class="col-6 mb-3 external-container">
