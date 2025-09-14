@@ -57,6 +57,73 @@
   </div>
 </form>
 
+<div class="report-summaries">
+  <div class="header-row">
+    <h3>Generated Reports</h3>
+    <button mat-stroked-button (click)="loadSummaries()" [disabled]="summariesLoading()">
+      Refresh
+      <mat-progress-spinner *ngIf="summariesLoading()" diameter="16" mode="indeterminate"></mat-progress-spinner>
+    </button>
+  </div>
+
+  <mat-error *ngIf="summariesError()">{{ summariesError() }}</mat-error>
+
+  <div *ngIf="summariesLoading()" class="loading-wrap">
+    <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+  </div>
+
+  <table mat-table [dataSource]="summaries() || []" class="mat-elevation-z2 full-width">
+
+    <!-- Report Type -->
+    <ng-container matColumnDef="reportType">
+      <th mat-header-cell *matHeaderCellDef> Type </th>
+      <td mat-cell *matCellDef="let r"> {{ r.reportType }} </td>
+    </ng-container>
+
+    <!-- File Name -->
+    <ng-container matColumnDef="fileName">
+      <th mat-header-cell *matHeaderCellDef> File </th>
+      <td mat-cell *matCellDef="let r"> {{ r.fileName }} </td>
+    </ng-container>
+
+    <!-- Start -->
+    <ng-container matColumnDef="start">
+      <th mat-header-cell *matHeaderCellDef> Start </th>
+      <td mat-cell *matCellDef="let r"> {{ r.startDateTime | date:'short' }} </td>
+    </ng-container>
+
+    <!-- End -->
+    <ng-container matColumnDef="end">
+      <th mat-header-cell *matHeaderCellDef> End </th>
+      <td mat-cell *matCellDef="let r"> {{ r.endDateTime | date:'short' }} </td>
+    </ng-container>
+
+    <!-- Created -->
+    <ng-container matColumnDef="createdAt">
+      <th mat-header-cell *matHeaderCellDef> Created </th>
+      <td mat-cell *matCellDef="let r"> {{ r.createdAt | date:'short' }} </td>
+    </ng-container>
+
+    <!-- Actions -->
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef> Actions </th>
+      <td mat-cell *matCellDef="let r">
+        <button mat-raised-button color="primary" (click)="download(r.id)">
+          <mat-icon>download</mat-icon>
+          Download
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="['reportType','fileName','start','end','createdAt','actions']"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['reportType','fileName','start','end','createdAt','actions'];"></tr>
+  </table>
+
+  <div *ngIf="(summaries()?.length || 0) === 0 && !summariesLoading()" class="empty-state">
+    No generated reports yet.
+  </div>
+</div>
+
 <div *ngIf="inventoryTransactions()" class="report-status">
   <mat-icon class="success-icon">check_circle</mat-icon>
   <span>Report generated successfully for

@@ -21,6 +21,9 @@ import { MatError } from '@angular/material/form-field';
 import { CommonModule } from '@angular/common';
 import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
+import {ReportSummaryDto} from './report-summary.dto';
+import {ReportService} from './report.service';
+import {MatTableModule} from '@angular/material/table';
 
 @Component({
   selector: 'app-report-generation',
@@ -39,6 +42,7 @@ import { MatSelectModule } from '@angular/material/select';
     MatSelectModule,
     MatOptionModule,
     MatNativeDateModule,
+    MatTableModule
   ],
   providers: [DatePipe],
   templateUrl: './report-generation.component.html',
@@ -54,6 +58,10 @@ export class ReportGenerationComponent implements OnInit {
   );
   error = signal('');
   private destroyRef = inject(DestroyRef);
+
+  summaries = signal<ReportSummaryDto[] | null>(null);
+  summariesLoading = signal(false);
+  summariesError = signal<string | null>(null);
 
   // Options array for report type dropdown
   reportTypeOptions = [
@@ -71,6 +79,7 @@ export class ReportGenerationComponent implements OnInit {
     private datePipe: DatePipe,
     private inventoryTransactionService: InventoryTransactionService,
     private productService: ProductService, // Added ProductService injection
+    private reportService: ReportService,
     private pdfService: PdfService
   ) {
     this.dateRangeForm = this.fb.group(
@@ -94,12 +103,20 @@ export class ReportGenerationComponent implements OnInit {
     this.dateRangeForm.get('startDate')?.valueChanges.subscribe(() => {
       this.dateRangeForm.get('endDate')?.updateValueAndValidity();
     });
+    this.loadSummaries();
   }
 
   dateRangeValidator(form: FormGroup) {
     const start = form.get('startDate')?.value;
     const end = form.get('endDate')?.value;
     return start && end && start > end ? { endBeforeStart: true } : null;
+  }
+
+  isSelectDateRange() {
+    const dateRangeCategories = ['inventoryTransaction'];
+    return dateRangeCategories.some(category =>
+      category.toLowerCase() === this.dateRangeForm.value.reportCategory.toLowerCase()
+    );
   }
 
   onSubmit() {
@@ -174,4 +191,43 @@ export class ReportGenerationComponent implements OnInit {
       subscription.unsubscribe();
     });
   }
+
+  loadSummaries(): void {
+    this.summariesLoading.set(true);
+    this.summariesError.set(null);
+    this.reportService.listSummaries().subscribe({
+      next: (data) => {
+        this.summaries.set(data ?? []);
+        this.summariesLoading.set(false);
+      },
+      error: (err) => {
+        this.summariesError.set('Failed to load reports.');
+        this.summariesLoading.set(false);
+        console.error(err);
+      }
+    });
+  }
+
+  download(id: string): void {
+    this.reportService.downloadContent(id).subscribe({
+      next: (res) => {
+        const blob = res.body!;
+        // Try filename from Content-Disposition; fallback to .zip/.pdf/etc.
+        const cd = res.headers.get('Content-Disposition') || '';
+        const match = /filename\*?=(?:UTF-8'')?([^;]+)/i.exec(cd);
+        const filename = match ? decodeURIComponent(match[1].replace(/"/g, '')) : `report-${id}`;
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.click();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        console.error(err);
+        // optionally surface a toast or set summariesError
+      }
+    });
+  }
+
 }
