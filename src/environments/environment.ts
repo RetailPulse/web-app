@@ -16,7 +16,7 @@ export const apiConfig = {
   user_api_url: 'http://localhost:30082/',
   business_entity_api_url: 'http://localhost:30083/',
   inventory_api_url: 'http://localhost:30084/',
-  sales_api_url: 'http://localhost:8092/', //'http://localhost:30085/',
+  sales_api_url: 'http://localhost:30085/',
   report_api_url: 'http://localhost:30086/',
   payment_api_url: 'http://localhost:30087/', 
 };
