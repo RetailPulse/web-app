@@ -16,7 +16,7 @@ COPY angular.json .
 COPY tsconfig*.json . 
 COPY nginx.conf .
 
-ARG BUILD_CONFIG=localk8s
+ARG BUILD_CONFIG=development
 
 # Build the Angular application for production
 RUN npm run build -- --configuration "$BUILD_CONFIG" --aot --output-path dist
