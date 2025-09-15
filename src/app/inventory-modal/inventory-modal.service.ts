@@ -10,8 +10,8 @@ import {Inventory, InventoryTransaction} from "./inventory-modal.model";
 
 export class InventoryModalService {
 
-  private inventoryTransactionApiUrl = `${apiConfig.backend_api_url}api/inventoryTransaction`;
-  private inventoryApiUrl = `${apiConfig.backend_api_url}api/inventory`;
+  private inventoryTransactionApiUrl = `${apiConfig.inventory_api_url}api/inventoryTransaction`;
+  private inventoryApiUrl = `${apiConfig.inventory_api_url}api/inventory`;
 
   constructor(private http: HttpClient) { }
 

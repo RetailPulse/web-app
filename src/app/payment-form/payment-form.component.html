@@ -1,0 +1,35 @@
+<div class="modal-backdrop">
+    <div class="modal">
+        <button class="close-btn" (click)="cancelPayment()">&times;</button>
+
+        <h2>Checkout</h2>
+
+        @if (loading()) {
+        <div>Loading payment UI...</div>
+    } @else {
+        <div id="payment-element"><!--Stripe.js injects the Payment Element--></div>
+
+        <div class="actions">
+            <button class="cancel-btn" (click)="cancelPayment()">Cancel</button>
+
+            <button class="pay-btn" (click)="confirmPayment()" [disabled]="confirming()">
+                {{ confirming() ? 'Processing...' : 'Pay ' + payLabel() }}
+            </button>
+
+        </div>
+    }
+
+    @if (status() === 'success') {
+        <p class="success">Payment successful! Thank you for your purchase.</p>
+    }
+
+    @if (status() === 'failed') {
+        <p class="success">Payment failed! Please check your payment details.</p>
+    }
+
+    @if (error(); as err) {
+        <p class="error"> {{ err }}</p>
+    }
+
+    </div>
+</div>

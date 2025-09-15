@@ -9,7 +9,7 @@ import { apiConfig } from '../../environments/environment';
 describe('BusinessEntityService', () => {
   let service: BusinessEntityService;
   let httpMock: HttpTestingController;
-  const apiUrl = `${apiConfig.backend_api_url}api/businessEntity`;
+  const apiUrl = `${apiConfig.business_entity_api_url}api/businessEntity`;
 
   beforeEach(() => {
     TestBed.configureTestingModule({

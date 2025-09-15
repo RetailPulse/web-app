@@ -10,7 +10,7 @@ import { apiConfig } from '../../environments/environment';
 })
 export class ProductService {
   private readonly http: HttpClient = inject(HttpClient);
-  private apiUrl = apiConfig.backend_api_url + 'api/products';
+  private apiUrl = apiConfig.inventory_api_url + 'api/products';
 
   constructor() { }
 

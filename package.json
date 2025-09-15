@@ -1,6 +1,6 @@
 {
   "name": "rp-web-app",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -12,18 +12,20 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^19.2.2",
-    "@angular/cdk": "19.2.3",
-    "@angular/material": "19.2.3",
-    "@angular/common": "^19.2.2",
-    "@angular/compiler": "^19.2.2",
-    "@angular/core": "^19.2.2",
-    "@angular/forms": "^19.2.2",
-    "@angular/platform-browser": "^19.2.2",
-    "@angular/platform-browser-dynamic": "^19.2.2",
-    "@angular/router": "^19.2.2",
-    "@ng-bootstrap/ng-bootstrap": "^18.0.0",
+    "@angular/animations": "^20.2.4",
+    "@angular/cdk": "20.2.2",
+    "@angular/common": "^20.2.4",
+    "@angular/compiler": "^20.2.4",
+    "@angular/core": "^20.2.4",
+    "@angular/forms": "^20.2.4",
+    "@angular/localize": "^20.2.4",
+    "@angular/material": "20.2.2",
+    "@angular/platform-browser": "^20.2.4",
+    "@angular/platform-browser-dynamic": "^20.2.4",
+    "@angular/router": "^20.2.4",
+    "@ng-bootstrap/ng-bootstrap": "^19.0.1",
     "@primeng/themes": "^19.1.0",
+    "@stripe/stripe-js": "^7.9.0",
     "angular-oauth2-oidc": "^19.0.0",
     "bootstrap": "^5.3.3",
     "fuse.js": "^7.1.0",
@@ -32,15 +34,15 @@
     "ng2-currency-mask": "^13.0.3",
     "ngx-scanner-qrcode": "^1.7.6",
     "primeicons": "^7.0.0",
-    "primeng": "^19.1.0",
+    "primeng": "^20.1.1",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
-    "@angular-devkit/build-angular": "^19.2.3",
-    "@angular/cli": "^19.2.3",
-    "@angular/compiler-cli": "^19.2.2",
+    "@angular/build": "^20.2.2",
+    "@angular/cli": "^20.2.2",
+    "@angular/compiler-cli": "^20.2.4",
     "@types/jasmine": "~5.1.0",
     "jasmine-core": "~5.5.0",
     "karma": "~6.4.0",
@@ -48,6 +50,6 @@
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.7.2"
+    "typescript": "~5.9.2"
   }
 }

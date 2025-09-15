@@ -9,7 +9,7 @@ import { Product } from './product.model';
 describe('ProductService', () => {
   let service: ProductService;
   let httpTestingController: HttpTestingController;
-  const apiUrl = `${apiConfig.backend_api_url}api/products`;
+  const apiUrl = `${apiConfig.inventory_api_url}api/products`;
 
   const mockProducts: Product[] = [
     {
