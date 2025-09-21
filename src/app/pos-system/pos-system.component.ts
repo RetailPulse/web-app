@@ -13,7 +13,7 @@ import {
   TransientTransaction
 } from './pos-system.model';
 
-import {AfterViewInit, Component, DestroyRef, ElementRef, inject, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, DestroyRef, ElementRef, inject, OnInit, ViewChild, signal} from '@angular/core';
 import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import Fuse from 'fuse.js';
@@ -24,6 +24,7 @@ import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
 import {forkJoin} from "rxjs";
+import { HttpErrorResponse } from '@angular/common/http';
 import {MatOption, MatSelect} from '@angular/material/select';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';
@@ -79,11 +80,13 @@ export class PosComponent implements OnInit, AfterViewInit {
   frozenTransactions: Transaction[] = [];
   suspendedTransaction: TransientTransaction[] | null = null;
   businessEntities: BusinessEntity[] = [];
-  selectedBusinessEntity: BusinessEntity | null = null;
-  isLoadingBusinessEntities: boolean = true;
+  selectedBusinessEntity: BusinessEntity | null = null;  
   businessConfirmed = false;
   showBusinessSelection = true;
   isLoading: boolean = false;
+
+  isLoadingBusinessEntities = signal<boolean>(true);
+
   private inventoryMap = new Map<number, number>();
 
   // Barcode scanner properties
@@ -118,6 +121,7 @@ export class PosComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    console.log('In After View Init...');
     if (!this.scanner) {
       console.error('Scanner not found!');
       return;
@@ -155,8 +159,6 @@ export class PosComponent implements OnInit, AfterViewInit {
     this.barcodeControl.reset();
   }
 
-
-
   setupSearch(): void {
     const fuse = new Fuse<Product>(this.products, {
       keys: ['sku', 'description', 'barcode'],
@@ -187,15 +189,30 @@ export class PosComponent implements OnInit, AfterViewInit {
   }
 
   loadBusinessEntities(): void {
-    this.businessEntityService.getBusinessEntities().subscribe(entities => {
-      this.businessEntities = entities.filter(entity => entity.active && !entity.external);
-      this.isLoadingBusinessEntities = false;
-    }, error => {
-      console.error('Error loading business entities:', error);
-      this.snackBar.open('Failed to load business entities', 'Close', {duration: 2000});
-      this.isLoadingBusinessEntities = false;
+    // It's good practice to ensure the loading flag is true at the start
+    this.isLoadingBusinessEntities.set(true);
+
+    console.log('Loading business entities...');
+    this.businessEntityService.getBusinessEntities().subscribe({
+      // Use 'next' property for the success callback
+      next: (entities) => {
+        console.log('Successfully loaded business entities:', entities); // Optional: for debugging
+        this.businessEntities = entities.filter(entity => entity.active && !entity.external);
+        console.log('Filtered business entities:', this.businessEntities); // Optional: for debugging
+        console.log('Number of filtered entities:', this.businessEntities.length);
+        this.isLoadingBusinessEntities.set(false);
+        console.log('isLoadingBusinessEntities set to false (success)');
+      },      
+      error: (error: HttpErrorResponse) => { // Typing the error is good practice
+        console.error('Error loading business entities:', error);
+        // Consider providing more specific feedback to the user based on error.status etc.
+        this.snackBar.open('Failed to load business entities', 'Close', { duration: 5000 }); // Maybe increase duration
+        this.isLoadingBusinessEntities.set(false);
+        console.log('isLoadingBusinessEntities set to false (error)');
+      }
     });
   }
+  
 
 // Add this method to get available quantity
   getAvailableQuantity(productId: number): number {
