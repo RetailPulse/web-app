@@ -35,7 +35,7 @@
         <button mat-raised-button
                 color="primary"
                 (click)="confirmBusinessSelection()"
-                [disabled]="!selectedBusinessEntity || isLoadingBusinessEntities">
+                [disabled]="!selectedBusinessEntity || isLoadingBusinessEntities()">
           Confirm
         </button>
       </mat-card-actions>
