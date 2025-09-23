@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Variables
-IMAGE_NAME=rp-report-service
+IMAGE_NAME=rp-web-app
 TAG=v0.1.0
 LOCAL_REPO=localhost:5000
 
