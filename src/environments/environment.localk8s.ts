@@ -12,7 +12,7 @@ export const authConfig: AuthConfig = {
   showDebugInformation: true
 };
 
-export const apiConfig = {  
+export const apiConfig = {
   user_api_url: 'http://svc-svc-rp-user:8082/',
   business_entity_api_url: 'http://svc-rp-businessentity:8083/',
   inventory_api_url: 'http://svc-rp-inventory:8084/',
@@ -22,7 +22,7 @@ export const apiConfig = {
 
 export const environment = {
   production: false,
-  authEnabled: false,
+  authEnabled: true,
   devModeUser: 'superadmin',
   devModeRole: 'ADMIN', //'OPERATOR', //
   defaultPassword: 'password1',

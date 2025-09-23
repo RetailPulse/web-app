@@ -12,18 +12,18 @@ export const authConfig: AuthConfig = {
   showDebugInformation: true
 };
 
-export const apiConfig = {  
+export const apiConfig = {
   user_api_url: 'http://localhost:30082/',
   business_entity_api_url: 'http://localhost:30083/',
   inventory_api_url: 'http://localhost:30084/',
   sales_api_url: 'http://localhost:30085/',
   report_api_url: 'http://localhost:30086/',
-  payment_api_url: 'http://localhost:30087/', 
+  payment_api_url: 'http://localhost:30087/',
 };
 
 export const environment = {
   production: false,
-  authEnabled: false,
+  authEnabled: true,
   devModeUser: 'superadmin',
   devModeRole: 'ADMIN', //'OPERATOR', //
   defaultPassword: 'password1',
