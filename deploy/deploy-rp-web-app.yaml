@@ -16,7 +16,7 @@ spec:
         app: deploy-rp-web
     spec:
       containers:
-      - image: docker.io/casperyap/rp-web-app:v0.1.0
+      - image: rp-web-app:v0.1.0 #docker.io/casperyap/
         name: rp-web-app
         imagePullPolicy: Always
         resources: {}

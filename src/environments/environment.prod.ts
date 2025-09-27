@@ -14,7 +14,7 @@ export const authConfig: AuthConfig = {
 };
 
 export const apiConfig = {  
-  user_api_url: 'http://svc-svc-rp-user:8082/',
+  user_api_url: 'http://svc-rp-user:8082/',
   business_entity_api_url: 'http://svc-rp-businessentity:8083/',
   inventory_api_url: 'http://svc-rp-inventory:8084/',
   sales_api_url: 'http://svc-rp-sales:8085/',
