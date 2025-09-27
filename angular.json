@@ -90,6 +90,9 @@
             "production": {
               "buildTarget": "rp-web-app:build:production"
             },
+            "localk8s": {
+              "buildTarget": "rp-web-app:build:localk8s"
+            },
             "development": {
               "buildTarget": "rp-web-app:build:development"
             }
