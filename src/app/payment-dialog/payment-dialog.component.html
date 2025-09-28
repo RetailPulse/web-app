@@ -1,0 +1,25 @@
+<h2 mat-dialog-title>Checkout</h2>
+
+<mat-dialog-content>
+  <div class="payment-summary">
+    <!-- show a short summary (you can expand with line items) -->
+    <p *ngIf="data.salesTransactionRequest">
+      Paying: {{ (data.salesTransactionRequest.totalAmount || 0) | currency }}
+    </p>
+  </div>
+
+  <div class="card-wrapper">
+    <div #cardElement class="card-element"></div>
+  </div>
+
+  <div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+  <div *ngIf="status" class="status">Status: {{ status }}</div>
+  <div *ngIf="success" class="success">Payment succeeded — thank you!</div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button (click)="cancel()" type="button">Cancel</button>
+  <button mat-raised-button color="primary" [disabled]="processing" (click)="pay()" type="button">
+    {{ processing ? 'Processing...' : 'Pay' }}
+  </button>
+</mat-dialog-actions>
