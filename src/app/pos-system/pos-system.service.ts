@@ -37,13 +37,18 @@ export class PosSystemService {
   }
 
   createTransaction(salesTransaction: SalesTransactionRequest) {
-    return this.http.post<SalesTransactionResponse>(`${this.apiUrl}/createTransaction`, salesTransaction)
+
+    console.log('Creating transaction:', salesTransaction);
+    const responseTransaction: Observable<SalesTransactionResponse> = this.http.post<SalesTransactionResponse>(`${this.apiUrl}/createTransaction`, salesTransaction)
       .pipe(
         catchError(error => {
           console.error('Error creating transaction:', error);
           return throwError(() => new Error('Failed to create transaction.'));
         })
       );
+
+    console.log('Transaction successfully created.');
+    return responseTransaction;
   }
 
 

@@ -413,7 +413,7 @@ export class PosComponent implements OnInit, AfterViewInit {
     // Remove businessEntityId from the request body since it's now in the URL
     const salesTransactionRequest: SalesTransactionRequest = {
       businessEntityId: this.selectedBusinessEntity.id,
-      taxAmount: this.salesTax.toString(),
+      taxAmount: this.salesTax.toString(), 
       totalAmount: this.getTotalWithTax().toString(),
       salesDetails
     };
