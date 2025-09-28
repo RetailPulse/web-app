@@ -24,7 +24,7 @@ import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
 import {MatButton, MatIconButton} from "@angular/material/button";
 import {MatInput} from "@angular/material/input";
 import {forkJoin} from "rxjs";
-import { HttpErrorResponse } from '@angular/common/http';
+import {HttpErrorResponse} from '@angular/common/http';
 import {MatOption, MatSelect} from '@angular/material/select';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {MatProgressSpinner} from '@angular/material/progress-spinner';
@@ -38,6 +38,8 @@ import {
 } from '@angular/material/card';
 import {NgxScannerQRCodeAdapterComponent} from '../ngx-scannerqrcode-adapter/ngx-scannerqrcode-adapter.component';
 import {InventoryService} from '../inventory-management/inventory.service';
+import {PaymentDialogComponent} from '../payment-dialog/payment-dialog.component';
+import {MatDialog} from '@angular/material/dialog';
 
 @Component({
   selector: 'app-pos-system',
@@ -80,7 +82,7 @@ export class PosComponent implements OnInit, AfterViewInit {
   frozenTransactions: Transaction[] = [];
   suspendedTransaction: TransientTransaction[] | null = null;
   businessEntities: BusinessEntity[] = [];
-  selectedBusinessEntity: BusinessEntity | null = null;  
+  selectedBusinessEntity: BusinessEntity | null = null;
   businessConfirmed = false;
   showBusinessSelection = true;
   isLoading: boolean = false;
@@ -106,6 +108,7 @@ export class PosComponent implements OnInit, AfterViewInit {
   @ViewChild('barcodeInput') barcodeInput!: ElementRef;
 
   private destroyRef = inject(DestroyRef);
+  private dialog: MatDialog = inject(MatDialog);
 
   constructor(
     private snackBar: MatSnackBar,
@@ -202,17 +205,17 @@ export class PosComponent implements OnInit, AfterViewInit {
         console.log('Number of filtered entities:', this.businessEntities.length);
         this.isLoadingBusinessEntities.set(false);
         console.log('isLoadingBusinessEntities set to false (success)');
-      },      
+      },
       error: (error: HttpErrorResponse) => { // Typing the error is good practice
         console.error('Error loading business entities:', error);
         // Consider providing more specific feedback to the user based on error.status etc.
-        this.snackBar.open('Failed to load business entities', 'Close', { duration: 5000 }); // Maybe increase duration
+        this.snackBar.open('Failed to load business entities', 'Close', {duration: 5000}); // Maybe increase duration
         this.isLoadingBusinessEntities.set(false);
         console.log('isLoadingBusinessEntities set to false (error)');
       }
     });
   }
-  
+
 
 // Add this method to get available quantity
   getAvailableQuantity(productId: number): number {
@@ -418,15 +421,23 @@ export class PosComponent implements OnInit, AfterViewInit {
       salesDetails
     };
 
-    this.posService
-      .createTransaction(salesTransactionRequest)
+    this.posService.createTransaction(salesTransactionRequest)
       .subscribe({
         next: (response) => {
-          this.snackBar.open(`Checkout completed. Total: $${response.totalAmount}`, 'Close', {duration: 2000});
-          this.cart = [];
-          this.salesTax = 0;
-          this.focusBarcodeInput();
-          this.loadProducts(); // Reload products to refresh inventory
+          console.log('Transaction created successfully:', response);
+
+          this.dialog.open(PaymentDialogComponent, {
+            width: '520px',
+            data: {
+              clientSecret: response.paymentIntent.clientSecret,
+              paymentIntentId: response.paymentIntent.paymentIntentId
+            }
+          });
+          // this.snackBar.open(`Checkout completed. Total: $${response.totalAmount}`, 'Close', {duration: 2000});
+          // this.cart = [];
+          // this.salesTax = 0;
+          // this.focusBarcodeInput();
+          // this.loadProducts(); // Reload products to refresh inventory
         },
         error: (error) => {
           console.error('Error creating transaction:', error);

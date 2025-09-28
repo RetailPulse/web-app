@@ -1,4 +1,5 @@
 import {
+  CreateTransactionResponse,
   SalesDetails,
   SalesTransactionRequest,
   SalesTransactionResponse, SuspendedTransactionRequest, TaxResult,
@@ -22,7 +23,7 @@ export class PosSystemService {
   }
 
   calculateSalesTax(transaction: Transaction) {
-   
+
     const salesDetails: SalesDetails[] = TransactionAdapter.mapTransactionToSalesDetails(transaction);
     console.log(salesDetails);
 
@@ -38,17 +39,13 @@ export class PosSystemService {
 
   createTransaction(salesTransaction: SalesTransactionRequest) {
 
-    console.log('Creating transaction:', salesTransaction);
-    const responseTransaction: Observable<SalesTransactionResponse> = this.http.post<SalesTransactionResponse>(`${this.apiUrl}/createTransaction`, salesTransaction)
+    return this.http.post<CreateTransactionResponse>(`${this.apiUrl}/createTransaction`, salesTransaction)
       .pipe(
         catchError(error => {
           console.error('Error creating transaction:', error);
           return throwError(() => new Error('Failed to create transaction.'));
         })
       );
-
-    console.log('Transaction successfully created.');
-    return responseTransaction;
   }
 
 
@@ -70,6 +67,16 @@ export class PosSystemService {
         catchError(error => {
           console.error('Error resuming transaction:', error);
           return throwError(() => new Error('Failed to resume transaction.'));
+        })
+      );
+  }
+
+  getPaymentStatus(paymentIntentId: string) {
+    return this.http.get<{ status: string }>(`${this.apiUrl}/payment-status/${encodeURIComponent(paymentIntentId)}`)
+      .pipe(
+        catchError(error => {
+          console.error('Error check payment status:', error);
+          return throwError(() => new Error('Failed to get payment status.'));
         })
       );
   }

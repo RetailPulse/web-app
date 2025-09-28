@@ -60,3 +60,13 @@ export interface TaxResult {
   totalAmount: string;
   salesDetails: SalesDetails[];
 }
+
+export interface PaymentIntentResponse {
+  clientSecret: string;
+  paymentIntentId: string;
+}
+
+export interface CreateTransactionResponse {
+  transaction: SalesTransactionResponse;
+  paymentIntent: PaymentIntentResponse;
+}
