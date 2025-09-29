@@ -15,15 +15,23 @@ import {
   throwError,
   timer
 } from 'rxjs';
-import {MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef} from '@angular/material/dialog';
+import {
+  MAT_DIALOG_DATA,
+  MatDialogActions,
+  MatDialogContent,
+  MatDialogRef,
+  MatDialogTitle
+} from '@angular/material/dialog';
 import {StripeService} from '../pos-system/stripe.service';
 import {PosSystemService} from '../pos-system/pos-system.service';
 import {CurrencyPipe, NgIf} from '@angular/common';
+import {MatButton} from '@angular/material/button';
 
 export interface PaymentDialogData {
   // Either pass pre-created PaymentIntent details OR sales transaction request to create inside dialog.
   // If clientSecret/paymentIntentId present, dialog will skip createTransaction and use them directly.
   clientSecret?: string;
+  paymentId?: number;
   paymentIntentId?: string;
   salesTransactionRequest?: SalesTransactionRequest;
 }
@@ -34,10 +42,12 @@ export interface PaymentDialogData {
     MatDialogContent,
     MatDialogActions,
     CurrencyPipe,
-    NgIf
+    NgIf,
+    MatDialogTitle,
+    MatButton
   ],
   templateUrl: './payment-dialog.component.html',
-  styleUrl: './payment-dialog.component.css'
+  styleUrl: './payment-dialog.component.scss'
 })
 export class PaymentDialogComponent implements OnInit, OnDestroy {
   @ViewChild('cardElement', { static: true }) cardElementRef!: ElementRef<HTMLElement>;
@@ -75,6 +85,7 @@ export class PaymentDialogComponent implements OnInit, OnDestroy {
 
     // create & mount the card element (container is always present in dialog template)
     this.card = elements.create('card', {
+      hidePostalCode: true,
       style: {
         base: { fontSize: '16px', color: '#32325d' }
       }
@@ -128,6 +139,7 @@ export class PaymentDialogComponent implements OnInit, OnDestroy {
     // Determine clientSecret/paymentIntentId from provided data OR from createTransactionResponse
     const clientSecret = this.data.clientSecret ?? this.createTransactionResponse?.paymentIntent?.clientSecret;
     const paymentIntentId = this.data.paymentIntentId ?? this.createTransactionResponse?.paymentIntent?.paymentIntentId;
+    const paymentId = this.data.paymentId ?? this.createTransactionResponse?.paymentIntent?.paymentId;
 
     if (!clientSecret || !paymentIntentId) {
       this.errorMessage = 'Payment initialization missing. Please retry.';
@@ -147,9 +159,15 @@ export class PaymentDialogComponent implements OnInit, OnDestroy {
             this.errorMessage = result.error.message ?? 'Payment failed';
             return throwError(() => result.error);
           }
+
+          if (paymentId === undefined) {
+            this.errorMessage = 'Payment ID is missing. Unable to poll payment status.';
+            return throwError(() => new Error('Payment ID is undefined'));
+          }
+
           // start polling backend for final status
           this.status = 'polling';
-          return this.startPollingPaymentStatus(paymentIntentId);
+          return this.startPollingPaymentStatus(paymentId);
         }),
         finalize(() => {
           // keep as fallback; polling / success handlers will set processing=false as needed
@@ -176,11 +194,11 @@ export class PaymentDialogComponent implements OnInit, OnDestroy {
   }
 
   // Poll backend for payment status. Returns Observable that resolves when final status reached or errors.
-  private startPollingPaymentStatus(paymentIntentId: string): Observable<string> {
+  private startPollingPaymentStatus(paymentId: number): Observable<string> {
     const intervals = [0, 2000, 2000, 3000, 5000, 8000]; // quick backoff
     let attempt = 0;
 
-    const check$ = () => this.posService.getPaymentStatus(paymentIntentId).pipe(
+    const check$ = () => this.posService.getPaymentStatus(paymentId).pipe(
       map((r: any) => r.status),
       catchError(err => {
         console.error('poll error', err);
@@ -195,10 +213,10 @@ export class PaymentDialogComponent implements OnInit, OnDestroy {
         const sub = timer(delayMs).pipe(switchMap(() => check$())).subscribe(status => {
           attempt++;
           this.status = status;
-          if (status === 'succeeded') {
+          if (status === 'completed') {
             subscriber.next(status);
             subscriber.complete();
-          } else if (['requires_payment_method', 'canceled', 'failed'].includes(status)) {
+          } else if (['requires_payment_method', 'canceled', 'failed', 'rejected'].includes(status)) {
             this.errorMessage = `Payment status: ${status}`;
             subscriber.error(new Error(`Payment ended with status ${status}`));
           } else {
