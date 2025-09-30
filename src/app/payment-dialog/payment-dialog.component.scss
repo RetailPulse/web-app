@@ -1,0 +1,11 @@
+:host ::ng-deep .card-wrapper {
+  margin-top: 12px;
+}
+:host ::ng-deep .card-element {
+  border: 1px solid #e6e9ee;
+  padding: 12px;
+  border-radius: 6px;
+}
+:host ::ng-deep .error { color: #b71c1c; margin-top: 8px; }
+:host ::ng-deep .success { color: #2e7d32; margin-top: 8px; }
+:host ::ng-deep .status { margin-top: 6px; font-weight: 600; }
