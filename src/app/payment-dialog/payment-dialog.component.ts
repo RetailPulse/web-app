@@ -194,11 +194,11 @@ export class PaymentDialogComponent implements OnInit, OnDestroy {
   }
 
   // Poll backend for payment status. Returns Observable that resolves when final status reached or errors.
-  private startPollingPaymentStatus(paymentId: number): Observable<string> {
+  private startPollingPaymentStatus(transactionId: number): Observable<string> {
     const intervals = [0, 2000, 2000, 3000, 5000, 8000]; // quick backoff
     let attempt = 0;
 
-    const check$ = () => this.posService.getPaymentStatus(paymentId).pipe(
+    const check$ = () => this.posService.getPaymentStatus(transactionId).pipe(
       map((r: any) => r.status),
       catchError(err => {
         console.error('poll error', err);
