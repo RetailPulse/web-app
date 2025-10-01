@@ -71,8 +71,8 @@ export class PosSystemService {
       );
   }
 
-  getPaymentStatus(paymentId: number) {
-    return this.http.get<{ status: string }>(`${this.apiUrl}/transactionStatus/${paymentId}`)
+  getPaymentStatus(transactionId: number) {
+    return this.http.get<{ status: string }>(`${this.apiUrl}/transactionStatus/${transactionId}`)
       .pipe(
         catchError(error => {
           console.error('Error check payment status:', error);
