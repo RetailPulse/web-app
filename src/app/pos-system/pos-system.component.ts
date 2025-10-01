@@ -430,6 +430,7 @@ export class PosComponent implements OnInit, AfterViewInit {
             width: '520px',
             data: {
               clientSecret: response.paymentIntent.clientSecret,
+              transactionId: response.transaction.salesTransactionId,
               paymentIntentId: response.paymentIntent.paymentIntentId
             }
           });

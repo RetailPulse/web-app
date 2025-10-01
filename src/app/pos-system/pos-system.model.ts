@@ -63,7 +63,9 @@ export interface TaxResult {
 
 export interface PaymentIntentResponse {
   clientSecret: string;
+  paymentId: number;
   paymentIntentId: string;
+  paymentEventDate: string;
 }
 
 export interface CreateTransactionResponse {

@@ -2,7 +2,8 @@ import {
   CreateTransactionResponse,
   SalesDetails,
   SalesTransactionRequest,
-  SalesTransactionResponse, SuspendedTransactionRequest, TaxResult,
+  SuspendedTransactionRequest,
+  TaxResult,
   Transaction,
   TransientTransaction
 } from './pos-system.model';
@@ -11,7 +12,7 @@ import {apiConfig} from '../../environments/environment';
 
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
-import {catchError, Observable, throwError} from 'rxjs';
+import {catchError, throwError} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -71,8 +72,8 @@ export class PosSystemService {
       );
   }
 
-  getPaymentStatus(paymentIntentId: string) {
-    return this.http.get<{ status: string }>(`${this.apiUrl}/payment-status/${encodeURIComponent(paymentIntentId)}`)
+  getPaymentStatus(transactionId: number) {
+    return this.http.get<{ status: string }>(`${this.apiUrl}/transactionStatus/${transactionId}`)
       .pipe(
         catchError(error => {
           console.error('Error check payment status:', error);
