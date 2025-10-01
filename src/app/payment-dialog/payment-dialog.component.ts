@@ -31,7 +31,7 @@ export interface PaymentDialogData {
   // Either pass pre-created PaymentIntent details OR sales transaction request to create inside dialog.
   // If clientSecret/paymentIntentId present, dialog will skip createTransaction and use them directly.
   clientSecret?: string;
-  paymentId?: number;
+  transactionId?: number;
   paymentIntentId?: string;
   salesTransactionRequest?: SalesTransactionRequest;
 }
@@ -139,7 +139,7 @@ export class PaymentDialogComponent implements OnInit, OnDestroy {
     // Determine clientSecret/paymentIntentId from provided data OR from createTransactionResponse
     const clientSecret = this.data.clientSecret ?? this.createTransactionResponse?.paymentIntent?.clientSecret;
     const paymentIntentId = this.data.paymentIntentId ?? this.createTransactionResponse?.paymentIntent?.paymentIntentId;
-    const paymentId = this.data.paymentId ?? this.createTransactionResponse?.paymentIntent?.paymentId;
+    const transactionId = this.data.transactionId ?? this.createTransactionResponse?.transaction?.salesTransactionId;
 
     if (!clientSecret || !paymentIntentId) {
       this.errorMessage = 'Payment initialization missing. Please retry.';
@@ -160,14 +160,14 @@ export class PaymentDialogComponent implements OnInit, OnDestroy {
             return throwError(() => result.error);
           }
 
-          if (paymentId === undefined) {
-            this.errorMessage = 'Payment ID is missing. Unable to poll payment status.';
-            return throwError(() => new Error('Payment ID is undefined'));
+          if (transactionId === undefined) {
+            this.errorMessage = 'Transaction ID is missing. Unable to poll payment status.';
+            return throwError(() => new Error('Transaction ID is undefined'));
           }
 
           // start polling backend for final status
           this.status = 'polling';
-          return this.startPollingPaymentStatus(paymentId);
+          return this.startPollingPaymentStatus(transactionId);
         }),
         finalize(() => {
           // keep as fallback; polling / success handlers will set processing=false as needed
