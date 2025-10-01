@@ -17,8 +17,7 @@ export const apiConfig = {
   business_entity_api_url: 'http://localhost:30083/',
   inventory_api_url: 'http://localhost:30084/',
   sales_api_url: 'http://localhost:30085/',
-  report_api_url: 'http://localhost:30086/',
-  payment_api_url: 'http://localhost:30087/',
+  report_api_url: 'http://localhost:30086/'
 };
 
 export const environment = {

@@ -8,7 +8,9 @@ import {
   SalesTransactionResponse,
   SuspendedTransactionRequest,
   TaxResult,
-  TransientTransaction
+  TransientTransaction,
+  CreateTransactionResponse,
+  PaymentIntentResponse
 } from './pos-system.model';
 import { TransactionAdapter } from './transaction-adapter';
 
@@ -83,14 +85,15 @@ describe('PosSystemService', () => {
   });
 
   describe('createTransaction', () => {
-    it('should post and return SalesTransactionResponse', (done) => {
+    it('should post and return CreateTransactionResponse', (done) => {
       const req: SalesTransactionRequest = {
         businessEntityId: 1,
         taxAmount: '1.00',
         totalAmount: '11.00',
         salesDetails: [{ productId: 1, quantity: 2, salesPricePerUnit: '5.00' }]
       };
-      const resp: SalesTransactionResponse = {
+
+      const transaction: SalesTransactionResponse = {
         salesTransactionId: 1,
         businessEntityId: 1,
         subTotalAmount: '10.00',
@@ -101,6 +104,17 @@ describe('PosSystemService', () => {
         salesDetails: req.salesDetails,
         transactionDateTime: '2024-05-09T12:00:00Z'
       };
+
+      const paymentIntent: PaymentIntentResponse = {
+        paymentIntentId: 'pi_123',
+        clientSecret: 'secret_abc'
+      };
+
+      const resp: CreateTransactionResponse = {
+        transaction,
+        paymentIntent
+      };
+
       httpSpy.post.and.returnValue(of(resp));
       service.createTransaction(req).subscribe(result => {
         expect(result).toEqual(resp);
