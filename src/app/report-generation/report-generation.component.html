@@ -60,10 +60,6 @@
 <div class="report-summaries">
   <div class="header-row">
     <h3>Generated Reports</h3>
-    <button mat-stroked-button (click)="loadSummaries()" [disabled]="summariesLoading()">
-      Refresh
-      <mat-progress-spinner *ngIf="summariesLoading()" diameter="16" mode="indeterminate"></mat-progress-spinner>
-    </button>
   </div>
 
   <mat-error *ngIf="summariesError()">{{ summariesError() }}</mat-error>

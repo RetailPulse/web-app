@@ -1,26 +1,26 @@
-import { InventoryTransactionModel } from './inventory-transaction.model';
-import { InventoryTransactionService } from './inventory-transaction.service';
-import { PdfService } from './pdf.service';
-import { ProductService } from './product.service'; // Added ProductService import
+import {InventoryTransactionModel} from './inventory-transaction.model';
+import {InventoryTransactionService} from './inventory-transaction.service';
+import {PdfService} from './pdf.service';
+import {ProductService} from './product.service'; // Added ProductService import
 
-import { Component, DestroyRef, inject, signal, OnInit } from '@angular/core'; // Added OnInit
+import {Component, DestroyRef, inject, signal, OnInit} from '@angular/core'; // Added OnInit
 import {
   FormBuilder,
   FormGroup,
   Validators,
   ReactiveFormsModule,
 } from '@angular/forms';
-import { DatePipe } from '@angular/common';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatError } from '@angular/material/form-field';
-import { CommonModule } from '@angular/common';
-import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
-import { MatSelectModule } from '@angular/material/select';
+import {DatePipe} from '@angular/common';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import {MatButtonModule} from '@angular/material/button';
+import {MatIconModule} from '@angular/material/icon';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {MatError} from '@angular/material/form-field';
+import {CommonModule} from '@angular/common';
+import {MatNativeDateModule, MatOptionModule} from '@angular/material/core';
+import {MatSelectModule} from '@angular/material/select';
 import {ReportSummaryDto} from './report-summary.dto';
 import {ReportService} from './report.service';
 import {MatTableModule} from '@angular/material/table';
@@ -65,13 +65,13 @@ export class ReportGenerationComponent implements OnInit {
 
   // Options array for report type dropdown
   reportTypeOptions = [
-    { value: 'pdf', label: 'PDF' },
-    { value: 'excel', label: 'Excel' },
+    {value: 'pdf', label: 'PDF'},
+    {value: 'excel', label: 'Excel'},
   ];
 
   reportCategoryOptions = [
-    { value: 'inventoryTransaction', label: 'Inventory Transaction' },
-    { value: 'products', label: 'Products' },
+    {value: 'inventoryTransaction', label: 'Inventory Transaction'},
+    {value: 'products', label: 'Products'},
   ];
 
   constructor(
@@ -93,7 +93,7 @@ export class ReportGenerationComponent implements OnInit {
           Validators.required,
         ],
       },
-      { validator: this.dateRangeValidator }
+      {validator: this.dateRangeValidator}
     );
   }
 
@@ -109,7 +109,7 @@ export class ReportGenerationComponent implements OnInit {
   dateRangeValidator(form: FormGroup) {
     const start = form.get('startDate')?.value;
     const end = form.get('endDate')?.value;
-    return start && end && start > end ? { endBeforeStart: true } : null;
+    return start && end && start > end ? {endBeforeStart: true} : null;
   }
 
   isSelectDateRange() {
@@ -117,6 +117,14 @@ export class ReportGenerationComponent implements OnInit {
     return dateRangeCategories.some(category =>
       category.toLowerCase() === this.dateRangeForm.value.reportCategory.toLowerCase()
     );
+  }
+
+  private makeDownloadFilename(reportCategory: string, reportType: string): string {
+    const currentDateTime = this.datePipe.transform(new Date(), 'yyyyMMdd_HHmmss') ?? '';
+    const extension = reportType === 'excel' ? '.xlsx' : '.pdf';
+    // Use category to produce a readable file name
+    const categoryPart = reportCategory ? reportCategory.replace(/\s+/g, '_') : 'report';
+    return `Report_${categoryPart}_${currentDateTime}${extension}`;
   }
 
   onSubmit() {
@@ -161,28 +169,35 @@ export class ReportGenerationComponent implements OnInit {
 
     const subscription = reportObservable.subscribe({
       next: (blob: Blob) => {
-        // Create a URL for the Blob and trigger download
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
+        try {
+          // Create a URL for the Blob and trigger download
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
 
-        // Use yyyyMMdd_HHmmss format for the filename
-        const currentDateTime =
-          this.datePipe.transform(new Date(), 'yyyyMMdd_HHmmss') ?? '';
-        const extension = reportType === 'excel' ? '.xlsx' : '.pdf';
-        a.download = `Report_InventoryTransaction_${currentDateTime}${extension}`;
+          // Use dynamic filename based on selected category
+          const filename = this.makeDownloadFilename(reportCategory, reportType);
+          a.download = filename;
 
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
 
-        window.URL.revokeObjectURL(url);
+          window.URL.revokeObjectURL(url);
+
+          // Immediately refresh summaries so the newly generated report appears
+          // (server-side persistence should already be complete if blob returned)
+          this.loadSummaries();
+        } catch (err) {
+          console.error('Error handling downloaded blob', err);
+        }
       },
       error: (err: Error) => {
         this.error.set(err.message);
         this.loading.set(false);
       },
       complete: () => {
+        // ensure loading is cleared
         this.loading.set(false);
       },
     });
