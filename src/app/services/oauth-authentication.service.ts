@@ -1,9 +1,8 @@
-// oauth-authentication.service.ts
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { OAuthService } from 'angular-oauth2-oidc';
-import { authConfig, environment } from '../../environments/environment';
 import { jwtDecode } from 'jwt-decode';
 import { Router } from '@angular/router';
+import { ConfigService } from '../services/config.service';
 
 export interface DecodedToken {
   roles: Array<string>;
@@ -14,21 +13,24 @@ export interface DecodedToken {
   providedIn: 'root'
 })
 export class OAuthAuthenticationService {
-  constructor(private router: Router, private oauthService: OAuthService) {
-    this.oauthService.configure(authConfig);
+  private readonly router: Router = inject(Router);
+  private readonly oauthService: OAuthService = inject(OAuthService);
+  private readonly config: ConfigService = inject(ConfigService);
+
+  constructor() {
+    this.oauthService.configure(this.config.authConfig);
     this.oauthService.setupAutomaticSilentRefresh();
   }
 
-  public initializeAuth() {
-    if (!environment.authEnabled) {
-      console.log("Authentication is disabled. Using dummy token.");
+  public initializeAuth(): Promise<void> {
+    if (!this.config.environment.authEnabled) {
+      console.log('Authentication is disabled. Using dummy token.');
       return Promise.resolve();
     }
 
     return this.oauthService.loadDiscoveryDocumentAndTryLogin().then(() => {
       if (this.oauthService.hasValidAccessToken()) {
-        console.log("Token: \r\n" + this.accessToken);
-        // Removed navigateToAuthenticatedUser() from here
+        console.log('Token: \r\n' + this.accessToken);
       } else {
         console.log('User is not logged in');
         this.router.navigate(['/login']);
@@ -39,34 +41,34 @@ export class OAuthAuthenticationService {
     });
   }
 
-  login() {
-    if (!environment.authEnabled) {
+  login(): void {
+    if (!this.config.environment.authEnabled) {
       console.log('Authentication is disabled');
       return;
     }
     this.oauthService.initCodeFlow();
   }
 
-  logout() {
-    if (!environment.authEnabled) {
+  logout(): void {
+    if (!this.config.environment.authEnabled) {
       console.log('Authentication is disabled');
       return;
     }
     this.oauthService.logOut();
-    this.router.navigate(['/login']); // Keep redirection here for now
+    this.router.navigate(['/login']);
   }
 
   get isAuthenticated(): boolean {
-    if (!environment.authEnabled) {
+    if (!this.config.environment.authEnabled) {
       console.log('Authentication is disabled');
       return true;
     }
     return this.oauthService.hasValidAccessToken();
   }
 
-  public getUserRole(): string[] {
-    if (!environment.authEnabled) {
-      return [environment.devModeRole.toUpperCase()];
+  getUserRole(): string[] {
+    if (!this.config.environment.authEnabled) {
+      return [this.config.environment.devModeRole.toUpperCase()];
     }
 
     if (!this.accessToken) {
@@ -82,10 +84,10 @@ export class OAuthAuthenticationService {
     }
   }
 
-  public getUsername(): string {
-    console.log('Casper Auth Mode: ' + environment.authEnabled);
-    if (!environment.authEnabled) {
-      return environment.devModeUser;
+  getUsername(): string {
+    console.log('Casper Auth Mode: ' + this.config.environment.authEnabled);
+    if (!this.config.environment.authEnabled) {
+      return this.config.environment.devModeUser;
     }
     if (!this.accessToken) {
       return 'UNAUTHORIZED';
@@ -95,22 +97,20 @@ export class OAuthAuthenticationService {
   }
 
   get accessToken(): string {
-    if (!environment.authEnabled) {
+    if (!this.config.environment.authEnabled) {
       return 'dummy-access-token';
     }
     return this.oauthService.getAccessToken();
   }
 
-  getDecodedToken() {
-    if (!environment.authEnabled) {
+  getDecodedToken(): DecodedToken {
+    if (!this.config.environment.authEnabled) {
       console.log('Authentication is disabled');
-      const dummyToken: DecodedToken = {
-        roles: [environment.devModeRole],
-        sub: environment.devModeUser
+      return {
+        roles: [this.config.environment.devModeRole],
+        sub: this.config.environment.devModeUser
       };
-      return dummyToken;
     }
     return jwtDecode(this.accessToken);
   }
-
 }

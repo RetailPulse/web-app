@@ -2,6 +2,7 @@ import { AuthConfig } from 'angular-oauth2-oidc';
 
 export const authConfig: AuthConfig = {
   issuer: 'http://localhost:30081', // Update with your authorization server URL
+  requireHttps: false,
   redirectUri: window.location.origin,
   clientId: 'client',
   responseType: 'code',
@@ -17,12 +18,14 @@ export const apiConfig = {
   business_entity_api_url: 'http://svc-rp-businessentity:8083/',
   inventory_api_url: 'http://svc-rp-inventory:8084/',
   sales_api_url: 'http://svc-rp-sales:8085/',
-  report_api_url: 'http://svc-rp-report:8086/'
+  report_api_url: 'http://svc-rp-report:8086/',
+  payments_api_url: 'http://svc-rp-payments:8087/'
 };
 
 export const environment = {
   production: false,
-  authEnabled: false,
+  authEnabled: true,
+  useRuntimeConfig: true,
   devModeUser: 'superadmin',
   devModeRole: 'ADMIN', //'OPERATOR', //
   defaultPassword: 'password1',

@@ -444,7 +444,7 @@ export class PosComponent implements OnInit, AfterViewInit {
 
     const salesTransactionRequest: SalesTransactionRequest = {
       businessEntityId: this.selectedBusinessEntity.id,
-      taxAmount: this.salesTax.toString(),
+      taxAmount: this.salesTax.toString(), 
       totalAmount: this.getTotalWithTax().toString(),
       salesDetails
     };

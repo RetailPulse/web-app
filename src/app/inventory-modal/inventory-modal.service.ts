@@ -1,22 +1,22 @@
-import { Injectable } from '@angular/core';
-import {HttpClient, HttpResponse} from '@angular/common/http';
-import {catchError, forkJoin, map, Observable, throwError} from 'rxjs';
-import {apiConfig} from '../../environments/environment';
-import {Inventory, InventoryTransaction} from "./inventory-modal.model";
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { catchError, forkJoin, map, Observable, throwError } from 'rxjs';
+import { Inventory, InventoryTransaction } from './inventory-modal.model';
+import { ConfigService } from '../services/config.service';
 
 @Injectable({
   providedIn: 'root'
 })
-
 export class InventoryModalService {
+  private http: HttpClient = inject(HttpClient);
+  private config: ConfigService = inject(ConfigService);
 
-  private inventoryTransactionApiUrl = `${apiConfig.inventory_api_url}api/inventoryTransaction`;
-  private inventoryApiUrl = `${apiConfig.inventory_api_url}api/inventory`;
+  private inventoryTransactionApiUrl = `${this.config.apiConfig.inventory_api_url}api/inventoryTransaction`;
+  private inventoryApiUrl = `${this.config.apiConfig.inventory_api_url}api/inventory`;
 
-  constructor(private http: HttpClient) { }
+  constructor() {}
 
   createInventoryTransaction(inventoryTransactionList: InventoryTransaction[]): Observable<string> {
-   
     if (!inventoryTransactionList || inventoryTransactionList.length === 0) {
       return throwError(() => new Error('No transactions to process.'));
     }
@@ -39,6 +39,4 @@ export class InventoryModalService {
       })
     );
   }
-
-
 }
