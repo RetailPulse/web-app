@@ -1,8 +1,8 @@
-import {ProductService} from '../product-management/product.service';
-import {Product} from '../product-management/product.model';
-import {PosSystemService} from './pos-system.service';
-import {BusinessEntityService} from "../business-entity-management/business-entity.service";
-import {BusinessEntity} from "../business-entity-management/business-entity.model";
+import { ProductService } from '../product-management/product.service';
+import { Product } from '../product-management/product.model';
+import { PosSystemService } from './pos-system.service';
+import { BusinessEntityService } from "../business-entity-management/business-entity.service";
+import { BusinessEntity } from "../business-entity-management/business-entity.model";
 import {
   CartItem,
   SalesDetails,
@@ -13,21 +13,32 @@ import {
   TransientTransaction
 } from './pos-system.model';
 
-import {AfterViewInit, Component, DestroyRef, ElementRef, inject, OnInit, ViewChild, signal} from '@angular/core';
-import {FormControl, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {MatSnackBar} from '@angular/material/snack-bar';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  ElementRef,
+  inject,
+  OnInit,
+  ViewChild,
+  signal
+} from '@angular/core';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import Fuse from 'fuse.js';
-import {MatFormField, MatLabel} from '@angular/material/form-field';
-import {MatIcon} from '@angular/material/icon';
-import {CommonModule, CurrencyPipe} from '@angular/common';
-import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';
-import {MatButton, MatIconButton} from "@angular/material/button";
-import {MatInput} from "@angular/material/input";
-import {forkJoin} from "rxjs";
-import {HttpErrorResponse} from '@angular/common/http';
-import {MatOption, MatSelect} from '@angular/material/select';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {MatProgressSpinner} from '@angular/material/progress-spinner';
+import { MatFormField, MatLabel } from '@angular/material/form-field';
+import { MatIcon } from '@angular/material/icon';
+import { CommonModule, CurrencyPipe } from '@angular/common';
+import { MatMenu, MatMenuItem, MatMenuTrigger } from '@angular/material/menu';
+import { MatButton, MatIconButton } from "@angular/material/button";
+import { MatInput } from "@angular/material/input";
+import { forkJoin } from "rxjs";
+import { HttpErrorResponse } from '@angular/common/http';
+// replaced MatSelect/MatOption imports with module import
+import { MatSelectModule } from '@angular/material/select';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 import {
   MatCard,
   MatCardActions,
@@ -36,10 +47,11 @@ import {
   MatCardSubtitle,
   MatCardTitle
 } from '@angular/material/card';
-import {NgxScannerQRCodeAdapterComponent} from '../ngx-scannerqrcode-adapter/ngx-scannerqrcode-adapter.component';
-import {InventoryService} from '../inventory-management/inventory.service';
-import {PaymentDialogComponent} from '../payment-dialog/payment-dialog.component';
-import {MatDialog} from '@angular/material/dialog';
+import { NgxScannerQRCodeAdapterComponent } from '../ngx-scannerqrcode-adapter/ngx-scannerqrcode-adapter.component';
+import { InventoryService } from '../inventory-management/inventory.service';
+import { PaymentDialogComponent } from '../payment-dialog/payment-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
+import { PaymentSuccessDialogComponent } from '../payment-success-dialog/payment-success-dialog.component';
 
 @Component({
   selector: 'app-pos-system',
@@ -58,8 +70,8 @@ import {MatDialog} from '@angular/material/dialog';
     MatButton,
     MatMenuItem,
     MatInput,
-    MatSelect,
-    MatOption,
+    // use module import here
+    MatSelectModule,
     MatProgressSpinner,
     MatCardActions,
     MatCard,
@@ -97,8 +109,8 @@ export class PosComponent implements OnInit, AfterViewInit {
   scannerConfig = {
     constraints: {
       video: {
-        width: {ideal: 640},
-        height: {ideal: 480},
+        width: { ideal: 640 },
+        height: { ideal: 480 },
         facingMode: 'environment'
       }
     }
@@ -116,6 +128,7 @@ export class PosComponent implements OnInit, AfterViewInit {
     private posService: PosSystemService,
     private businessEntityService: BusinessEntityService,
     private inventoryService: InventoryService,
+    private cdr: ChangeDetectorRef,           // <-- added
   ) {
   }
 
@@ -137,9 +150,13 @@ export class PosComponent implements OnInit, AfterViewInit {
   confirmBusinessSelection(): void {
     if (!this.selectedBusinessEntity) return;
 
+    console.log('Confirmed business:', this.selectedBusinessEntity);
     this.businessConfirmed = true;
     this.showBusinessSelection = false;
     this.initializePOS();
+
+    // Force immediate view update in case change detection wasn't triggered
+    this.cdr.detectChanges();
   }
 
   initializePOS(): void {
@@ -153,6 +170,9 @@ export class PosComponent implements OnInit, AfterViewInit {
     this.showBusinessSelection = true;
     this.selectedBusinessEntity = null;
     this.resetPOS();
+
+    // ensure UI updates
+    this.cdr.detectChanges();
   }
 
   resetPOS(): void {
@@ -192,37 +212,38 @@ export class PosComponent implements OnInit, AfterViewInit {
   }
 
   loadBusinessEntities(): void {
-    // It's good practice to ensure the loading flag is true at the start
     this.isLoadingBusinessEntities.set(true);
 
     console.log('Loading business entities...');
     this.businessEntityService.getBusinessEntities().subscribe({
-      // Use 'next' property for the success callback
       next: (entities) => {
-        console.log('Successfully loaded business entities:', entities); // Optional: for debugging
+        console.log('Successfully loaded business entities:', entities);
         this.businessEntities = entities.filter(entity => entity.active && !entity.external);
-        console.log('Filtered business entities:', this.businessEntities); // Optional: for debugging
+        console.log('Filtered business entities:', this.businessEntities);
         console.log('Number of filtered entities:', this.businessEntities.length);
         this.isLoadingBusinessEntities.set(false);
-        console.log('isLoadingBusinessEntities set to false (success)');
+        this.cdr.detectChanges(); // update view if needed
       },
-      error: (error: HttpErrorResponse) => { // Typing the error is good practice
+      error: (error: HttpErrorResponse) => {
         console.error('Error loading business entities:', error);
-        // Consider providing more specific feedback to the user based on error.status etc.
-        this.snackBar.open('Failed to load business entities', 'Close', {duration: 5000}); // Maybe increase duration
+        this.snackBar.open('Failed to load business entities', 'Close', { duration: 5000 });
         this.isLoadingBusinessEntities.set(false);
-        console.log('isLoadingBusinessEntities set to false (error)');
+        this.cdr.detectChanges();
       }
     });
   }
 
-
-// Add this method to get available quantity
+  // Add this method to get available quantity
   getAvailableQuantity(productId: number): number {
     return this.inventoryMap.get(productId) || 0;
   }
 
-// fliter the product by business
+  // trackBy helper for ngFor
+  trackById(index: number, item: any) {
+    return item?.id ?? item?.transactionId ?? index;
+  }
+
+  // filter the product by business
   loadProducts(): void {
     this.isLoading = true;
     if (!this.selectedBusinessEntity) {
@@ -251,12 +272,18 @@ export class PosComponent implements OnInit, AfterViewInit {
         });
 
         this.filteredProducts = [...this.products];
+
+        // Force change detection to immediately update the products grid
+        this.cdr.detectChanges();
+
         this.focusBarcodeInput();
         this.isLoading = false;
+
+        console.log('loadProducts -> products:', this.products.length, 'filtered:', this.filteredProducts.length);
       },
       error: (error) => {
         console.error('Error loading products:', error);
-        this.snackBar.open('Failed to load products', 'Close', {duration: 2000});
+        this.snackBar.open('Failed to load products', 'Close', { duration: 2000 });
         this.isLoading = false;
       }
     });
@@ -277,6 +304,8 @@ export class PosComponent implements OnInit, AfterViewInit {
       }
       this.focusBarcodeInput();
     }
+    // ensure template updates
+    this.cdr.detectChanges();
   }
 
   onCodeResult(result: string): void {
@@ -295,12 +324,12 @@ export class PosComponent implements OnInit, AfterViewInit {
 
     if (product) {
       this.addToCart(product);
-      this.snackBar.open(`${product.description} added`, 'OK', {duration: 1000});
+      this.snackBar.open(`${product.description} added`, 'OK', { duration: 1000 });
 
       this.manualBarcode = '';
 
     } else {
-      this.snackBar.open('Product not found', 'Close', {duration: 2000});
+      this.snackBar.open('Product not found', 'Close', { duration: 2000 });
     }
 
     this.manualBarcode = '';
@@ -318,7 +347,7 @@ export class PosComponent implements OnInit, AfterViewInit {
     if (product) {
       this.addToCart(product);
     } else {
-      this.snackBar.open('Product not found', 'Close', {duration: 2000});
+      this.snackBar.open('Product not found', 'Close', { duration: 2000 });
     }
   }
 
@@ -329,21 +358,21 @@ export class PosComponent implements OnInit, AfterViewInit {
     if (existingItem) {
       // Check if we're exceeding available stock
       if (existingItem.quantity >= availableQuantity) {
-        this.snackBar.open(`Only ${availableQuantity} available in stock`, 'Close', {duration: 2000});
+        this.snackBar.open(`Only ${availableQuantity} available in stock`, 'Close', { duration: 2000 });
         return;
       }
       existingItem.quantity += 1;
     } else {
       // Check if product is in stock at all
       if (availableQuantity <= 0) {
-        this.snackBar.open(`${product.description} is out of stock`, 'Close', {duration: 2000});
+        this.snackBar.open(`${product.description} is out of stock`, 'Close', { duration: 2000 });
         return;
       }
-      this.cart.push({product, quantity: 1});
+      this.cart.push({ product, quantity: 1 });
     }
 
     this.calculateSalesTax();
-    this.snackBar.open(`${product.description} added to cart`, 'Close', {duration: 1000});
+    this.snackBar.open(`${product.description} added to cart`, 'Close', { duration: 1000 });
     this.focusBarcodeInput();
   }
 
@@ -387,7 +416,7 @@ export class PosComponent implements OnInit, AfterViewInit {
         },
         error: (error: Error) => {
           console.error('Error calculating sales tax:', error);
-          this.snackBar.open('Failed to calculate sales tax', 'Close', {duration: 2000});
+          this.snackBar.open('Failed to calculate sales tax', 'Close', { duration: 2000 });
           this.taxLoading = false;
         },
         complete: () => {
@@ -413,7 +442,6 @@ export class PosComponent implements OnInit, AfterViewInit {
       salesPricePerUnit: item.product.rrp.toString(),
     }));
 
-    // Remove businessEntityId from the request body since it's now in the URL
     const salesTransactionRequest: SalesTransactionRequest = {
       businessEntityId: this.selectedBusinessEntity.id,
       taxAmount: this.salesTax.toString(),
@@ -426,23 +454,65 @@ export class PosComponent implements OnInit, AfterViewInit {
         next: (response) => {
           console.log('Transaction created successfully:', response);
 
-          this.dialog.open(PaymentDialogComponent, {
+          const dialogRef = this.dialog.open(PaymentDialogComponent, {
             width: '520px',
             data: {
               clientSecret: response.paymentIntent.clientSecret,
               transactionId: response.transaction.salesTransactionId,
               paymentIntentId: response.paymentIntent.paymentIntentId
+            },
+            disableClose: false
+          });
+
+          dialogRef.afterClosed().subscribe(result => {
+            if (!result) {
+              console.log('Payment dialog closed without result');
+              return;
+            }
+
+            if (result.success) {
+
+              const successData = {
+                transactionId: response.transaction?.salesTransactionId,
+                amount: response.transaction?.totalAmount ?? this.getTotalWithTax(),
+                currency: 'SGD',
+                createdAt: response.transaction?.transactionDateTime,
+                items: this.cart.map(i => ({
+                  sku: i.product.sku,
+                  description: i.product.description,
+                  quantity: i.quantity,
+                  unitPrice: i.product.rrp
+                })),
+                raw: result.transaction ?? result
+              };
+
+              const successRef = this.dialog.open(PaymentSuccessDialogComponent, {
+                width: '520px',
+                data: successData,
+                disableClose: false
+              });
+
+              successRef.afterClosed().subscribe(() => {
+                this.cart = [];
+                this.salesTax = 0;
+                this.loadProducts();
+                this.focusBarcodeInput?.();
+              });
+
+            } else {
+              if (result.cancelled) {
+                console.log('User cancelled payment');
+              } else {
+                this.snackBar.open('Payment failed or cancelled', 'Close', { duration: 3000 });
+                console.warn('Payment failure payload:', result);
+              }
             }
           });
-          // this.snackBar.open(`Checkout completed. Total: $${response.totalAmount}`, 'Close', {duration: 2000});
-          // this.cart = [];
-          // this.salesTax = 0;
-          // this.focusBarcodeInput();
-          // this.loadProducts(); // Reload products to refresh inventory
+
         },
         error: (error) => {
           console.error('Error creating transaction:', error);
-          this.snackBar.open('Failed to create transaction', 'Close', {duration: 2000});
+          this.snackBar.open('Failed to create transaction', 'Close', { duration: 2000 });
         }
       });
   }
@@ -450,7 +520,7 @@ export class PosComponent implements OnInit, AfterViewInit {
   freezeTransaction(): void {
     if (!this.selectedBusinessEntity) return;
     if (this.cart.length === 0) {
-      this.snackBar.open('Cart is empty', 'Close', {duration: 2000});
+      this.snackBar.open('Cart is empty', 'Close', { duration: 2000 });
       return;
     }
 
@@ -473,7 +543,7 @@ export class PosComponent implements OnInit, AfterViewInit {
         },
         error: (error: Error) => {
           console.error('Error suspending transaction:', error);
-          this.snackBar.open('Failed to suspend transaction', 'Close', {duration: 2000});
+          this.snackBar.open('Failed to suspend transaction', 'Close', { duration: 2000 });
         }
       });
 
@@ -482,7 +552,7 @@ export class PosComponent implements OnInit, AfterViewInit {
     });
 
     this.cart = [];
-    this.snackBar.open('Transaction frozen', 'Close', {duration: 2000});
+    this.snackBar.open('Transaction frozen', 'Close', { duration: 2000 });
     this.focusBarcodeInput();
   }
 
@@ -501,7 +571,7 @@ export class PosComponent implements OnInit, AfterViewInit {
         },
         error: (error: Error) => {
           console.error('Error resuming transaction:', error);
-          this.snackBar.open('Failed to resume transaction', 'Close', {duration: 2000});
+          this.snackBar.open('Failed to resume transaction', 'Close', { duration: 2000 });
         }
       });
 
@@ -509,9 +579,7 @@ export class PosComponent implements OnInit, AfterViewInit {
       subscription.unsubscribe();
     });
 
-    this.snackBar.open('Transaction is resumed', 'Close', {duration: 2000});
+    this.snackBar.open('Transaction is resumed', 'Close', { duration: 2000 });
     this.focusBarcodeInput();
   }
-
-
 }

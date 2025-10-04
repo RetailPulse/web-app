@@ -175,7 +175,7 @@ export class PaymentDialogComponent implements OnInit, OnDestroy {
         })
       ).subscribe({
       next: (finalStatus: string) => {
-        if (finalStatus === 'succeeded') {
+        if (finalStatus === 'COMPLETED') {
           this.success = true;
           this.status = finalStatus;
           // Close dialog and return success data
@@ -213,10 +213,10 @@ export class PaymentDialogComponent implements OnInit, OnDestroy {
         const sub = timer(delayMs).pipe(switchMap(() => check$())).subscribe(status => {
           attempt++;
           this.status = status;
-          if (status === 'completed') {
+          if (status === 'COMPLETED') {
             subscriber.next(status);
             subscriber.complete();
-          } else if (['requires_payment_method', 'canceled', 'failed', 'rejected'].includes(status)) {
+          } else if (['requires_payment_method', 'CANCELLED', 'failed', 'REJECTED'].includes(status)) {
             this.errorMessage = `Payment status: ${status}`;
             subscriber.error(new Error(`Payment ended with status ${status}`));
           } else {

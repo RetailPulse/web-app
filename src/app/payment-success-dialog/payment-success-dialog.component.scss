@@ -1,0 +1,33 @@
+:host { display: block; }
+
+/* Reach into overlay dialog content where your class actually sits */
+:host ::ng-deep .mat-mdc-dialog-content.success-container {
+  text-align: center;
+  padding: 14px 24px !important;
+}
+
+/* center wrapper */
+:host ::ng-deep .mat-mdc-dialog-content.success-container .icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+/* force-size & color on the material icon */
+:host ::ng-deep .mat-mdc-dialog-content.success-container .icon mat-icon {
+  font-size: 56px !important;
+  width: 56px !important;
+  height: 56px !important;
+  line-height: 56px !important;
+  color: #2e7d32 !important;
+}
+
+/* rest of layout */
+:host ::ng-deep .mat-mdc-dialog-content.success-container h2 {
+  margin: 6px 0 8px 0;
+  font-weight: 600;
+}
+:host ::ng-deep .mat-mdc-dialog-content.success-container .summary { margin-top: 8px; color: rgba(0,0,0,0.85); }
+:host ::ng-deep .mat-mdc-dialog-content.success-container .summary .row { margin: 6px 0; }
+:host ::ng-deep .mat-mdc-dialog-content.success-container .items-preview { margin-top: 12px; text-align:left; max-height:160px; overflow:auto; }
+:host ::ng-deep .mat-mdc-dialog-content.success-container .item { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed #eee; }

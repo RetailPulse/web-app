@@ -1,0 +1,25 @@
+<mat-dialog-content class="success-container">
+  <div class="icon">
+    <mat-icon>check_circle</mat-icon>
+  </div>
+
+  <h2>Payment successful</h2>
+
+  <div class="summary">
+    <div class="row"><strong>Transaction:</strong> {{ data.transactionId || '—' }}</div>
+    <div class="row"><strong>Amount:</strong> {{ data.amount | currency:data.currency }}</div>
+    <div class="row"><strong>Date:</strong> {{ data.createdAt || (now | date:'medium') }}</div>
+  </div>
+
+  <div *ngIf="data.items?.length" class="items-preview">
+    <h4>Items</h4>
+    <div class="item" *ngFor="let i of data.items">
+      <div class="left">{{ i.description }}</div>
+      <div class="right">{{ i.quantity }} × {{ i.unitPrice | currency:data.currency }}</div>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()" type="button">Close</button>
+</mat-dialog-actions>

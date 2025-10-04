@@ -1,7 +1,6 @@
 <div class="pos-container">
   <!-- Business Selection Panel -->
-  @if (showBusinessSelection) {
-  <div class="business-selection-panel">
+  <div *ngIf="showBusinessSelection" class="business-selection-panel">
     <mat-card class="selection-card">
       <mat-card-header>
         <mat-card-title>Select Business Location</mat-card-title>
@@ -11,24 +10,23 @@
       <mat-card-content>
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Business Location</mat-label>
-          <mat-select [(value)]="selectedBusinessEntity" panelClass="pastel-dropdown-panel">
-            @for (entity of businessEntities; track entity.id) {
-            <mat-option [value]="entity">
+
+          <!-- bind object using ngModel; [value] used to avoid ngValue/module issues -->
+          <mat-select [(ngModel)]="selectedBusinessEntity" name="businessSelect" panelClass="pastel-dropdown-panel">
+            <mat-option *ngFor="let entity of businessEntities; trackBy: trackById" [value]="entity">
               {{ entity.name }} ({{ entity.location }})
             </mat-option>
-            }
-            <!-- Add a temporary check to see if the loop runs -->
-            @empty {
-            <mat-option disabled>No locations available</mat-option>
-            }
+
+            <!-- fallback when empty -->
+            <mat-option *ngIf="!businessEntities || businessEntities.length === 0" disabled>
+              No locations available
+            </mat-option>
           </mat-select>
         </mat-form-field>
 
-        @if (isLoadingBusinessEntities()) {
-        <div class="loading-spinner">
+        <div *ngIf="isLoadingBusinessEntities()" class="loading-spinner">
           <mat-spinner diameter="40"></mat-spinner>
         </div>
-        }
       </mat-card-content>
 
       <mat-card-actions align="end">
@@ -41,11 +39,9 @@
       </mat-card-actions>
     </mat-card>
   </div>
-  }
 
   <!-- POS Interface (shown after confirmation) -->
-  @if (!showBusinessSelection) {
-  <div class="pos-interface">
+  <div *ngIf="!showBusinessSelection" class="pos-interface">
     <div class="business-header-container">
       <div class="business-header">
         <div class="business-info">
@@ -61,7 +57,6 @@
       </div>
     </div>
   </div>
-  }
 
   <!-- Search and Barcode Section -->
   <div class="search-section">
@@ -75,31 +70,21 @@
       <mat-icon>{{ showScannerView ? 'list' : 'barcode_reader' }}</mat-icon>
       {{ showScannerView ? 'Show Product List' : 'Show Scanner' }}
     </button>
-    <!--    <mat-form-field appearance="outline" class="barcode-field">-->
-    <!--      <mat-label>Barcode Scanner</mat-label>-->
-    <!--      <input matInput [formControl]="barcodeControl" placeholder="Scan barcode">-->
-    <!--      <mat-icon matSuffix>barcode_reader</mat-icon>-->
-    <!--    </mat-form-field>-->
   </div>
 
   <div class="main-content">
     <!-- Products Grid (60%) -->
-    @if (!showScannerView) {
-    <div class="products-grid">
-      @for (product of filteredProducts; track product.id) {
-      <div class="product-card">
+    <div *ngIf="!showScannerView" class="products-grid">
+      <div *ngFor="let product of filteredProducts; trackBy: trackById" class="product-card">
         <div class="product-info">
           <div class="product-sku">{{ product.sku }}</div>
           <div class="product-description">{{ product.description }}</div>
           <div class="product-price">{{ product.rrp | currency }}</div>
           <div class="inventory-quantity">
-            @if (getAvailableQuantity(product.id) > 0) {
-            <span>
+            <span *ngIf="getAvailableQuantity(product.id) > 0">
               {{ getAvailableQuantity(product.id) }} in stock
             </span>
-            } @else {
-            <span class="out-of-stock">Out of stock</span>
-            }
+            <span *ngIf="getAvailableQuantity(product.id) === 0" class="out-of-stock">Out of stock</span>
           </div>
         </div>
         <button mat-raised-button color="primary" (click)="addToCart(product)">
@@ -107,29 +92,31 @@
           Add
         </button>
       </div>
-      }
+
+      <div *ngIf="!filteredProducts || filteredProducts.length === 0" class="no-products">
+        <p>No products to display</p>
+      </div>
     </div>
-    }
 
     <!-- Scanner View -->
-    @if (showScannerView) {
-    <div class="scanner-view">
+    <div *ngIf="showScannerView" class="scanner-view">
       <div class="scanner-container">
         <div class="scanner-fallback">
           <p>Or enter barcode manually:</p>
           <mat-form-field appearance="outline">
             <input matInput
                    [(ngModel)]="manualBarcode"
+                   name="manualBarcode"
                    placeholder="Enter barcode"
                    (keyup.enter)="processBarcode(manualBarcode)">
           </mat-form-field>
         </div>
+
         <div class="scanner-container">
           <ngx-scannerqrcode-adapter #scanner (scannedEvent)="onCodeResult($event)"></ngx-scannerqrcode-adapter>
         </div>
       </div>
     </div>
-    }
 
     <!-- Shopping Cart (40%) - Always visible -->
     <div class="shopping-cart">
@@ -139,19 +126,22 @@
         <button mat-raised-button class="action-button" [matMenuTriggerFor]="freezeMenu">
           <mat-icon>more_vert</mat-icon>
         </button>
+
         <mat-menu #freezeMenu="matMenu">
           <button mat-menu-item (click)="freezeTransaction()">
             <mat-icon>pause_circle</mat-icon>
             Freeze Transaction
           </button>
-          <!-- Note: Nested menus can be tricky. Ensure 'frozenMenu' logic works as expected -->
+
           <mat-menu #frozenMenu="matMenu">
-            @for (trx of suspendedTransaction; track trx.transactionId) {
-            <button mat-menu-item (click)="unfreezeTransaction(trx)">
+            <button mat-menu-item *ngFor="let trx of suspendedTransaction || []; trackBy: trackById" (click)="unfreezeTransaction(trx)">
               {{ trx.transactionId }} ({{ trx.transactionDateTime }})
             </button>
-            }
+            <div *ngIf="!suspendedTransaction || suspendedTransaction.length === 0">
+              <button mat-menu-item disabled>No suspended transactions</button>
+            </div>
           </mat-menu>
+
           <button mat-menu-item [matMenuTriggerFor]="frozenMenu" [disabled]="!suspendedTransaction || suspendedTransaction.length === 0">
             <mat-icon>play_circle</mat-icon>
             Unfreeze Transaction
@@ -160,10 +150,8 @@
       </div>
 
       <!-- Cart Items -->
-      @if (cart.length > 0) {
-      <div class="cart-items">
-        @for (item of cart; track $index; let i = $index) {
-        <div class="cart-item">
+      <div *ngIf="cart.length > 0; else emptyCart" class="cart-items">
+        <div *ngFor="let item of cart; let i = index; trackBy: trackById" class="cart-item">
           <div class="item-info">
             <div class="item-sku">{{ item.product.sku }}</div>
             <div class="item-description">{{ item.product.description }}</div>
@@ -182,26 +170,23 @@
             </button>
           </div>
         </div>
-        }
       </div>
-      } @else {
-      <div class="empty-cart">
-        <mat-icon>shopping_cart</mat-icon>
-        <p>Your cart is empty</p>
-      </div>
-      }
+
+      <ng-template #emptyCart>
+        <div class="empty-cart">
+          <mat-icon>shopping_cart</mat-icon>
+          <p>Your cart is empty</p>
+        </div>
+      </ng-template>
 
       <!-- Cart Footer (shown only if cart has items) -->
-      @if (cart.length > 0) {
-      <div class="cart-footer">
+      <div *ngIf="cart.length > 0" class="cart-footer">
         <div class="total">
           <div class="total-row">
             <span>Tax:</span>
             <span class="total-amount">
               {{ salesTax | currency }}
-              @if (taxLoading) {
-              <mat-icon class="spinner">autorenew</mat-icon>
-              }
+              <mat-icon *ngIf="taxLoading" class="spinner">autorenew</mat-icon>
             </span>
           </div>
           <div class="total-row">
@@ -221,7 +206,6 @@
           </button>
         </div>
       </div>
-      }
     </div>
   </div>
 </div>
