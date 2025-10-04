@@ -3,16 +3,17 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { Product } from './product.model';
-import { apiConfig } from '../../environments/environment';
+import { ConfigService } from '../services/config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProductService {
   private readonly http: HttpClient = inject(HttpClient);
-  private apiUrl = apiConfig.inventory_api_url + 'api/products';
+  private readonly config: ConfigService = inject(ConfigService);
+  private readonly apiUrl = this.config.apiConfig.inventory_api_url + 'api/products';
 
-  constructor() { }
+  constructor() {}
 
   getProducts(): Observable<Product[]> {
     return this.http.get<Product[] | null>(this.apiUrl).pipe(
@@ -61,7 +62,7 @@ export class ProductService {
       if (error.status === 404) {
         return throwError(() => new Error(`Not found: ${operation} failed: ${error.message}`));
       }
-      // For other errors, re-throw the original error
+
       return throwError(() => error);
     };
   }

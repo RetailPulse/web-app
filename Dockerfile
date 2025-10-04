@@ -1,5 +1,5 @@
 # Stage 1: Build the Angular application
-FROM node:22-alpine AS builder 
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
@@ -13,10 +13,10 @@ RUN npm ci --quiet
 COPY src/ ./src/
 COPY public/ ./public/
 COPY angular.json .
-COPY tsconfig*.json . 
+COPY tsconfig*.json .
 COPY nginx.conf .
 
-ARG BUILD_CONFIG=development
+ARG BUILD_CONFIG=production
 
 # Build the Angular application for production
 RUN npm run build -- --configuration "$BUILD_CONFIG" --aot --output-path dist
@@ -31,7 +31,13 @@ RUN addgroup -g 1001 -S nginx-group && \
     chmod -R 755 /usr/share/nginx/html && \
     rm -rf /usr/share/nginx/html/*
 
+# Copy built Angular app
 COPY --from=builder /app/dist/browser /usr/share/nginx/html
+
+# Inject runtime config
+COPY --from=builder /app/src/assets/runtime-config.json /usr/share/nginx/html/assets/runtime-config.json
+
+# Copy custom NGINX config
 COPY ./nginx.conf /etc/nginx/nginx.conf
 
 USER nginx-user

@@ -2,15 +2,16 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, Observable } from 'rxjs';
 import { BusinessEntity, BusinessEntityDTO } from './business-entity.model';
-import { apiConfig } from '../../environments/environment';
+import { ConfigService } from '../services/config.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BusinessEntityService {
 
-  private http: HttpClient = inject(HttpClient);
-  private apiUrl = apiConfig.business_entity_api_url + 'api/businessEntity';
+  private http: HttpClient = inject(HttpClient);    
+  private config: ConfigService = inject(ConfigService);
+  private apiUrl = this.config.apiConfig.business_entity_api_url + 'api/businessEntity'; 
 
   constructor() { }
 

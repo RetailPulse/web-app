@@ -1,35 +1,31 @@
-import { InventoryTransactionModel } from './inventory-transaction.model';
-
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { apiConfig } from '../../environments/environment';
 import { catchError, throwError } from 'rxjs';
+import { InventoryTransactionModel } from './inventory-transaction.model';
+import { ConfigService } from '../services/config.service';
 
 @Injectable({ providedIn: 'root' })
 export class InventoryTransactionService {
-  constructor(private http: HttpClient) {}
+  private readonly http: HttpClient = inject(HttpClient);
+  private readonly config: ConfigService = inject(ConfigService);
+  private readonly baseUrl = this.config.apiConfig.report_api_url + 'api/reports/inventory-transactions';
 
   fetchInventoryTransactions(
     startDate: string,
     endDate: string,
     dateTimeFormat: string
   ) {
-    let searchParams = new HttpParams();
-    searchParams = searchParams.append('startDateTime', startDate);
-    searchParams = searchParams.append('endDateTime', endDate);
-    searchParams = searchParams.append('dateTimeFormat', dateTimeFormat);
+    const searchParams = new HttpParams()
+      .set('startDateTime', startDate)
+      .set('endDateTime', endDate)
+      .set('dateTimeFormat', dateTimeFormat);
 
     return this.http
-      .get<InventoryTransactionModel[]>(
-        apiConfig.report_api_url + 'api/reports/inventory-transactions',
-        { params: searchParams }
-      )
+      .get<InventoryTransactionModel[]>(this.baseUrl, { params: searchParams })
       .pipe(
         catchError((error) => {
-          console.log(error);
-          return throwError(
-            () => new Error('Failed to fetch inventory transactions.')
-          );
+          console.error('Fetch Error:', error);
+          return throwError(() => new Error('Failed to fetch inventory transactions.'));
         })
       );
   }
@@ -40,23 +36,21 @@ export class InventoryTransactionService {
     dateTimeFormat: string,
     reportType: string
   ) {
-    let searchParams = new HttpParams();
-    searchParams = searchParams.append('startDateTime', startDate);
-    searchParams = searchParams.append('endDateTime', endDate);
-    searchParams = searchParams.append('dateTimeFormat', dateTimeFormat);
-    searchParams = searchParams.append('format', reportType);
+    const searchParams = new HttpParams()
+      .set('startDateTime', startDate)
+      .set('endDateTime', endDate)
+      .set('dateTimeFormat', dateTimeFormat)
+      .set('format', reportType);
 
     return this.http
-      .get(
-        apiConfig.report_api_url + 'api/reports/inventory-transactions/export',
-        { params: searchParams, responseType: 'blob' }
-      )
+      .get(`${this.baseUrl}/export`, {
+        params: searchParams,
+        responseType: 'blob'
+      })
       .pipe(
         catchError((error) => {
-          console.error('Export Report Error Message', error);
-          return throwError(
-            () => new Error('Failed to fetch inventory transactions.')
-          );
+          console.error('Export Report Error:', error);
+          return throwError(() => new Error('Failed to export inventory transactions.'));
         })
       );
   }
