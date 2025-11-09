@@ -8,6 +8,7 @@ interface ApiConfig {
   inventory_api_url: string;
   sales_api_url: string;
   report_api_url: string;
+  payments_api_url: string;
 }
 
 interface EnvironmentConfig {
