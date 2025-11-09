@@ -1,3 +1,4 @@
+// inventory-management.component.spec.ts
 import { InventoryManagementComponent } from './inventory-management.component';
 import { BusinessEntityService } from '../business-entity-management/business-entity.service';
 import { ProductService } from '../product-management/product.service';
@@ -7,6 +8,7 @@ import { InventoryTransaction, SummaryData } from './inventory.model';
 
 import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
@@ -25,7 +27,6 @@ describe('InventoryManagementComponent', () => {
     { id: 2, name: 'Central', location: 'HQ', type: 'CentralInventory', active: true, external: false }
   ];
 
-  // Correct InventoryTransaction according to inventory.model.ts
   const mockTransactions: InventoryTransaction[] = [
     {
       productSku: 'SKU001',
@@ -61,7 +62,10 @@ describe('InventoryManagementComponent', () => {
     dialogSpy = jasmine.createSpyObj('MatDialog', ['open']);
 
     await TestBed.configureTestingModule({
-      imports: [InventoryManagementComponent],
+      imports: [
+        InventoryManagementComponent,
+        NoopAnimationsModule
+      ],
       providers: [
         provideHttpClientTesting(),
         { provide: InventoryService, useValue: inventoryServiceSpy },
@@ -73,6 +77,10 @@ describe('InventoryManagementComponent', () => {
 
     fixture = TestBed.createComponent(InventoryManagementComponent);
     component = fixture.componentInstance;
+
+    // Default harmless stubs so creating the component doesn't explode
+    businessEntityServiceSpy.getBusinessEntities.and.returnValue(of([]));
+    inventoryServiceSpy.getInventoryTransaction.and.returnValue(of([]));
   });
 
   it('should create', () => {
@@ -94,6 +102,7 @@ describe('InventoryManagementComponent', () => {
   });
 
   it('should handle error when fetching business entities', () => {
+    spyOn(console, 'error'); // silence expected error path
     businessEntityServiceSpy.getBusinessEntities.and.returnValue(throwError(() => new Error('fail')));
     component.fetchBusinessEntities();
     expect(component.isLoading).toBeFalse();
@@ -118,6 +127,7 @@ describe('InventoryManagementComponent', () => {
   });
 
   it('should handle error in onFilterChange', () => {
+    spyOn(console, 'error'); // silence expected error path
     inventoryServiceSpy.getInventoryByBusinessEntity.and.returnValue(throwError(() => new Error('fail')));
     component.onFilterChange(1);
     expect(component.errorMessage).toBe('Failed to load inventory data');
@@ -125,19 +135,17 @@ describe('InventoryManagementComponent', () => {
   });
 
   it('should handle error in forkJoin in onFilterChange', fakeAsync(() => {
-    inventoryServiceSpy.getInventoryByBusinessEntity.and.returnValue(of([{ productId: 1, quantity: 10, businessEntityId: 1, totalCostPrice: 100 }]));
+    spyOn(console, 'error'); // silence expected error path
+    inventoryServiceSpy.getInventoryByBusinessEntity.and.returnValue(
+      of([{ productId: 1, quantity: 10, businessEntityId: 1, totalCostPrice: 100 }])
+    );
     productServiceSpy.getProductById.and.returnValue(throwError(() => new Error('fail')));
     businessEntityServiceSpy.getBusinessEntityById.and.returnValue(of({
-      id: 1,
-      name: 'Shop 1',
-      location: 'Loc1',
-      type: 'Shop',
-      active: true,
-      external: false
+      id: 1, name: 'Shop 1', location: 'Loc1', type: 'Shop', active: true, external: false
     }));
 
-    component.paginator = { } as any;
-    component.sort = { } as any;
+    component.paginator = {} as any;
+    component.sort = {} as any;
 
     component.onFilterChange(1);
     tick();
@@ -148,25 +156,26 @@ describe('InventoryManagementComponent', () => {
     dialogSpy.open.and.returnValue({
       afterClosed: () => of(true)
     } as any);
-    spyOn<any>(component, 'refreshData');
+    const refreshSpy = spyOn<any>(component, 'refreshData');
     component.openModal();
     expect(component.isModalOpen).toBeFalse();
     expect(dialogSpy.open).toHaveBeenCalled();
-    expect((component as any).refreshData).toHaveBeenCalled();
+    expect(refreshSpy).toHaveBeenCalled();
   });
 
   it('should open modal and not refresh data on close without result', () => {
     dialogSpy.open.and.returnValue({
       afterClosed: () => of(null)
     } as any);
-    spyOn<any>(component, 'refreshData');
+    const refreshSpy = spyOn<any>(component, 'refreshData');
     component.openModal();
     expect(component.isModalOpen).toBeFalse();
     expect(dialogSpy.open).toHaveBeenCalled();
-    expect((component as any).refreshData).not.toHaveBeenCalled();
+    expect(refreshSpy).not.toHaveBeenCalled();
   });
 
   it('should handle error in loadInventoryTransaction', fakeAsync(() => {
+    spyOn(console, 'error'); // silence expected error path
     inventoryServiceSpy.getInventoryTransaction.and.returnValue(throwError(() => new Error('fail')));
     (component as any).loadInventoryTransaction();
     tick();
@@ -180,24 +189,20 @@ describe('InventoryManagementComponent', () => {
     (component as any).loadInventoryTransaction();
     tick();
     expect(component.errorMessage).toBe('No inventory transactions found.');
-  }));  
+  }));
 
   it('should handle error in productService.getProductById in onFilterChange', fakeAsync(() => {
+    spyOn(console, 'error'); // silence expected error path
     inventoryServiceSpy.getInventoryByBusinessEntity.and.returnValue(of([
       { productId: 1, quantity: 10, businessEntityId: 1, totalCostPrice: 100 }
     ]));
     productServiceSpy.getProductById.and.returnValue(throwError(() => new Error('fail')));
     businessEntityServiceSpy.getBusinessEntityById.and.returnValue(of({
-      id: 1,
-      name: 'Shop 1',
-      location: 'Loc1',
-      type: 'Shop',
-      active: true,
-      external: false
+      id: 1, name: 'Shop 1', location: 'Loc1', type: 'Shop', active: true, external: false
     }));
 
-    component.paginator = { } as any;
-    component.sort = { } as any;
+    component.paginator = {} as any;
+    component.sort = {} as any;
 
     component.onFilterChange(1);
     tick();
@@ -205,6 +210,7 @@ describe('InventoryManagementComponent', () => {
   }));
 
   it('should handle error in businessEntityService.getBusinessEntityById in onFilterChange', fakeAsync(() => {
+    spyOn(console, 'error'); // silence expected error path
     inventoryServiceSpy.getInventoryByBusinessEntity.and.returnValue(of([
       { productId: 1, quantity: 10, businessEntityId: 1, totalCostPrice: 100 }
     ]));
@@ -224,8 +230,8 @@ describe('InventoryManagementComponent', () => {
     }));
     businessEntityServiceSpy.getBusinessEntityById.and.returnValue(throwError(() => new Error('fail')));
 
-    component.paginator = { } as any;
-    component.sort = { } as any;
+    component.paginator = {} as any;
+    component.sort = {} as any;
 
     component.onFilterChange(1);
     tick();
@@ -257,6 +263,7 @@ describe('InventoryManagementComponent', () => {
 
   // Edge: loadInventoryTransaction returns null
   it('should handle null data in loadInventoryTransaction', fakeAsync(() => {
+    // Return null -> switchMap will treat as falsy and set "No inventory transactions found."
     inventoryServiceSpy.getInventoryTransaction.and.returnValue(of(null as any));
     (component as any).loadInventoryTransaction();
     tick();
