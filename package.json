@@ -29,7 +29,7 @@
     "angular-oauth2-oidc": "^19.0.0",
     "bootstrap": "^5.3.3",
     "fuse.js": "^7.1.0",
-    "jspdf": "^3.0.0",
+    "jspdf": "^3.0.2",
     "jwt-decode": "^4.0.0",
     "ng2-currency-mask": "^13.0.3",
     "ngx-scanner-qrcode": "^1.7.6",
