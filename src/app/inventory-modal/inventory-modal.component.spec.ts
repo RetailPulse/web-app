@@ -10,6 +10,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { of, throwError } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 
 describe('InventoryModalComponent', () => {
   let component: InventoryModalComponent;
@@ -66,9 +68,11 @@ describe('InventoryModalComponent', () => {
     await TestBed.configureTestingModule({
       imports: [
         InventoryModalComponent,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        NoopAnimationsModule
       ],
       providers: [
+        provideHttpClientTesting(), // guards against _HttpClient provider errors in the suite
         { provide: ProductService, useValue: mockProductService },
         { provide: BusinessEntityService, useValue: mockBusinessEntityService },
         { provide: InventoryModalService, useValue: mockInventoryModalService },
@@ -80,6 +84,10 @@ describe('InventoryModalComponent', () => {
 
     fixture = TestBed.createComponent(InventoryModalComponent);
     component = fixture.componentInstance;
+
+    // Default safe stubs so no real HTTP is attempted
+    mockProductService.getProducts.and.returnValue(of([...mockProducts]));
+    mockBusinessEntityService.getBusinessEntities.and.returnValue(of([...mockStores]));
   });
 
   it('should create', () => {
@@ -87,9 +95,9 @@ describe('InventoryModalComponent', () => {
   });
 
   it('should initialize data on ngOnInit', () => {
-    spyOn(component as any, 'initializeData');
+    const spyInit = spyOn<any>(component, 'initializeData').and.callThrough();
     component.ngOnInit();
-    expect((component as any).initializeData).toHaveBeenCalled();
+    expect(spyInit).toHaveBeenCalled();
   });
 
   it('should load products and filter only active', () => {
@@ -187,11 +195,11 @@ describe('InventoryModalComponent', () => {
   });
 
   it('should not submit if form is invalid', () => {
-    spyOn(component.importForm, 'markAllAsTouched');
+    const markAll = spyOn(component.importForm, 'markAllAsTouched').and.callThrough();
     component.selection.clear();
     component.importForm.get('sourceBusinessEntity')?.setValue(null);
     component.submit();
-    expect(component.importForm.markAllAsTouched).toHaveBeenCalled();
+    expect(markAll).toHaveBeenCalled();
     expect(mockInventoryModalService.createInventoryTransaction).not.toHaveBeenCalled();
   });
 
@@ -205,18 +213,32 @@ describe('InventoryModalComponent', () => {
     component.submit();
     expect(mockInventoryModalService.createInventoryTransaction).toHaveBeenCalled();
     expect(mockDialogRef.close).toHaveBeenCalledWith('success');
-    expect(mockSnackBar.open).toHaveBeenCalledWith('Inventory allocated successfully!', 'Close', jasmine.any(Object));
+    expect(mockSnackBar.open).toHaveBeenCalledWith(
+      'Inventory allocated successfully!',
+      'Close',
+      jasmine.any(Object)
+    );
   });
 
   it('should show error notification on submit error', () => {
+    // Silence error logs from the component for this test
+    spyOn(console, 'error');
+    spyOn(console, 'log');
+
     component.filteredProducts = [...mockProducts];
     component.initProductControls();
     component.selection.select(mockProducts[0]);
     component.importForm.get('sourceBusinessEntity')?.setValue(1);
     component.importForm.get('destinationBusinessEntity')?.setValue(2);
-    mockInventoryModalService.createInventoryTransaction.and.returnValue(throwError(() => new Error('fail')));
+    mockInventoryModalService.createInventoryTransaction.and.returnValue(
+      throwError(() => new Error('fail'))
+    );
     component.submit();
-    expect(mockSnackBar.open).toHaveBeenCalledWith('Failed to allocate inventory. Please try again.', 'Close', jasmine.any(Object));
+    expect(mockSnackBar.open).toHaveBeenCalledWith(
+      'Failed to allocate inventory. Please try again.',
+      'Close',
+      jasmine.any(Object)
+    );
   });
 
   it('should set error on duplicate entities', () => {

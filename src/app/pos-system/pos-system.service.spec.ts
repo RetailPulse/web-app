@@ -24,11 +24,13 @@ describe('PosSystemService', () => {
   let configSpy: jasmine.SpyObj<ConfigService>;
 
   beforeEach(() => {
-    // HttpClient spy (include all methods used by the service)
+    // Silence console noise that your service intentionally emits in error paths.
+    spyOn(console, 'error').and.stub();
+    spyOn(console, 'log').and.stub();
+
     httpSpy = jasmine.createSpyObj('HttpClient', ['post', 'delete', 'get']);
 
-    // ConfigService spy: ensure apiConfig.sales_api_url exists and ends with a slash
-    // so the service builds URLs like http://localhost/api/sales/...
+    // Ensure the base URL ends with a trailing slash so concatenations work as expected.
     configSpy = jasmine.createSpyObj('ConfigService', [], {
       apiConfig: { sales_api_url: 'http://localhost/' },
     });
@@ -91,7 +93,6 @@ describe('PosSystemService', () => {
         next: (result) => {
           expect(result).toEqual(taxResult);
           expect(httpSpy.post).toHaveBeenCalledTimes(1);
-          // Ends with calculateSalesTax; base comes from ConfigService
           expect(httpSpy.post.calls.argsFor(0)[0]).toMatch(/\/api\/sales\/calculateSalesTax$/);
           expect(httpSpy.post.calls.argsFor(0)[1]).toEqual(mapped);
           done();
@@ -145,7 +146,7 @@ describe('PosSystemService', () => {
         clientSecret: 'secret_abc',
         paymentId: 1001,
         paymentIntentId: 'pi_123',
-        paymentEventDate: '2025-10-31T12:00:00Z'
+        paymentEventDate: '2025-10-31T12:00:00Z',
       };
 
       const resp: CreateTransactionResponse = {
